@@ -44,7 +44,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Commander.cs" />
-    <Compile Include="ImageEntity.cs" />
+    <Compile Include="Entity_Galaxy.cs" />
+    <Compile Include="Entity_Image.cs" />
+    <Compile Include="Entity_Image_Background.cs" />
+    <Compile Include="Entity_StarRoutes.cs" />
+    <Compile Include="Entity_StarSystem.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
