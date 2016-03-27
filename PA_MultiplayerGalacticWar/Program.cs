@@ -20,6 +20,25 @@ namespace PA_MultiplayerGalacticWar
 		static private string PATH_PA = "C:/Program Files (x86)/Steam/steamapps/common/Planetary Annihilation Titans/";
 		static private string PATH_MOD = "C:/Users/mcorm/AppData/Local/Uber Entertainment/Planetary Annihilation/server_mods/com.pa.startege.TCommander/";
 		static private string PATH_BASE = "resources/json_base/";
+		static private string PATH_INVICTUS = "imperial_invictus/imperial_invictus";
+		static private string PATH_OSIRIS = "quad_osiris/quad_osiris";
+		static private string PATH_CENTURION = "raptor_centurion/raptor_centurion";
+
+		static private string[] Commander_Cards_Invictus =
+		{
+			"Miner Upgrade",
+			"Charging Upgrade",
+		};
+		static private string[] Commander_Cards_Osiris =
+		{
+			"Charging Upgrade",
+			"Charging Upgrade",
+		};
+		static private string[] Commander_Cards_Centurion =
+		{
+			"Miner Upgrade",
+			"Miner Upgrade",
+		};
 
 		static void Main( string[] args )
 		{
@@ -32,7 +51,7 @@ namespace PA_MultiplayerGalacticWar
 			// Create a Scene
 			var scene = new Scene();
 			{
-				scene.Add( new Entity_Image( 150, 150, PATH_MOD + "ui/main/shared/img/commanders/img_raptor_centurion.png" ) );
+				//scene.Add( new Entity_Image( 150, 150, PATH_MOD + "ui/main/shared/img/commanders/img_raptor_centurion.png" ) );
 				scene.Add( new Entity_Galaxy( scene, PATH_PA, PATH_MOD ) );
 			}
 			// Test json
@@ -47,37 +66,9 @@ namespace PA_MultiplayerGalacticWar
 					}
 				}
 
-				// Read file
-				string file = "pa/units/commanders/raptor_centurion/raptor_centurion.json";
-                String json = "";
-				try
-				{   // Open the text file using a stream reader.
-                    using ( StreamReader sr = new StreamReader( PATH_BASE + file ) )
-					{
-						// Read the stream to a string, and write the string to the console.
-						json = sr.ReadToEnd();
-					}
-				}
-				catch ( Exception e )
-				{
-					Console.WriteLine( "The file could not be read:" );
-					Console.WriteLine( e.Message );
-				}
-
-				// Parse and alter
-				Commander Commander_Loaded = JsonConvert.DeserializeObject<Commander>( json );
-				//Commander_Loaded.production.metal *= 20;
-				foreach ( Commander card in Cards_Commander )
-				{
-					Commander_Loaded.AddCard( card );
-				}
-
-				// Write back out
-				StreamWriter writer = new StreamWriter( PATH_MOD + file );
-				{
-					writer.WriteLine( JsonConvert.SerializeObject( Commander_Loaded ) );
-				}
-				writer.Close();
+				SetupCommander( PATH_INVICTUS, Commander_Cards_Invictus );
+				SetupCommander( PATH_OSIRIS, Commander_Cards_Osiris );
+				SetupCommander( PATH_CENTURION, Commander_Cards_Centurion );
 			}
 			// Start it up
 			game.Start( scene );
@@ -106,6 +97,47 @@ namespace PA_MultiplayerGalacticWar
 				json_cards.Add( json_card );
 			}
 			return json_cards;
+		}
+
+		static void SetupCommander( string commander, string[] cards )
+		{
+			// Read file
+			string file = "pa/units/commanders/" + commander + ".json";
+			String json = "";
+			try
+			{   // Open the text file using a stream reader.
+				using ( StreamReader sr = new StreamReader( PATH_BASE + file ) )
+				{
+					// Read the stream to a string, and write the string to the console.
+					json = sr.ReadToEnd();
+				}
+			}
+			catch ( Exception e )
+			{
+				Console.WriteLine( "The file could not be read:" );
+				Console.WriteLine( e.Message );
+			}
+
+			// Parse and alter
+			Commander Commander_Loaded = JsonConvert.DeserializeObject<Commander>( json );
+			foreach ( string cardname in cards )
+			{
+				foreach ( Commander card in Cards_Commander )
+				{
+					if ( card.display_name == cardname )
+					{
+						Commander_Loaded.AddCard( card );
+						break;
+					}
+				}
+			}
+
+			// Write back out
+			StreamWriter writer = new StreamWriter( PATH_MOD + file );
+			{
+				writer.WriteLine( JsonConvert.SerializeObject( Commander_Loaded ) );
+			}
+			writer.Close();
 		}
 	}
 }

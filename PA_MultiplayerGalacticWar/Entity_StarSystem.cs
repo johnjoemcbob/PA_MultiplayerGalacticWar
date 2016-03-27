@@ -16,28 +16,31 @@ namespace PA_MultiplayerGalacticWar
 {
 	class Entity_StarSystem : Entity
 	{
+		// System name and type (i.e. map)
+		public string Name = StarSystemInfos.Names.RandomElement() + StarSystemInfos.Name_Suffix.RandomElement();
+		public string Type = StarSystemInfos.Types.RandomElement();
 		// Team colour
 		public Color Colour = new Color( 0.6f, 0.5f, 0.5f );
 
 		// Images
-		private Entity_Image Selected;
+		private Entity_Image SelectCircle;
 		private Entity_Image Owner;
 		private Entity_Image Star;
 		// Lerp
 		private float Time_Lerp;
 		// Selection
-		private bool Select = false;
+		private bool Selected = false;
 		private bool Hover = false;
 
 		public Entity_StarSystem( Scene scene, float x, float y, string path_pa, string path_mod ) : base( x, y )
 		{
-			Selected = new Entity_Image( x, y, "resources/selected.png" );
+			SelectCircle = new Entity_Image( x, y, "resources/selected.png" );
 			{
-				Selected.image.Scale = 0.5f;
-				Selected.image.Alpha = 0;
-				Selected.image.Scroll = 1;
+				SelectCircle.image.Scale = 0.5f;
+				SelectCircle.image.Alpha = 0;
+				SelectCircle.image.Scroll = 1;
 			}
-			AddGraphics( Selected.Graphic );
+			AddGraphics( SelectCircle.Graphic );
 
 			Owner = new Entity_Image( x, y, "resources/owner.png" );
 			{
@@ -84,8 +87,7 @@ namespace PA_MultiplayerGalacticWar
 			{
 				if ( Collider.Overlap( 0.5f, 0.5f, x, y ) )
 				{
-					Select = true;
-					Selected.image.Alpha = 1;
+					Select();
 				}
 				else
 				{
@@ -100,7 +102,7 @@ namespace PA_MultiplayerGalacticWar
 			// Pulse slightly
 			float extradist = 2;
 			{
-				if ( Select )
+				if ( Selected )
 				{
 					extradist *= 2;
 				}
@@ -110,7 +112,7 @@ namespace PA_MultiplayerGalacticWar
 				}
 			}
 			float offset = ( X / Game.Instance.Width ) / 10;
-			float speed = 0.05f;
+			float speed = 0.03f;
 			Time_Lerp += ( Game.Instance.DeltaTime * ( speed * extradist ) ) + offset;
 			float lerp = (float) Math.Sin( Time_Lerp + offset );
 			{
@@ -127,10 +129,17 @@ namespace PA_MultiplayerGalacticWar
 			}
 		}
 
+		private void Select()
+		{
+			Selected = true;
+			SelectCircle.image.Alpha = 1;
+			Console.WriteLine( Name + ": "+ Type );
+		}
+
 		private void Deselect()
 		{
-			Select = false;
-			Selected.image.Alpha = 0;
+			Selected = false;
+			SelectCircle.image.Alpha = 0;
 		}
 	}
 }

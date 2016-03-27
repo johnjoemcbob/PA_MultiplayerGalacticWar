@@ -1,0 +1,26 @@
+{
+	"display_name":"Sprinter Upgrade",
+	"description":"10% increase in base commander speed",
+	"navigation":{
+		"type":"amphibious",
+		"acceleration":0,
+		"brake":0,
+		"move_speed":10,
+		"turn_speed":0,
+		"turn_in_place":false,
+		"park_stamp":{
+			"shape":"sphere",
+			"cost":0,
+			"type_data":[
+				{
+					"move_type":"land-small",
+					"stamp_type":"simple"
+				},
+				{
+					"move_type":"amphibious",
+					"stamp_type":"simple"
+				}
+			]
+		}
+	}
+}

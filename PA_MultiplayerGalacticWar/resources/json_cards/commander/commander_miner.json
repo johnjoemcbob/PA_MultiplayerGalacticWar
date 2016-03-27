@@ -1,0 +1,8 @@
+{
+	"display_name":"Miner Upgrade",
+	"description":"200% increase in base metal production",
+	"production":{
+		"energy":0.0,
+		"metal":200.0
+	}
+}

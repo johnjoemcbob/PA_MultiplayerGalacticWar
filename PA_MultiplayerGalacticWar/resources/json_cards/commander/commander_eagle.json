@@ -1,0 +1,28 @@
+{
+	"display_name":"Eagle Upgrade",
+	"description":"200% increase in base commander sight",
+	"recon":{
+		"observer":{
+			"items":[
+				{
+					"layer":"surface_and_air",
+					"channel":"sight",
+					"shape":"capsule",
+					"radius":200
+				},
+				{
+					"layer":"underwater",
+					"channel":"sight",
+					"shape":"capsule",
+					"radius":0
+				},
+				{
+					"layer":"celestial",
+					"channel":"sight",
+					"shape":"sphere",
+					"radius":0
+				}
+			]
+		}
+	}
+}

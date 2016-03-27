@@ -1,0 +1,8 @@
+{
+	"display_name":"Charging Upgrade",
+	"description":"50% increase in base energy production",
+	"production":{
+		"energy":50.0,
+		"metal":0.0
+	}
+}
