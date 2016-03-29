@@ -4,6 +4,7 @@
 
 using Otter;
 using System;
+using System.Drawing;
 using System.IO;
 using System.Collections.Generic;
 using System.Linq;
@@ -69,7 +70,9 @@ namespace PA_MultiplayerGalacticWar
 				SetupCommander( PATH_INVICTUS, Commander_Cards_Invictus );
 				SetupCommander( PATH_OSIRIS, Commander_Cards_Osiris );
 				SetupCommander( PATH_CENTURION, Commander_Cards_Centurion );
-			}
+
+				SetupArmies( PATH_PA + "media/pa/units/", new int[]{ 0, 1, 2, 3, 4, 5 } );
+            }
 			// Start it up
 			game.Start( scene );
 		}
@@ -80,20 +83,7 @@ namespace PA_MultiplayerGalacticWar
 			string[] fileEntries = Directory.GetFiles( directory );
 			foreach ( string filename in fileEntries )
 			{
-				String json_card = "";
-				try
-				{   // Open the text file using a stream reader.
-					using ( StreamReader sr = new StreamReader( filename ) )
-					{
-						// Read the stream to a string, and write the string to the console.
-						json_card = sr.ReadToEnd();
-					}
-				}
-				catch ( Exception e )
-				{
-					Console.WriteLine( "The file could not be read:" );
-					Console.WriteLine( e.Message );
-				}
+				String json_card = ReadJSON( filename );
 				json_cards.Add( json_card );
 			}
 			return json_cards;
@@ -103,20 +93,7 @@ namespace PA_MultiplayerGalacticWar
 		{
 			// Read file
 			string file = "pa/units/commanders/" + commander + ".json";
-			String json = "";
-			try
-			{   // Open the text file using a stream reader.
-				using ( StreamReader sr = new StreamReader( PATH_BASE + file ) )
-				{
-					// Read the stream to a string, and write the string to the console.
-					json = sr.ReadToEnd();
-				}
-			}
-			catch ( Exception e )
-			{
-				Console.WriteLine( "The file could not be read:" );
-				Console.WriteLine( e.Message );
-			}
+			String json = ReadJSON( PATH_BASE + file );
 
 			// Parse and alter
 			Commander Commander_Loaded = JsonConvert.DeserializeObject<Commander>( json );
@@ -138,6 +115,159 @@ namespace PA_MultiplayerGalacticWar
 				writer.WriteLine( JsonConvert.SerializeObject( Commander_Loaded ) );
 			}
 			writer.Close();
+		}
+
+		static void SetupArmies( string directory, int[] commanders )
+		{
+			// Find all unit files which are NOT the commanders
+			List<string> file_units = new List<string>();
+			{
+				SetupArmies_ProcessDirectory( ref file_units, directory, directory );
+			}
+
+			// Setup same folder structure in mod
+			string basedir = PATH_MOD + "pa/units";
+			foreach ( string unit in file_units )
+			{
+				// Ensure all the slashes are forward
+				string temp = unit.Replace( "\\", "/" );
+
+				// Substring each part of the path by forwardslash
+				string[] dirs = temp.Split( '/' );
+				string curdir = basedir;
+				foreach ( string dir in dirs )
+				{
+					// Isn't file, check for directory existance or create
+					if ( !dir.Contains( ".json" ) )
+					{
+						curdir += "/" + dir;
+						if ( !Directory.Exists( curdir ) )
+						{
+							Directory.CreateDirectory( curdir );
+						}
+					}
+				}
+			}
+
+			// Save copy for each commander
+			// TEST: add name to end of each unit displayname
+			List<string> commander_units = new List<string>();
+			foreach ( int commanderid in commanders )
+			{
+				foreach ( string unit in file_units )
+				{
+					// Ensure all the slashes are forward (purely for visuals)
+					string temp = unit.Replace( "\\", "/" );
+
+					// Get commander unique unit path
+					string unit_command = temp.Substring( 0, temp.Length - 5 ) + commanderid + ".json";
+					if ( commanderid == 0 )
+					{
+						commander_units.Add( temp );
+					}
+					commander_units.Add( unit_command );
+
+					// Load default unit
+					String json = ReadJSON( directory + temp );
+
+					// Parse and alter
+					Unit Unit_Loaded = JsonConvert.DeserializeObject<Unit>( json );
+					Unit_Loaded.display_name += commanderid;
+					Unit_Loaded.description += "MATTHEW" + commanderid;
+
+					// Save commander unique unit
+					string newfile = basedir + "/" + unit_command;
+					StreamWriter writer = new StreamWriter( newfile );
+					{
+						writer.WriteLine( JsonConvert.SerializeObject( Unit_Loaded ) );
+					}
+					writer.Close();
+
+					// Also include the icon image for this unit
+					string iconfile = temp.Substring( 0, temp.Length - 5 ) + "_icon_buildbar.png";
+					if ( File.Exists( directory + iconfile ) )
+					{
+						string iconfile_commander = temp.Substring( 0, temp.Length - 5 ) + commanderid + "_icon_buildbar.png"; ;
+                        System.Drawing.Image icon = Bitmap.FromFile( directory + iconfile );
+						icon.Save( basedir + "/" + iconfile_commander, System.Drawing.Imaging.ImageFormat.Png );
+					}
+     //               StreamReader file_icon_read = new StreamReader( directory + iconfile );
+					//{
+					//	StreamWriter file_icon_write = new StreamWriter( basedir + "/" + iconfile );
+					//	{
+					//		writer.Write( file_icon_read.ReadToEnd() );
+     //                   }
+					//	file_icon_write.Close();
+					//}
+					//file_icon_read.Close();
+				}
+			}
+
+			// Update unit_list.json
+			{
+				// Load base
+				string filename = "unit_list.json";
+				String json = ReadJSON( directory + filename );
+
+				// Parse and add units
+				UnitList UnitList_Loaded = JsonConvert.DeserializeObject<UnitList>( json );
+				foreach ( string unit in commander_units )
+				{
+					UnitList_Loaded.units.Add( "/pa/units/" + unit );
+				}
+
+				// Write back out
+				string newfile = basedir + "/" + filename;
+				StreamWriter writer = new StreamWriter( newfile );
+				{
+					writer.WriteLine( JsonConvert.SerializeObject( UnitList_Loaded ) );
+				}
+				writer.Close();
+			}
+		}
+
+		static void SetupArmies_ProcessDirectory( ref List<string> file_units, string basedir, string curdir )
+		{
+			// Process the list of files found in the directory
+			string[] fileEntries = Directory.GetFiles( curdir, "*.json" );
+			foreach ( string filename in fileEntries )
+			{
+				// Ignore unit_list.json
+				if ( !filename.Contains( "unit_list.json" ) )
+				{
+					// Remove unit path prefix
+					file_units.Add( filename.Substring( basedir.Length ) );
+				}
+			}
+
+			// Recurse into subdirectories of this directory
+			string[] subdirectoryEntries = Directory.GetDirectories( curdir );
+			foreach ( string subdirectory in subdirectoryEntries )
+			{
+				// Ignore commander files, these are loaded separately
+				if ( !subdirectory.Contains( "commander" ) )
+				{
+					SetupArmies_ProcessDirectory( ref file_units, basedir, subdirectory );
+				}
+			}
+		}
+
+		static string ReadJSON( string file )
+		{
+			try
+			{   // Open the text file using a stream reader.
+				using ( StreamReader sr = new StreamReader( file ) )
+				{
+					// Read the stream to a string, and write the string to the console.
+					return sr.ReadToEnd();
+				}
+			}
+			catch ( Exception e )
+			{
+				Console.WriteLine( "The file could not be read:" );
+				Console.WriteLine( e.Message );
+			}
+			return "";
 		}
 	}
 }
