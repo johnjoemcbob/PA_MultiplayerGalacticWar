@@ -7,6 +7,7 @@ using System;
 using System.Drawing;
 using System.IO;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -16,30 +17,25 @@ namespace PA_MultiplayerGalacticWar
 {
 	class Program
 	{
-		static private List<Commander> Cards_Commander = new List<Commander>();
+		static public bool Clicked = false;
 
-		static private string PATH_PA = "C:/Program Files (x86)/Steam/steamapps/common/Planetary Annihilation Titans/";
-		static private string PATH_MOD = "C:/Users/mcorm/AppData/Local/Uber Entertainment/Planetary Annihilation/server_mods/com.pa.startege.TCommander/";
-		static private string PATH_BASE = "resources/json_base/";
-		static private string PATH_INVICTUS = "imperial_invictus/imperial_invictus";
-		static private string PATH_OSIRIS = "quad_osiris/quad_osiris";
-		static private string PATH_CENTURION = "raptor_centurion/raptor_centurion";
+		static public List<string> ExtraUnits = new List<string>();
+		static public List<dynamic> Cards_Commander = new List<dynamic>();
+		static public List<dynamic> Cards = new List<dynamic>();
 
-		static private string[] Commander_Cards_Invictus =
-		{
-			"Miner Upgrade",
-			"Charging Upgrade",
+		static public string PATH_PA = "C:/Program Files (x86)/Steam/steamapps/common/Planetary Annihilation Titans/";
+		static public string PATH_MOD = "C:/Users/mcorm/AppData/Local/Uber Entertainment/Planetary Annihilation/server_mods/com.pa.startege.TCommander/";
+		static public string PATH_BASE = "resources/json_base/";
+		static public string[] PATH_COMMANDER = new string[] {
+			"imperial_invictus/imperial_invictus",
+			"quad_osiris/quad_osiris",
+			"raptor_centurion/raptor_centurion"
 		};
-		static private string[] Commander_Cards_Osiris =
-		{
-			"Charging Upgrade",
-			"Charging Upgrade",
-		};
-		static private string[] Commander_Cards_Centurion =
-		{
-			"Miner Upgrade",
-			"Miner Upgrade",
-		};
+		static public int COMMANDER_INVICTUS = 0;
+		static public int COMMANDER_OSIRIS = 1;
+		static public int COMMANDER_CENTURION = 2;
+
+		static public Otter.Font Font = new Otter.Font( Program.PATH_PA + "media/ui/main/shared/font/Sansation_Bold-webfont.ttf" );
 
 		static void Main( string[] args )
 		{
@@ -49,32 +45,36 @@ namespace PA_MultiplayerGalacticWar
 				game.MouseVisible = true;
 			}
 
-			// Create a Scene
-			var scene = new Scene();
-			{
-				//scene.Add( new Entity_Image( 150, 150, PATH_MOD + "ui/main/shared/img/commanders/img_raptor_centurion.png" ) );
-				scene.Add( new Entity_Galaxy( scene, PATH_PA, PATH_MOD ) );
-			}
 			// Test json
 			{
 				List<string> json_card_commander = LoadCards( "resources/json_cards/commander/" );
 				{
 					foreach ( string json_card in json_card_commander )
 					{
-						Commander card_commander = JsonConvert.DeserializeObject<Commander>( json_card );
+						dynamic card_commander = JsonConvert.DeserializeObject( json_card );
 						// Add to card container
 						Cards_Commander.Add( card_commander );
 					}
 				}
+				List<string> json_card_unit = LoadCards( "resources/json_cards/" );
+				{
+					foreach ( string json_card in json_card_unit )
+					{
+						dynamic card = JsonConvert.DeserializeObject( json_card );
+						// Add to card container
+						Cards.Add( card );
+					}
+				}
 
-				SetupCommander( PATH_INVICTUS, Commander_Cards_Invictus );
-				SetupCommander( PATH_OSIRIS, Commander_Cards_Osiris );
-				SetupCommander( PATH_CENTURION, Commander_Cards_Centurion );
+				//SetupCommander( PATH_INVICTUS, Commander_Cards_Invictus );
+				//SetupCommander( PATH_OSIRIS, Commander_Cards_Osiris );
+				//SetupCommander( PATH_CENTURION, Commander_Cards_Centurion );
 
-				SetupArmies( PATH_PA + "media/pa/units/", new int[]{ 0, 1, 2, 3, 4, 5 } );
-            }
-			// Start it up
-			game.Start( scene );
+				//SetupArmies( PATH_PA + "media/pa/units/", new int[]{ 0, 1, 2, 3, 4, 5 } );
+			}
+
+			// Start up in the choose game scene
+			game.Start( new Scene_ChooseGame() );
 		}
 
 		static List<string> LoadCards( string directory )
@@ -89,21 +89,21 @@ namespace PA_MultiplayerGalacticWar
 			return json_cards;
 		}
 
-		static void SetupCommander( string commander, string[] cards )
+		static public void SetupCommander( string commander, List<string> cards )
 		{
 			// Read file
 			string file = "pa/units/commanders/" + commander + ".json";
 			String json = ReadJSON( PATH_BASE + file );
 
 			// Parse and alter
-			Commander Commander_Loaded = JsonConvert.DeserializeObject<Commander>( json );
+			dynamic Commander_Loaded = JsonConvert.DeserializeObject( json );
 			foreach ( string cardname in cards )
 			{
-				foreach ( Commander card in Cards_Commander )
+				foreach ( dynamic card in Cards_Commander )
 				{
-					if ( card.display_name == cardname )
+					if ( card["display_name"].Value == cardname )
 					{
-						Commander_Loaded.AddCard( card );
+						Commander.AddCard( Commander_Loaded, card );
 						break;
 					}
 				}
@@ -117,7 +117,7 @@ namespace PA_MultiplayerGalacticWar
 			writer.Close();
 		}
 
-		static void SetupArmies( string directory, int[] commanders )
+		static public void SetupArmy( string directory, int army, List<string> cards )
 		{
 			// Find all unit files which are NOT the commanders
 			List<string> file_units = new List<string>();
@@ -151,35 +151,32 @@ namespace PA_MultiplayerGalacticWar
 
 			// Save copy for each commander
 			// TEST: add name to end of each unit displayname
-			List<string> commander_units = new List<string>();
-			foreach ( int commanderid in commanders )
+			foreach ( string unit in file_units )
 			{
-				foreach ( string unit in file_units )
+				if ( !unit.Contains( "base" ) )
 				{
 					// Ensure all the slashes are forward (purely for visuals)
 					string temp = unit.Replace( "\\", "/" );
 
 					// Get commander unique unit path
-					string unit_command = temp.Substring( 0, temp.Length - 5 ) + commanderid + ".json";
-					if ( commanderid == 0 )
-					{
-						commander_units.Add( temp );
-					}
-					commander_units.Add( unit_command );
+					string unit_command = temp.Substring( 0, temp.Length - 5 ) + army + ".json";
+					ExtraUnits.Add( unit_command );
 
 					// Load default unit
 					String json = ReadJSON( directory + temp );
 
 					// Parse and alter
-					Unit Unit_Loaded = JsonConvert.DeserializeObject<Unit>( json );
-					Unit_Loaded.display_name += commanderid;
-					Unit_Loaded.description += "MATTHEW" + commanderid;
+					dynamic Unit_Loaded = JsonConvert.DeserializeObject( json );
+					if ( Unit_Loaded["display_name"] != null )
+					{
+						Unit_Loaded["display_name"] = Unit_Loaded["display_name"].Value + army; // TEMP
+					}
 
 					// Save commander unique unit
 					string newfile = basedir + "/" + unit_command;
 					StreamWriter writer = new StreamWriter( newfile );
 					{
-						writer.WriteLine( JsonConvert.SerializeObject( Unit_Loaded ) );
+                        writer.WriteLine( JsonConvert.SerializeObject( Unit_Loaded ) );
 					}
 					writer.Close();
 
@@ -187,21 +184,27 @@ namespace PA_MultiplayerGalacticWar
 					string iconfile = temp.Substring( 0, temp.Length - 5 ) + "_icon_buildbar.png";
 					if ( File.Exists( directory + iconfile ) )
 					{
-						string iconfile_commander = temp.Substring( 0, temp.Length - 5 ) + commanderid + "_icon_buildbar.png"; ;
-                        System.Drawing.Image icon = Bitmap.FromFile( directory + iconfile );
+						string iconfile_commander = temp.Substring( 0, temp.Length - 5 ) + army + "_icon_buildbar.png"; ;
+						System.Drawing.Image icon = Bitmap.FromFile( directory + iconfile );
 						icon.Save( basedir + "/" + iconfile_commander, System.Drawing.Imaging.ImageFormat.Png );
 					}
-     //               StreamReader file_icon_read = new StreamReader( directory + iconfile );
-					//{
-					//	StreamWriter file_icon_write = new StreamWriter( basedir + "/" + iconfile );
-					//	{
-					//		writer.Write( file_icon_read.ReadToEnd() );
-     //                   }
-					//	file_icon_write.Close();
-					//}
-					//file_icon_read.Close();
+				}
+				else
+				{
+					Console.WriteLine( "Skipping: " + unit );
 				}
 			}
+
+			// TODO!
+			// Update strategic icons for each of the new units
+			{
+				// media\ui\main\atlas\icon_atlas\img\strategic_icons
+			}
+		}
+
+		static public void EndSetupArmy( string directory )
+		{
+			string basedir = PATH_MOD + "pa/units";
 
 			// Update unit_list.json
 			{
@@ -211,7 +214,7 @@ namespace PA_MultiplayerGalacticWar
 
 				// Parse and add units
 				UnitList UnitList_Loaded = JsonConvert.DeserializeObject<UnitList>( json );
-				foreach ( string unit in commander_units )
+				foreach ( string unit in ExtraUnits )
 				{
 					UnitList_Loaded.units.Add( "/pa/units/" + unit );
 				}
@@ -252,7 +255,7 @@ namespace PA_MultiplayerGalacticWar
 			}
 		}
 
-		static string ReadJSON( string file )
+		static public string ReadJSON( string file )
 		{
 			try
 			{   // Open the text file using a stream reader.

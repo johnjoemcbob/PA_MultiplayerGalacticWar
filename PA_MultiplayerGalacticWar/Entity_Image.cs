@@ -13,20 +13,24 @@ namespace PA_MultiplayerGalacticWar
 {
 	class Entity_Image : Entity
 	{
-		public Image image;
+		public bool LerpToTarget = true;
+        public Graphic image;
 
 		private Vector2 Target = Vector2.Zero;
 
-		public Entity_Image( float x, float y, string imagepath ) : base( x, y )
+		public Entity_Image( float x, float y, string imagepath, bool init = true ) : base( x, y )
 		{
-			// Create an Image using the path passed in with the constructor
-			image = new Image( imagepath );
+			if ( init )
 			{
-				// Center the origin of the Image
-				image.CenterOrigin();
+				// Create an Image using the path passed in with the constructor
+				image = new Image( imagepath );
+				{
+					// Center the origin of the Image
+					image.CenterOrigin();
+				}
+				// Add the Image to the Entity's Graphic list.
+				AddGraphic( image );
 			}
-			// Add the Image to the Entity's Graphic list.
-			AddGraphic( image );
 
 			Target.X = x;
 			Target.Y = y;
@@ -37,10 +41,23 @@ namespace PA_MultiplayerGalacticWar
 			base.Update();
 
 			// Lerp the position towards the target
+			if ( LerpToTarget )
 			{
 				X += ( Target.X - X ) * Game.DeltaTime;
 				Y += ( Target.Y - Y ) * Game.DeltaTime;
 			}
+		}
+
+		public void NineSlice( string file, int slicewidth, int sliceheight, int width, int height )
+		{
+			image = new NineSlice( file, slicewidth, sliceheight );
+			{
+				( (NineSlice) image ).PanelWidth = width;
+				( (NineSlice) image ).PanelHeight = height;
+
+				image.CenterOrigin();
+			}
+			AddGraphic( image );
 		}
 
 		public void SetTarget( Vector2 target )

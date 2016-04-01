@@ -1,6 +1,6 @@
 {
-	"display_name":"Miner Upgrade",
-	"description":"200% increase in base metal production",
+	"display_name":"Foreman Commander",
+	"description":"Your commander is specialised in\nproducing metal.\n\nGain a 100% increase to base metal\nproduction.",
 	"production":{
 		"energy":0.0,
 		"metal":200.0

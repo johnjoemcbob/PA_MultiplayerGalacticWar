@@ -17,6 +17,9 @@ namespace PA_MultiplayerGalacticWar
 		private Entity_Image Background_Stars1;
 		private Entity_Image Background_Stars2;
 		private Entity_Image Background_Galaxy;
+		// Camera
+		private Vector2 CameraTarget;
+		private Vector2 CameraPos;
 
 		public Entity_Image_Background( Scene scene, string path_pa, string path_mod )
 		{
@@ -43,6 +46,26 @@ namespace PA_MultiplayerGalacticWar
 				Background_Galaxy.image.Scroll = 1;
 			}
 			scene.Add( Background_Galaxy );
+		}
+
+		public override void Update()
+		{
+			base.Update();
+
+			// Update camera
+			CameraTarget = new Vector2( Input.MouseScreenX, Input.MouseScreenY );
+			{
+				// Clamp
+				float dist = 10 / Scene.Instance.CameraZoom;
+				float maxdist = 40;
+				CameraTarget.X = Math.Max( -maxdist, Math.Min( maxdist, CameraTarget.X / dist ) );
+				CameraTarget.Y = Math.Max( -maxdist, Math.Min( maxdist, CameraTarget.Y / dist ) );
+
+				// Lerp
+				CameraPos.X += ( CameraTarget.X - CameraPos.X ) * 0.1f * Game.Instance.DeltaTime;
+				CameraPos.Y += ( CameraTarget.Y - CameraPos.Y ) * 0.1f * Game.Instance.DeltaTime;
+			}
+			Scene.Instance.CenterCamera( CameraPos.X, CameraPos.Y );
 		}
 
 		public Entity_Image GetGalaxy()

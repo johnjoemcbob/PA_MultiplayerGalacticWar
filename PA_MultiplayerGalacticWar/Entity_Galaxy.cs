@@ -18,9 +18,6 @@ namespace PA_MultiplayerGalacticWar
         private Entity_Image Galaxy;
 		private List<Entity_StarSystem> StarSystems = new List<Entity_StarSystem>();
 		private Entity_StarRoutes StarRoutes;
-		// Camera
-		private Vector2 CameraTarget;
-		private Vector2 CameraPos;
 		// Zooming
 		private float Zoom = 1;
 		private float ZoomTarget = 1;
@@ -69,21 +66,6 @@ namespace PA_MultiplayerGalacticWar
 		public override void Update()
 		{
 			base.Update();
-
-			// Update camera
-			CameraTarget = new Vector2( Input.MouseScreenX, Input.MouseScreenY );
-			{
-				// Clamp
-				float dist = 10 / Zoom;
-				float maxdist = 40;
-				CameraTarget.X = Math.Max( -maxdist, Math.Min( maxdist, CameraTarget.X / dist ) );
-				CameraTarget.Y = Math.Max( -maxdist, Math.Min( maxdist, CameraTarget.Y / dist ) );
-
-				// Lerp
-				CameraPos.X += ( CameraTarget.X - CameraPos.X ) * 0.1f * Game.Instance.DeltaTime;
-				CameraPos.Y += ( CameraTarget.Y - CameraPos.Y ) * 0.1f * Game.Instance.DeltaTime;
-			}
-			Scene.Instance.CenterCamera( CameraPos.X, CameraPos.Y );
 
 			UpdateZoom();
         }

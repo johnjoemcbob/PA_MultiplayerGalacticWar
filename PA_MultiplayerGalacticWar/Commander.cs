@@ -7,6 +7,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace PA_MultiplayerGalacticWar
 {
@@ -47,6 +49,7 @@ namespace PA_MultiplayerGalacticWar
 		public float brake;
 		public float move_speed;
 		public float turn_speed;
+		public float turn_accel;
 		public bool turn_in_place;
 	}
 
@@ -73,42 +76,41 @@ namespace PA_MultiplayerGalacticWar
 		public String catalog_object_name;
 		public Object client; // ?????
 
-		public void AddCard( Commander card )
+		static public void AddCard( JObject commander, JObject card )
 		{
-			if ( card.max_health != 0 )
+			AddIndividualCard( ref commander, ref card, "max_health" );
+			AddIndividualCard( ref commander, ref card, "production", "energy" );
+			AddIndividualCard( ref commander, ref card, "production", "metal" );
+			AddIndividualCard( ref commander, ref card, "storage", "energy" );
+			AddIndividualCard( ref commander, ref card, "storage", "metal" );
+			AddIndividualCard( ref commander, ref card, "navigation", "move_speed" );
+
+			//if ( ( card.recon.observer.items != null ) && ( card.recon.observer.items.Length != 0 ) )
+			//{
+			//	for ( int id = 0; id < card.recon.observer.items.Length; id++ )
+			//	{
+			//                 if ( card.recon.observer.items[id].radius != 0 )
+			//		{
+			//			recon.observer.items[id].radius += recon.observer.items[id].radius / 100 * card.recon.observer.items[id].radius;
+			//                 }
+			//	}
+			//}
+		}
+
+		static public void AddIndividualCard( ref JObject commander, ref JObject card, string key )
+		{
+			if ( ( commander[key] != null ) && ( card[key] != null ) )
 			{
-				max_health += max_health / 100 * card.max_health;
-			}
-			if ( card.production.energy != 0 )
-			{
-				production.energy += production.energy / 100 * card.production.energy;
-			}
-			if ( card.production.metal != 0 )
-			{
-				production.metal += production.metal / 100 * card.production.metal;
-			}
-			if ( card.storage.energy != 0 )
-			{
-				storage.energy += storage.energy / 100 * card.storage.energy;
-			}
-			if ( card.storage.metal != 0 )
-			{
-				storage.metal += storage.metal / 100 * card.storage.metal;
-			}
-			if ( card.navigation.move_speed != 0 )
-			{
-				navigation.move_speed += navigation.move_speed / 100 * card.navigation.move_speed;
-			}
-			if ( ( card.recon.observer.items != null ) && ( card.recon.observer.items.Length != 0 ) )
-			{
-				for ( int id = 0; id < card.recon.observer.items.Length; id++ )
-				{
-                    if ( card.recon.observer.items[id].radius != 0 )
-					{
-						recon.observer.items[id].radius += recon.observer.items[id].radius / 100 * card.recon.observer.items[id].radius;
-                    }
-				}
+				commander[key] = float.Parse( commander[key].ToString() ) + ( ( float.Parse( commander[key].ToString() ) / 100.0f * float.Parse( card[key].ToString() ) ) );
 			}
 		}
-    }
+
+		static public void AddIndividualCard( ref JObject commander, ref JObject card, string key, string key2 )
+		{
+			if ( ( commander[key] != null ) && ( card[key] != null ) && ( commander[key][key2] != null ) && ( card[key][key2] != null ) )
+			{
+				commander[key][key2] = float.Parse( commander[key][key2].ToString() ) + ( ( float.Parse( commander[key][key2].ToString() ) / 100.0f * float.Parse( card[key][key2].ToString() ) ) );
+			}
+		}
+	}
 }

@@ -1,6 +1,6 @@
 {
-	"display_name":"Charging Upgrade",
-	"description":"50% increase in base energy production",
+	"display_name":"Powerhouse Commander",
+	"description":"Your commander is specialised in\nproducing energy.\n\nGain a 50% increase to base energy\nproduction.",
 	"production":{
 		"energy":50.0,
 		"metal":0.0
