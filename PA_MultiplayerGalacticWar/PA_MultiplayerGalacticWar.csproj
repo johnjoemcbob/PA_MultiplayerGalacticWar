@@ -46,12 +46,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Commander.cs" />
-    <Compile Include="Entity_Card.cs" />
     <Compile Include="Entity_Galaxy.cs" />
     <Compile Include="Entity_Image.cs" />
     <Compile Include="Entity_Image_Background.cs" />
     <Compile Include="Entity_StarRoutes.cs" />
     <Compile Include="Entity_StarSystem.cs" />
+    <Compile Include="Entity_UIPanel_Card.cs" />
+    <Compile Include="Entity_UIPanel_StarSystem.cs" />
     <Compile Include="Entity_UI_Button.cs" />
     <Compile Include="Helper.cs" />
     <Compile Include="Info_Game.cs" />

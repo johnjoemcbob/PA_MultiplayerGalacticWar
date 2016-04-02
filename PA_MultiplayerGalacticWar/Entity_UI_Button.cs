@@ -25,6 +25,8 @@ namespace PA_MultiplayerGalacticWar
 		public MouseEvent OnHover = delegate () {};
 		public MouseEvent OnUnHover = delegate () {};
 		public Vector2 Scroll = new Vector2( 0, -0.1f );
+		public Color Colour_Default = Color.White;
+		public Color Colour_Hover = Color.Green;
 
 		public bool Hover = false;
 
@@ -35,11 +37,11 @@ namespace PA_MultiplayerGalacticWar
 		{
 			OnHover = delegate ()
 			{
-				Image.image.Color = Color.Green;
+				Image.image.Color = Colour_Hover;
 			};
 			OnUnHover = delegate ()
 			{
-				Image.image.Color = Color.White;
+				Image.image.Color = Colour_Default;
 			};
 		}
 
@@ -53,7 +55,8 @@ namespace PA_MultiplayerGalacticWar
 				int height = (int) ( ButtonBounds.W );
 				Image.NineSlice( Program.PATH_PA + "media/ui/main/shared/img/buttons/btn_lrg_std.png", 82, 50, width, height );
 
-				Image.SetTarget( Center + new Vector2( ButtonBounds.X, ButtonBounds.Y ) );
+				Image.image.Color = Colour_Default;
+                Image.SetTarget( Center + new Vector2( ButtonBounds.X, ButtonBounds.Y ) );
 				Image.image.ScrollX = Scroll.X;
 				Image.image.ScrollY = Scroll.Y;
 			}

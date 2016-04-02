@@ -38,6 +38,7 @@ namespace PA_MultiplayerGalacticWar
 			// Setup buttons
 			Button_New = new Entity_UI_Button();
 			{
+				Button_New.Label = "NEW";
 				Vector2 pos = new Vector2( 0, -100 );
                 Button_New.ButtonBounds = new Vector4( pos.X, pos.Y, 256, 48 );
 				Button_New.OnPressed = delegate()
@@ -49,7 +50,7 @@ namespace PA_MultiplayerGalacticWar
 			Add( Button_New );
 			Button_Continue = new Entity_UI_Button();
 			{
-				Button_Continue.Label = "Continue";
+				Button_Continue.Label = "CONTINUE";
 				Vector2 pos = new Vector2( 0, -25 );
 				Button_Continue.ButtonBounds = new Vector4( pos.X, pos.Y, 256, 48 );
 				Button_Continue.OnPressed = delegate ()
@@ -61,7 +62,7 @@ namespace PA_MultiplayerGalacticWar
 			Add( Button_Continue );
 			Button_Load = new Entity_UI_Button();
 			{
-				Button_Load.Label = "Load Game";
+				Button_Load.Label = "LOAD GAME";
 				Vector2 pos = new Vector2( 0, 50 );
 				Button_Load.ButtonBounds = new Vector4( pos.X, pos.Y, 256, 48 );
 				Button_Load.OnPressed = delegate ()
@@ -73,7 +74,7 @@ namespace PA_MultiplayerGalacticWar
 			Add( Button_Load );
 			Button_Quit = new Entity_UI_Button();
 			{
-				Button_Quit.Label = "Quit";
+				Button_Quit.Label = "QUIT";
 				Vector2 pos = new Vector2( 0, 250 );
 				Button_Quit.ButtonBounds = new Vector4( pos.X, pos.Y, 256, 48 );
 				Button_Quit.OnPressed = delegate ()

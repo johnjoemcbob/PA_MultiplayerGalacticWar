@@ -1,4 +1,9 @@
-﻿using System;
+﻿// Matthew Cormack
+// Star system names and information
+// 02/04/16
+
+using Otter;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,7 +11,17 @@ using System.Threading.Tasks;
 
 namespace PA_MultiplayerGalacticWar
 {
-	public static class StarSystemInfos
+	public struct StarSystemInfo
+	{
+		public StarSystemInfo( int planets )
+		{
+			Planets = planets;
+		}
+
+		public int Planets;
+	}
+
+    public static class StarSystemInfos
 	{
 		public static string[] Names = new string[]
 		{
@@ -38,6 +53,14 @@ namespace PA_MultiplayerGalacticWar
 			"Crag",
 			"Bedlam",
 			"Pax"
+		};
+		public static StarSystemInfo[] Infos = new StarSystemInfo[]
+		{
+			new StarSystemInfo( 1 ),
+			new StarSystemInfo( 2 ),
+			new StarSystemInfo( 3 ),
+			new StarSystemInfo( 4 ),
+			new StarSystemInfo( 5 )
 		};
 	}
 }

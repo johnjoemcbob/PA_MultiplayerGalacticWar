@@ -19,6 +19,8 @@ namespace PA_MultiplayerGalacticWar
 		// System name and type (i.e. map)
 		public string Name = StarSystemInfos.Names.RandomElement() + StarSystemInfos.Name_Suffix.RandomElement();
 		public string Type = StarSystemInfos.Types.RandomElement();
+		public int ID = -1;
+
 		// Team colour
 		public Color Colour = new Color( 0.6f, 0.5f, 0.5f );
 
@@ -26,6 +28,7 @@ namespace PA_MultiplayerGalacticWar
 		private Entity_Image SelectCircle;
 		private Entity_Image Owner;
 		private Entity_Image Star;
+		private Entity_UIPanel_StarSystem UI;
 		// Lerp
 		private float Time_Lerp;
 		// Selection
@@ -34,6 +37,8 @@ namespace PA_MultiplayerGalacticWar
 
 		public Entity_StarSystem( Scene scene, float x, float y, string path_pa, string path_mod ) : base( x, y )
 		{
+			ID = StarSystemInfos.Types.IndexOf( Type );
+
 			SelectCircle = new Entity_Image( x, y, "resources/selected.png" );
 			{
 				SelectCircle.image.Scale = 0.5f;
@@ -59,6 +64,11 @@ namespace PA_MultiplayerGalacticWar
 				Star.image.Scroll = 1;
 			}
 			AddGraphics( Star.Graphic );
+
+			UI = new Entity_UIPanel_StarSystem( Entity_UIPanel_StarSystem.HalfWidth, Entity_UIPanel_StarSystem.HalfHeight - 8, Name, Type );
+			{
+				UI.SystemID = ID;
+			}
 
 			Time_Lerp = 0;
 
@@ -129,17 +139,29 @@ namespace PA_MultiplayerGalacticWar
 			}
 		}
 
+		public override void Removed()
+		{
+			base.Removed();
+
+			SelectCircle = null;
+			Star = null;
+			Scene.Instance.Remove( UI );
+        }
+
 		private void Select()
 		{
 			Selected = true;
 			SelectCircle.image.Alpha = 1;
-			Console.WriteLine( Name + ": "+ Type );
+
+			Scene.Instance.Add( UI );
 		}
 
 		private void Deselect()
 		{
 			Selected = false;
 			SelectCircle.image.Alpha = 0;
+
+			Scene.Instance.Remove( UI );
 		}
 	}
 }

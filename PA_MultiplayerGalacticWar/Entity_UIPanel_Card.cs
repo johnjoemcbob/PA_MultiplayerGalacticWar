@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace PA_MultiplayerGalacticWar
 {
-	class Entity_Card : Entity
+	class Entity_UIPanel_Card : Entity
 	{
 		public string Label = "Test Card";
 		public string Description = "Description Text\nYeah!";
@@ -24,14 +24,14 @@ namespace PA_MultiplayerGalacticWar
 		private Text Text_Description;
 		private Entity_UI_Button Button_Choose;
 
-		public Entity_Card( float x, float y, string label = "Test Card", string description = "Description", string iconfile = "" )
+		public Entity_UIPanel_Card( float x, float y, string label = "Test Card", string description = "Description", string iconfile = "" )
 		{
 			X = x;
 			Y = y;
 			Initialise( label, description, iconfile );
         }
 
-		public Entity_Card( string label = "Test Card", string description = "Description", string iconfile = "" )
+		public Entity_UIPanel_Card( string label = "Test Card", string description = "Description", string iconfile = "" )
 		{
 			Initialise( label, description, iconfile );
 		}
@@ -84,6 +84,15 @@ namespace PA_MultiplayerGalacticWar
 			}
 			Image_Icon.AddGraphic( Text_Description );
 
+			// Panel image
+			Image_Button_Background = new Entity_Image( X, Y + 140, "", false );
+			{
+				Image_Button_Background.NineSlice( Program.PATH_PA + "media/ui/main/shared/img/panel/img_panel_std_black.png", 120, 86, 326, 156 );
+
+				//Image_Button_Background.SetTarget( center );
+			}
+			Scene.Instance.Add( Image_Button_Background );
+
 			// Button Choose
 			Button_Choose = new Entity_UI_Button();
 			{
@@ -96,6 +105,7 @@ namespace PA_MultiplayerGalacticWar
 				Button_Choose.OnPressed = delegate ()
 				{
 					Console.WriteLine( "added " + Label );
+					( (Scene_Game) Scene.Instance ).PickCard( this );
 					Scene.Instance.Remove( this );
 				};
 			}
@@ -108,6 +118,7 @@ namespace PA_MultiplayerGalacticWar
 
 			Scene.Instance.Remove( Image_Background );
 			Scene.Instance.Remove( Image_Icon );
+			Scene.Instance.Remove( Image_Button_Background );
 			Scene.Instance.Remove( Button_Choose );
 		}
 	}

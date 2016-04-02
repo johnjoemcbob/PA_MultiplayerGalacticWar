@@ -19,10 +19,18 @@ namespace PA_MultiplayerGalacticWar
 	{
 		static public bool Clicked = false;
 
+		// Units to be added to the unit_list.json
 		static public List<string> ExtraUnits = new List<string>();
+
+		// Loaded upgrade cards
+		static public List<string> Cards_Loaded_Commander;
+		static public List<string> Cards_Loaded_Unit;
+
+		// Cards applied to each commander
 		static public List<dynamic> Cards_Commander = new List<dynamic>();
 		static public List<dynamic> Cards = new List<dynamic>();
 
+		// File directory paths
 		static public string PATH_PA = "C:/Program Files (x86)/Steam/steamapps/common/Planetary Annihilation Titans/";
 		static public string PATH_MOD = "C:/Users/mcorm/AppData/Local/Uber Entertainment/Planetary Annihilation/server_mods/com.pa.startege.TCommander/";
 		static public string PATH_BASE = "resources/json_base/";
@@ -35,6 +43,7 @@ namespace PA_MultiplayerGalacticWar
 		static public int COMMANDER_OSIRIS = 1;
 		static public int COMMANDER_CENTURION = 2;
 
+		// Basic PA font
 		static public Otter.Font Font = new Otter.Font( Program.PATH_PA + "media/ui/main/shared/font/Sansation_Bold-webfont.ttf" );
 
 		static void Main( string[] args )
@@ -47,18 +56,18 @@ namespace PA_MultiplayerGalacticWar
 
 			// Test json
 			{
-				List<string> json_card_commander = LoadCards( "resources/json_cards/commander/" );
+				Cards_Loaded_Commander = LoadCards( "resources/json_cards/commander/" );
 				{
-					foreach ( string json_card in json_card_commander )
+					foreach ( string json_card in Cards_Loaded_Commander )
 					{
 						dynamic card_commander = JsonConvert.DeserializeObject( json_card );
 						// Add to card container
 						Cards_Commander.Add( card_commander );
 					}
 				}
-				List<string> json_card_unit = LoadCards( "resources/json_cards/" );
+				Cards_Loaded_Unit = LoadCards( "resources/json_cards/" );
 				{
-					foreach ( string json_card in json_card_unit )
+					foreach ( string json_card in Cards_Loaded_Unit )
 					{
 						dynamic card = JsonConvert.DeserializeObject( json_card );
 						// Add to card container
