@@ -102,7 +102,11 @@ namespace PA_MultiplayerGalacticWar
 				Button_Choose.Offset.Y = -1;
                 Button_Choose.ButtonBounds = new Vector4( pos.X, pos.Y, 196, 48 );
 				Button_Choose.Scroll = new Vector2( 1, 1 );
-				Button_Choose.OnPressed = delegate ()
+				Button_Choose.OnPressed = delegate ( Entity_UI_Button self )
+				{
+					self.Image.image.Color = self.Colour_Hover * Color.Gray;
+				};
+				Button_Choose.OnReleased = delegate ( Entity_UI_Button self )
 				{
 					Console.WriteLine( "added " + Label );
 					( (Scene_Game) Scene.Instance ).PickCard( this );

@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace PA_MultiplayerGalacticWar
 {
-	delegate void MouseEvent();
+	delegate void MouseEvent( Entity_UI_Button self );
 
 	class Entity_UI_Button : Entity
 	{
@@ -21,9 +21,11 @@ namespace PA_MultiplayerGalacticWar
 		public Vector2 Center = new Vector2( Game.Instance.HalfWidth, Game.Instance.HalfHeight );
         public Vector4 ButtonBounds = new Vector4();
 		public Vector4 ButtonCameraBounds = new Vector4();
-		public MouseEvent OnPressed = delegate() {};
-		public MouseEvent OnHover = delegate () {};
-		public MouseEvent OnUnHover = delegate () {};
+		public MouseEvent OnPressed = delegate( Entity_UI_Button self ) {};
+		public MouseEvent OnUnPressed = delegate ( Entity_UI_Button self ) {};
+		public MouseEvent OnReleased = delegate ( Entity_UI_Button self ) { };
+		public MouseEvent OnHover = delegate ( Entity_UI_Button self ) {};
+		public MouseEvent OnUnHover = delegate ( Entity_UI_Button self ) {};
 		public Vector2 Scroll = new Vector2( 0, -0.1f );
 		public Color Colour_Default = Color.White;
 		public Color Colour_Hover = Color.Green;
@@ -32,14 +34,15 @@ namespace PA_MultiplayerGalacticWar
 
 		public Entity_Image Image;
 		private Text Text_Label;
+		private bool Pressed = false;
 
 		public Entity_UI_Button()
 		{
-			OnHover = delegate ()
+			OnHover = delegate ( Entity_UI_Button self )
 			{
 				Image.image.Color = Colour_Hover;
 			};
-			OnUnHover = delegate ()
+			OnUnHover = delegate ( Entity_UI_Button self )
 			{
 				Image.image.Color = Colour_Default;
 			};
@@ -82,11 +85,11 @@ namespace PA_MultiplayerGalacticWar
 				Image.image.ScaledWidth,
 				Image.image.ScaledHeight
 			);
-			if ( ( Image.image.ScrollX == 0 ) )
+			//if ( (  == 0 ) )
 			{
 				ButtonCameraBounds += new Vector4(
-					Scene.Instance.CameraCenterX,
-					Scene.Instance.CameraCenterY,
+					Scene.Instance.CameraCenterX * ( 1 - Scroll.X ),
+					Scene.Instance.CameraCenterY * ( 1 - Scroll.Y ),
 					0,
 					0
 				);
@@ -103,17 +106,31 @@ namespace PA_MultiplayerGalacticWar
 			{
 				if ( Program.Clicked )
 				{
-					OnPressed();
+					OnPressed( this );
+					Pressed = true;
 					Program.Clicked = false;
 				}
-				Hover = true;
-				OnHover();
+				else if ( Game.Instance.Input.MouseButtonReleased( MouseButton.Left ) )
+				{
+					OnReleased( this );
+					Hover = false;
+				}
+				if ( !Hover )
+				{
+					OnHover( this );
+					Hover = true;
+				}
 			}
-			else
+			else if ( Hover )
 			{
 				Hover = false;
-				OnUnHover();
+				OnUnHover( this );
             }
+			if ( ( !Program.Clicked ) && Pressed )
+			{
+				OnUnPressed( this );
+				Pressed = false;
+			}
 		}
 
 		public override void Render()

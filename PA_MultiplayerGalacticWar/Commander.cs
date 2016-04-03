@@ -12,6 +12,25 @@ using Newtonsoft.Json.Linq;
 
 namespace PA_MultiplayerGalacticWar
 {
+	//	"client":{
+	//		"ui":{
+	//			"image":"/ui/main/shared/img/commanders/img_imperial_invictus.png",
+	//			"thumb_image":"/ui/main/shared/img/commanders/thumbs/img_imperial_invictus_thumb.png",
+	//			"profile_image":"/ui/main/shared/img/commanders/profiles/profile_imperial_invictus.png"
+	//		}
+	//	}
+	struct PAUI
+	{
+		public string image;
+		public string thumb_image;
+		public string profile_image;
+	}
+
+	struct PAClient
+	{
+		public PAUI ui;
+	}
+
 	struct PAReconObvervable
 	{
 		public bool always_visible;

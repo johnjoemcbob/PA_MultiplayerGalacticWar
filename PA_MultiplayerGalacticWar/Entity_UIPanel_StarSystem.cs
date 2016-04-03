@@ -52,6 +52,7 @@ namespace PA_MultiplayerGalacticWar
 				Text_Label.Scroll = 0;
 				//Text_Label.Color = Color.Green;
 			}
+			Image_Background.AddGraphic( Text_Label );
 			// System type (i.e. map)
 			Text_SystemType = new Text( "(" + SystemType + ")", Program.Font, 16 );
 			{
@@ -60,6 +61,7 @@ namespace PA_MultiplayerGalacticWar
 				Text_SystemType.Scroll = 0;
 				Text_SystemType.Color = Color.Gray;
 			}
+			Image_Background.AddGraphic( Text_SystemType );
 			// System information (i.e. number of planets)
 			Text_SystemInfo = new Text( "(Planets: " + StarSystemInfos.Infos[SystemID].Planets + ")", Program.Font, 12 );
 			{
@@ -68,22 +70,34 @@ namespace PA_MultiplayerGalacticWar
 				Text_SystemInfo.Scroll = 0;
 				Text_SystemInfo.Color = Color.Shade( 0.7f );
 			}
+			Image_Background.AddGraphic( Text_SystemInfo );
 			// Button WAR
 			Button_War = new Entity_UI_Button();
 			{
 				Button_War.Colour_Default = Color.Red;
-				Button_War.Colour_Hover = Color.Red * Color.Gray;
+				Button_War.Colour_Hover = Color.Red * Color.Shade( 0.8f );
 				Button_War.Label = "WAR";
-				Vector2 pos = new Vector2( X, Y + 72 );
-				Button_War.Center = Vector2.Zero;
+
+				Vector2 pos = new Vector2( X - Game.Instance.HalfWidth, Y - Game.Instance.HalfHeight + 72 );
 				Button_War.Offset.Y = -1;
 				Button_War.ButtonBounds = new Vector4( pos.X, pos.Y, 128, 48 );
 				Button_War.Scroll = new Vector2( 0, 0 );
-				Button_War.OnPressed = delegate ()
+
+				Button_War.OnPressed = delegate ( Entity_UI_Button self )
+				{
+					self.Image.image.Color = self.Colour_Hover * Color.Gray;
+				};
+				Button_War.OnReleased = delegate ( Entity_UI_Button self )
 				{
 					Console.WriteLine( "WAR " + Label );
-				};
+					( (Scene_Game) Scene.Instance ).SaveGame();
+                };
 			}
+
+			// Add ui press collider
+			AddCollider<BoxCollider>( new BoxCollider( Width, Height ) );
+			Collider.CenterOrigin();
+            Collider.SetPosition( -Game.Instance.HalfWidth, -Game.Instance.HalfHeight );
 		}
 
 		public override void Added()
@@ -91,14 +105,15 @@ namespace PA_MultiplayerGalacticWar
 			base.Added();
 
 			Scene.Instance.Add( Image_Background );
-
-			Image_Background.AddGraphic( Text_Label );
-
-			Image_Background.AddGraphic( Text_SystemType );
-
-			Image_Background.AddGraphic( Text_SystemInfo );
-
 			Scene.Instance.Add( Button_War );
+		}
+
+		public override void Update()
+		{
+			base.Update();
+
+			// Update the collider to follow the camera
+			Collider.SetPosition( -Game.Instance.HalfWidth + Scene.Instance.CameraCenterX, -Game.Instance.HalfHeight + Scene.Instance.CameraCenterY );
 		}
 
 		public override void Removed()

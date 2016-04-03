@@ -41,7 +41,11 @@ namespace PA_MultiplayerGalacticWar
 				Button_New.Label = "NEW";
 				Vector2 pos = new Vector2( 0, -100 );
                 Button_New.ButtonBounds = new Vector4( pos.X, pos.Y, 256, 48 );
-				Button_New.OnPressed = delegate()
+				Button_New.OnPressed = delegate ( Entity_UI_Button self )
+				{
+					self.Image.image.Color = self.Colour_Hover * Color.Gray;
+				};
+				Button_New.OnReleased = delegate ( Entity_UI_Button self )
 				{
 					Game.Instance.RemoveScene();
 					Game.Instance.AddScene( new Scene_Game() );
@@ -53,7 +57,11 @@ namespace PA_MultiplayerGalacticWar
 				Button_Continue.Label = "CONTINUE";
 				Vector2 pos = new Vector2( 0, -25 );
 				Button_Continue.ButtonBounds = new Vector4( pos.X, pos.Y, 256, 48 );
-				Button_Continue.OnPressed = delegate ()
+				Button_Continue.OnPressed = delegate ( Entity_UI_Button self )
+				{
+					self.Image.image.Color = self.Colour_Hover * Color.Gray;
+				};
+				Button_Continue.OnReleased = delegate ( Entity_UI_Button self )
 				{
 					Game.Instance.RemoveScene();
 					Game.Instance.AddScene( new Scene_Game( "data/game1.json" ) );
@@ -65,7 +73,11 @@ namespace PA_MultiplayerGalacticWar
 				Button_Load.Label = "LOAD GAME";
 				Vector2 pos = new Vector2( 0, 50 );
 				Button_Load.ButtonBounds = new Vector4( pos.X, pos.Y, 256, 48 );
-				Button_Load.OnPressed = delegate ()
+				Button_Load.OnPressed = delegate ( Entity_UI_Button self )
+				{
+					self.Image.image.Color = self.Colour_Hover * Color.Gray;
+				};
+				Button_Load.OnReleased = delegate ( Entity_UI_Button self )
 				{
 					Game.Instance.RemoveScene();
 					Game.Instance.AddScene( new Scene_Game( "data/game2.json" ) );
@@ -77,7 +89,11 @@ namespace PA_MultiplayerGalacticWar
 				Button_Quit.Label = "QUIT";
 				Vector2 pos = new Vector2( 0, 250 );
 				Button_Quit.ButtonBounds = new Vector4( pos.X, pos.Y, 256, 48 );
-				Button_Quit.OnPressed = delegate ()
+				Button_Quit.OnPressed = delegate ( Entity_UI_Button self )
+				{
+					self.Image.image.Color = self.Colour_Hover * Color.Gray;
+				};
+				Button_Quit.OnReleased = delegate ( Entity_UI_Button self )
 				{
 					Game.Instance.Close();
 				};

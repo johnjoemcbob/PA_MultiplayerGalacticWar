@@ -4,6 +4,7 @@
 
 using Otter;
 using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -13,6 +14,40 @@ namespace PA_MultiplayerGalacticWar
 {
 	class Helper
 	{
+		// Ensure all directories in path exist
+		static public void CreateDirectory( string path )
+		{
+			string[] dirs = path.Split( '/' );
+			string currentdir = "";
+			foreach ( string dir in dirs )
+			{
+				currentdir += dir + "/";
+				if ( ( !Directory.Exists( currentdir ) ) && ( !dir.Contains( "." ) ) )
+				{
+					Directory.CreateDirectory( currentdir );
+				}
+            }
+		}
+
+		// Load files as strings
+		static public string ReadFile( string file )
+		{
+			try
+			{   // Open the text file using a stream reader.
+				using ( StreamReader sr = new StreamReader( file ) )
+				{
+					// Read the stream to a string, and write the string to the console.
+					return sr.ReadToEnd();
+				}
+			}
+			catch ( Exception e )
+			{
+				Console.WriteLine( "The file could not be read:" );
+				Console.WriteLine( e.Message );
+			}
+			return "";
+		}
+
 		// Basic collision detection; rect expects upper left and lower right points
 		public static bool PointWithinRect( Vector2 point, Vector4 rect )
 		{

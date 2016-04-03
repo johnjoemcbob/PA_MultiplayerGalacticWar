@@ -10,16 +10,6 @@ using System.Threading.Tasks;
 
 namespace PA_MultiplayerGalacticWar
 {
-	struct CommanderType
-	{
-		public string PlayerName;
-		public string UberID;
-		public string FactionName;
-		public int ModelID;
-		public List<string> CommanderCards;
-		public List<string> Cards;
-	};
-
     class Info_Game
 	{
 		public string StartDate;

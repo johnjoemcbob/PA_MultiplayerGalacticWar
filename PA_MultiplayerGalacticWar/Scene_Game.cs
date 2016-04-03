@@ -16,6 +16,7 @@ namespace PA_MultiplayerGalacticWar
 	class Scene_Game : Scene
 	{
 		public Info_Game CurrentGame;
+		public List<Info_Player> CurrentPlayers = new List<Info_Player>();
 
 		private string Filename = "";
 		private string FileToLoad = "";
@@ -89,17 +90,18 @@ namespace PA_MultiplayerGalacticWar
 			}
 
 			// Apply this card to the winning player
-			//Program.AddCard()
+			//Program.AddCard(  );
 		}
 
-		private void ApplyCards()
+		private void ApplyCards( Info_Player player, List<string> commandercards, List<string> cards )
 		{
-			foreach ( CommanderType commander in CurrentGame.Commanders )
-			{
-				Program.SetupCommander( Program.PATH_COMMANDER[commander.ModelID], commander.CommanderCards );
-				Program.SetupArmy( Program.PATH_PA + "media/pa/units/", commander.ModelID, commander.Cards );
-			}
-			Program.EndSetupArmy( Program.PATH_PA + "media/pa/units/" );
+			player.AddCommanderCards( commandercards );
+			player.AddArmyCards( cards );
+		}
+
+		private void FinishCards()
+		{
+			Info_Player.EndSetupArmy( Program.PATH_PA + "media/pa/units/" );
 		}
 
 		private void NewGame()
@@ -131,6 +133,8 @@ namespace PA_MultiplayerGalacticWar
 				}
 			}
 			SaveGame();
+
+			SetupGame();
 		}
 
 		private void LoadGame()
@@ -147,7 +151,7 @@ namespace PA_MultiplayerGalacticWar
 				if ( File.Exists( FileToLoad ) )
 				{
 					// Load
-					CurrentGame = JsonConvert.DeserializeObject<Info_Game>( Program.ReadJSON( FileToLoad ) );
+					CurrentGame = JsonConvert.DeserializeObject<Info_Game>( Helper.ReadFile( FileToLoad ) );
 				}
 				else
 				{
@@ -158,11 +162,24 @@ namespace PA_MultiplayerGalacticWar
 				FileToLoad = null;
 			}
 
-			ApplyCards();
+			SetupGame();
+
+			foreach ( Info_Player player in CurrentPlayers )
+			{
+				ApplyCards( player, player.Commander.CommanderCards, player.Commander.Cards );
+			}
 		}
 
-		private void SaveGame()
+		public void SaveGame()
 		{
+			// Save player states
+			foreach ( Info_Player player in CurrentPlayers )
+			{
+				player.SaveCommander();
+				player.SaveArmy();
+			}
+
+			// Save game state
 			if ( !Directory.Exists(  "data/" ) )
 			{
 				Directory.CreateDirectory( "data/" );
@@ -179,6 +196,21 @@ namespace PA_MultiplayerGalacticWar
 				writer.WriteLine( JsonConvert.SerializeObject( CurrentGame ) );
 			}
 			writer.Close();
+		}
+
+		private void SetupGame()
+		{
+			Info_Player.SetupAllArmy();
+            foreach ( CommanderType com in CurrentGame.Commanders )
+			{
+				Info_Player player = new Info_Player();
+				{
+					player.Commander = com;
+					player.CommanderPath = Program.PATH_COMMANDER[com.ModelID];
+				}
+				player.Initialise();
+                CurrentPlayers.Add( player );
+            }
 		}
 	}
 }

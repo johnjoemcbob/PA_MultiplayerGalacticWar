@@ -99,8 +99,8 @@ namespace PA_MultiplayerGalacticWar
 				{
 					Select();
 				}
-				else
-				{
+				else if ( !UI.Collider.Overlap( 0.5f, 0.5f, x, y ) )
+                {
 					Deselect();
 				}
 			}
