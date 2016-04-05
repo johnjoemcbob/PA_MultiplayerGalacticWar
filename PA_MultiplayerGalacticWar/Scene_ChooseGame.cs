@@ -36,7 +36,7 @@ namespace PA_MultiplayerGalacticWar
 			Add( image_title );
 
 			// Setup buttons
-			Button_New = new Entity_UI_Button();
+			Button_New = new Entity_UI_ButtonLerp();
 			{
 				Button_New.Label = "NEW";
 				Vector2 pos = new Vector2( 0, -100 );
@@ -44,15 +44,17 @@ namespace PA_MultiplayerGalacticWar
 				Button_New.OnPressed = delegate ( Entity_UI_Button self )
 				{
 					self.Image.image.Color = self.Colour_Hover * Color.Gray;
+					AudioManager.PlaySound( "resources/audio/ui_click.wav" );
 				};
 				Button_New.OnReleased = delegate ( Entity_UI_Button self )
 				{
 					Game.Instance.RemoveScene();
 					Game.Instance.AddScene( new Scene_Game() );
+					AudioManager.PlaySound( "resources/audio/ui_click.wav" );
 				};
 			}
 			Add( Button_New );
-			Button_Continue = new Entity_UI_Button();
+			Button_Continue = new Entity_UI_ButtonLerp();
 			{
 				Button_Continue.Label = "CONTINUE";
 				Vector2 pos = new Vector2( 0, -25 );
@@ -60,15 +62,17 @@ namespace PA_MultiplayerGalacticWar
 				Button_Continue.OnPressed = delegate ( Entity_UI_Button self )
 				{
 					self.Image.image.Color = self.Colour_Hover * Color.Gray;
+					AudioManager.PlaySound( "resources/audio/ui_click.wav" );
 				};
 				Button_Continue.OnReleased = delegate ( Entity_UI_Button self )
 				{
 					Game.Instance.RemoveScene();
 					Game.Instance.AddScene( new Scene_Game( "data/game1.json" ) );
+					AudioManager.PlaySound( "resources/audio/ui_click.wav" );
 				};
 			}
 			Add( Button_Continue );
-			Button_Load = new Entity_UI_Button();
+			Button_Load = new Entity_UI_ButtonLerp();
 			{
 				Button_Load.Label = "LOAD GAME";
 				Vector2 pos = new Vector2( 0, 50 );
@@ -76,31 +80,46 @@ namespace PA_MultiplayerGalacticWar
 				Button_Load.OnPressed = delegate ( Entity_UI_Button self )
 				{
 					self.Image.image.Color = self.Colour_Hover * Color.Gray;
+					AudioManager.PlaySound( "resources/audio/ui_click.wav" );
 				};
 				Button_Load.OnReleased = delegate ( Entity_UI_Button self )
 				{
 					Game.Instance.RemoveScene();
 					Game.Instance.AddScene( new Scene_Game( "data/game2.json" ) );
+					AudioManager.PlaySound( "resources/audio/ui_click.wav" );
 				};
 			}
 			Add( Button_Load );
-			Button_Quit = new Entity_UI_Button();
+			Button_Quit = new Entity_UI_ButtonLerp();
 			{
+				Button_Quit.Colour_Hover = Color.Red;
 				Button_Quit.Label = "QUIT";
 				Vector2 pos = new Vector2( 0, 250 );
 				Button_Quit.ButtonBounds = new Vector4( pos.X, pos.Y, 256, 48 );
 				Button_Quit.OnPressed = delegate ( Entity_UI_Button self )
 				{
 					self.Image.image.Color = self.Colour_Hover * Color.Gray;
+					AudioManager.PlaySound( "resources/audio/ui_click.wav" );
 				};
 				Button_Quit.OnReleased = delegate ( Entity_UI_Button self )
 				{
-					Game.Instance.Close();
+					if ( Program.CloseTime != -1 )
+					{
+						Program.CloseTime = 0;
+					}
+					else
+					{
+						Program.CloseTime = Game.Instance.Timer + 30;
+					}
+					AudioManager.PlaySound( "resources/audio/ui_decline.wav" );
 				};
 			}
 			Add( Button_Quit );
 
 			Game.Instance.QuitButton.Clear();
+
+			// Cursor last
+			Add( new Entity_Cursor( Program.PATH_PA + "media/ui/main/shared/img/icons/cursor.png" ) );
 		}
 
 		public override void UpdateFirst()
@@ -114,7 +133,7 @@ namespace PA_MultiplayerGalacticWar
 		{
 			base.Update();
 
-			if ( Game.Instance.Input.KeyPressed( Key.Escape ) )
+			if ( Game.Instance.Input.KeyPressed( Key.Escape ) || ( ( Program.CloseTime != -1 ) && ( Program.CloseTime < Game.Instance.Timer ) ) )
 			{
 				Game.Instance.Close();
 			}

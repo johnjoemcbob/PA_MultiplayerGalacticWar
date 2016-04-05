@@ -23,8 +23,9 @@ namespace PA_MultiplayerGalacticWar
 		public Vector4 ButtonCameraBounds = new Vector4();
 		public MouseEvent OnPressed = delegate( Entity_UI_Button self ) {};
 		public MouseEvent OnUnPressed = delegate ( Entity_UI_Button self ) {};
-		public MouseEvent OnReleased = delegate ( Entity_UI_Button self ) { };
+		public MouseEvent OnReleased = delegate ( Entity_UI_Button self ) {};
 		public MouseEvent OnHover = delegate ( Entity_UI_Button self ) {};
+		public MouseEvent WhileHover = delegate ( Entity_UI_Button self ) {};
 		public MouseEvent OnUnHover = delegate ( Entity_UI_Button self ) {};
 		public Vector2 Scroll = new Vector2( 0, -0.1f );
 		public Color Colour_Default = Color.White;
@@ -33,14 +34,15 @@ namespace PA_MultiplayerGalacticWar
 		public bool Hover = false;
 
 		public Entity_Image Image;
-		private Text Text_Label;
-		private bool Pressed = false;
+		protected Text Text_Label;
+		protected bool Pressed = false;
 
 		public Entity_UI_Button()
 		{
 			OnHover = delegate ( Entity_UI_Button self )
 			{
 				Image.image.Color = Colour_Hover;
+				AudioManager.PlaySound( "resources/audio/ui_hover.wav" );
 			};
 			OnUnHover = delegate ( Entity_UI_Button self )
 			{
@@ -131,6 +133,10 @@ namespace PA_MultiplayerGalacticWar
 				OnUnPressed( this );
 				Pressed = false;
 			}
+			if ( Hover )
+			{
+				WhileHover( this );
+            }
 		}
 
 		public override void Render()

@@ -17,6 +17,7 @@ namespace PA_MultiplayerGalacticWar
 {
 	class Program
 	{
+		static public float CloseTime = -1;
 		static public bool Clicked = false;
 
 		// Loaded upgrade cards
@@ -47,9 +48,12 @@ namespace PA_MultiplayerGalacticWar
 		{
 			// Create a game
 			var game = new Game( "Planetary Annihilation: Galactic War", 1024, 768, 60, false );
+			//var game = new Game( "Planetary Annihilation: Galactic War", 1920, 1080, 60, false );
 			{
-				game.MouseVisible = true;
+				//game.MouseVisible = true;
 			}
+			Music music = AudioManager.PlayMusic( "resources/audio/music.ogg" );
+			music.Volume = 0.2f;
 
 			// Load JSON
 			{
@@ -81,7 +85,10 @@ namespace PA_MultiplayerGalacticWar
 
 			// Start up in the choose game scene
 			game.Start( new Scene_ChooseGame() );
-		}
+
+			// Cleanup
+			AudioManager.Cleanup();
+        }
 
 		static List<string> LoadCards( string directory )
 		{

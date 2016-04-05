@@ -64,8 +64,8 @@ namespace PA_MultiplayerGalacticWar
 
 			foreach ( PARoute route in StarRoutes )
 			{
-				Draw.Line( route.Position1.X, route.Position1.Y, route.Position1.Z, route.Position1.W, route.Colour1, 6 );
-				Draw.Line( route.Position2.X, route.Position2.Y, route.Position2.Z, route.Position2.W, route.Colour2, 6 );
+				Draw.Line( route.Position1.X, route.Position1.Y, route.Position1.Z, route.Position1.W, route.Colour1, 2 );
+				Draw.Line( route.Position2.X, route.Position2.Y, route.Position2.Z, route.Position2.W, route.Colour2, 2 );
 			}
 		}
 

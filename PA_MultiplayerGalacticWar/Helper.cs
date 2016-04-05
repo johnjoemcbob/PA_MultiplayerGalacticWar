@@ -48,6 +48,19 @@ namespace PA_MultiplayerGalacticWar
 			return "";
 		}
 
+		// Return the first existing file OR null
+		static public string FindFile( string[] files )
+		{
+			foreach ( string file in files )
+			{
+				if ( File.Exists( file ) )
+				{
+					return file;
+				}
+			}
+			return null;
+		}
+
 		// Basic collision detection; rect expects upper left and lower right points
 		public static bool PointWithinRect( Vector2 point, Vector4 rect )
 		{

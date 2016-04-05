@@ -86,12 +86,14 @@ namespace PA_MultiplayerGalacticWar
 				Button_War.OnPressed = delegate ( Entity_UI_Button self )
 				{
 					self.Image.image.Color = self.Colour_Hover * Color.Gray;
+					AudioManager.PlaySound( "resources/audio/ui_click.wav" );
 				};
 				Button_War.OnReleased = delegate ( Entity_UI_Button self )
 				{
 					Console.WriteLine( "WAR " + Label );
 					( (Scene_Game) Scene.Instance ).SaveGame();
-                };
+					AudioManager.PlaySound( "resources/audio/ui_click.wav" );
+				};
 			}
 
 			// Add ui press collider

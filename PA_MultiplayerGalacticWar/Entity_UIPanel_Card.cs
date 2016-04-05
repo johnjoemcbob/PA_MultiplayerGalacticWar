@@ -105,12 +105,14 @@ namespace PA_MultiplayerGalacticWar
 				Button_Choose.OnPressed = delegate ( Entity_UI_Button self )
 				{
 					self.Image.image.Color = self.Colour_Hover * Color.Gray;
+					AudioManager.PlaySound( "resources/audio/ui_click.wav" );
 				};
 				Button_Choose.OnReleased = delegate ( Entity_UI_Button self )
 				{
 					Console.WriteLine( "added " + Label );
 					( (Scene_Game) Scene.Instance ).PickCard( this );
 					Scene.Instance.Remove( this );
+					AudioManager.PlaySound( "resources/audio/ui_click.wav" );
 				};
 			}
 			Scene.Instance.Add( Button_Choose );

@@ -49,6 +49,9 @@ namespace PA_MultiplayerGalacticWar
 			}
 
 			Game.Instance.QuitButton.Clear();
+
+			// Cursor last
+			Add( new Entity_Cursor( Program.PATH_PA + "media/ui/main/shared/img/icons/cursor.png" ) );
 		}
 
 		public override void UpdateFirst()
