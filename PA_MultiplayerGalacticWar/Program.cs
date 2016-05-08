@@ -53,8 +53,8 @@ namespace PA_MultiplayerGalacticWar
 			{
 				//game.MouseVisible = true;
 			}
-			Music = AudioManager.PlayMusic( "resources/audio/music.ogg" );
-			Music.Volume = 0.2f;
+			//Music = AudioManager.PlayMusic( "resources/audio/music.ogg" );
+			//Music.Volume = 0.2f;
 
 			// Load JSON
 			{

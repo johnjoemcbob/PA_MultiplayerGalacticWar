@@ -6,9 +6,7 @@ using Otter;
 using System;
 using System.IO;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Threading;
 using Newtonsoft.Json;
 
 namespace PA_MultiplayerGalacticWar
@@ -20,8 +18,14 @@ namespace PA_MultiplayerGalacticWar
 
 		private string Filename = "";
 		private string FileToLoad = "";
+		private bool FileToSave = true;
 
 		private List<Entity_UIPanel_Card> PossibleCards = new List<Entity_UIPanel_Card>();
+
+		private Thread Thread_Load = null;
+		private Thread Thread_Save = null;
+
+		private Entity_UIPanel_FileIO LoadUI = null;
 
 		// Zooming
 		private float Zoom = 1;
@@ -52,6 +56,11 @@ namespace PA_MultiplayerGalacticWar
 				Add( card );
 			}
 
+			// Threading
+			Thread_Load = new Thread( new ThreadStart( this.ThreadLoadGame ) );
+			Thread_Save = new Thread( new ThreadStart( this.ThreadSaveGame ) );
+			FileToSave = true;
+
 			Game.Instance.QuitButton.Clear();
 
 			// Cursor last
@@ -69,13 +78,30 @@ namespace PA_MultiplayerGalacticWar
 		{
 			base.Update();
 
+			// Loading thread & UI
+			if ( Thread_Load.IsAlive || Thread_Save.IsAlive ) return;
+			if ( ( FileToLoad == null ) && LoadUI.IsInScene )
+			{
+				Remove( LoadUI );
+            }
+			if ( !FileToSave )
+			{
+				// Change state
+				Game.Instance.RemoveScene();
+				Game.Instance.AddScene( new Scene_ChooseGame() );
+			}
+
 			TryLoadGame();
 			//UpdateZoom();
 
 			if ( Game.Instance.Input.KeyPressed( Key.Escape ) )
 			{
-				Game.Instance.RemoveScene();
-				Game.Instance.AddScene( new Scene_ChooseGame() );
+				// Launch saving thread, scene will be switched when the thread joins
+				SaveGame();
+
+				// Change state
+				//Game.Instance.RemoveScene();
+				//Game.Instance.AddScene( new Scene_ChooseGame() );
 			}
 		}
 
@@ -89,13 +115,6 @@ namespace PA_MultiplayerGalacticWar
 			}
 			Zoom += ( ZoomTarget - Zoom ) * Game.Instance.DeltaTime;
 			Scene.Instance.CameraZoom = Zoom;
-		}
-
-		public override void End()
-		{
-			base.End();
-
-			SaveGame();
 		}
 
 		public void PickCard( Entity_UIPanel_Card pickedcard )
@@ -159,28 +178,37 @@ namespace PA_MultiplayerGalacticWar
 
 		private void TryLoadGame()
 		{
-			if ( FileToLoad == null ) return;
+			if ( ( FileToLoad == null ) || ( Thread_Load.IsAlive ) ) return;
 
 			if ( FileToLoad == "" )
 			{
 				NewGame();
-				FileToLoad = null;
 			}
 			else
 			{
+				// Check for a save
 				if ( File.Exists( FileToLoad ) )
 				{
-					// Load
-					CurrentGame = JsonConvert.DeserializeObject<Info_Game>( Helper.ReadFile( FileToLoad ) );
-				}
+					// Add the loading text to the screen
+					LoadUI = new Entity_UIPanel_FileIO();
+                    Add( LoadUI );
+
+					// Start at thread to load the content
+					Thread_Load.Start();
+                }
 				else
 				{
 					// Return to menu
 					Game.Instance.RemoveScene();
 					Game.Instance.AddScene( new Scene_ChooseGame() );
 				}
-				FileToLoad = null;
 			}
+		}
+
+		public void ThreadLoadGame()
+		{
+			CurrentGame = JsonConvert.DeserializeObject<Info_Game>( Helper.ReadFile( FileToLoad ) );
+			FileToLoad = null;
 
 			SetupGame();
 
@@ -199,8 +227,21 @@ namespace PA_MultiplayerGalacticWar
 				player.SaveArmy();
 			}
 
+			// Add the saving text to the screen
+			LoadUI = new Entity_UIPanel_FileIO();
+			{
+				LoadUI.Label = "Saving";
+			}
+			Add( LoadUI );
+
+			// Start at thread to load the content
+			Thread_Save.Start();
+		}
+
+		public void ThreadSaveGame()
+		{
 			// Save game state
-			if ( !Directory.Exists(  "data/" ) )
+			if ( !Directory.Exists( "data/" ) )
 			{
 				Directory.CreateDirectory( "data/" );
 			}
@@ -208,7 +249,7 @@ namespace PA_MultiplayerGalacticWar
 			{
 				int num = Directory.GetFiles( "data/" ).Length + 1;
 				Filename = "data/game" + num + ".json";
-            }
+			}
 
 			// Write back out
 			StreamWriter writer = new StreamWriter( Filename );
@@ -216,7 +257,9 @@ namespace PA_MultiplayerGalacticWar
 				writer.WriteLine( JsonConvert.SerializeObject( CurrentGame ) );
 			}
 			writer.Close();
-		}
+
+			FileToSave = false;
+        }
 
 		private void SetupGame()
 		{

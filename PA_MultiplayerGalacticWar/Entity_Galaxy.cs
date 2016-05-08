@@ -16,14 +16,14 @@ namespace PA_MultiplayerGalacticWar
 		public int MaxSystems = 40;
 		public float MinSystemDistance = 50;
 		public float MaxPathDistance = 50;
-        public Rectangle GalaxyBounds = new Rectangle( -450, -300, 850, 600 );
+		public Rectangle GalaxyBounds = new Rectangle( -450, -300, 850, 600 );
 
 		// Currently selected star system
 		public int SelectedSystem = -1;
 
 		// Scene entities
 		private Entity_Image_Background Background;
-        private Entity_Image Galaxy;
+		private Entity_Image Galaxy;
 		private List<Entity_StarSystem> StarSystems = new List<Entity_StarSystem>();
 		private Entity_StarRoutes StarRoutes;
 
@@ -53,7 +53,7 @@ namespace PA_MultiplayerGalacticWar
 				{
 					starsystem.Index = StarSystems.Count;
 					StarSystems.Add( starsystem );
-                }
+				}
 				scene.Add( starsystem );
 			}
 		}
@@ -61,7 +61,7 @@ namespace PA_MultiplayerGalacticWar
 		public override void Update()
 		{
 			base.Update();
-        }
+		}
 
 		public void UpdateSelection( int id, bool selected )
 		{
@@ -100,7 +100,7 @@ namespace PA_MultiplayerGalacticWar
 				Vector2 pos;
 				int tries = 0;
 				int maxtries = 10;
-                do
+				do
 				{
 					// Generate position
 					pos = Otter.Rand.XY( GalaxyBounds );
@@ -115,7 +115,7 @@ namespace PA_MultiplayerGalacticWar
 							break;
 						}
 					}
-                    if ( nocollision )
+					if ( nocollision )
 					{
 						break;
 					}
@@ -144,7 +144,7 @@ namespace PA_MultiplayerGalacticWar
 					float distance = Vector2.Distance( star, other );
 					if ( distance < MaxPathDistance )
 					{
-                        StarConnections.Add( new Vector2( id, otherid ) );
+						StarConnections.Add( new Vector2( id, otherid ) );
 					}
 					otherid++;
 				}
@@ -257,7 +257,7 @@ namespace PA_MultiplayerGalacticWar
 				if ( group.Count > 2 )
 				{
 					Generate_ConnectAll();
-                }
+				}
 			}
 			// Randomly add extra path nodes for more interesting results
 
@@ -318,5 +318,5 @@ namespace PA_MultiplayerGalacticWar
 			}
 			return new Vector2( index, mindistance );
 		}
-    }
+ }
 }

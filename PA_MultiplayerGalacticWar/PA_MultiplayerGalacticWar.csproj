@@ -54,6 +54,7 @@
     <Compile Include="Entity_StarRoutes.cs" />
     <Compile Include="Entity_StarSystem.cs" />
     <Compile Include="Entity_UIPanel_Card.cs" />
+    <Compile Include="Entity_UIPanel_FileIO.cs" />
     <Compile Include="Entity_UIPanel_StarSystem.cs" />
     <Compile Include="Entity_UI_Button.cs" />
     <Compile Include="Entity_UI_ButtonLerp.cs" />
