@@ -48,7 +48,11 @@ namespace PA_MultiplayerGalacticWar
 						mouse.Normalize();
 					}
 					selfl.TargetPosition = mouse * 20;
-				}
+
+					Sound sound = AudioManager.PlaySound( "resources/audio/ui_hover_loop.wav" );
+					sound.Volume = 0.2f + Math.Abs( Game.Instance.Input.MouseDeltaX * 0.2f ) + Math.Abs( Game.Instance.Input.MouseDeltaX * 0.2f );
+					sound.Pitch = 0.9f + ( mouse.X * 0.1f ) + ( mouse.Y * 0.1f );
+                }
 			};
 			OnUnHover = delegate ( Entity_UI_Button self )
 			{
@@ -59,6 +63,9 @@ namespace PA_MultiplayerGalacticWar
 					selfl.TargetPosition = Vector2.Zero;
 					selfl.TargetScale = Vector2.Zero;
 				}
+
+				Sound sound = AudioManager.PlaySound( "resources/audio/ui_hover_loop.wav" );
+				sound.Stop();
 			};
 		}
 
@@ -89,6 +96,12 @@ namespace PA_MultiplayerGalacticWar
 				Text_Label.ScaleX = Image.image.ScaleX;
 				Text_Label.ScaleY = Image.image.ScaleY;
 			}
+		}
+
+		public override void Removed()
+		{
+			Sound sound = AudioManager.PlaySound( "resources/audio/ui_hover_loop.wav" );
+			sound.Stop();
 		}
 
 		public void Initialise()

@@ -18,6 +18,8 @@ namespace PA_MultiplayerGalacticWar
 
 		static public Sound PlaySound( string path, bool looping = false )
 		{
+			if ( Sounds == null ) return null;
+
 			// Load and store the sound if first play
 			if ( !Sounds.ContainsKey( path ) )
 			{
@@ -32,6 +34,8 @@ namespace PA_MultiplayerGalacticWar
 
 		static public Music PlayMusic( string path, bool looping = true )
 		{
+			if ( Musics == null ) return null;
+
 			// Load and store the sound if first play
 			if ( !Musics.ContainsKey( path ) )
 			{

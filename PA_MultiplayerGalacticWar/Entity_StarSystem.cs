@@ -19,7 +19,8 @@ namespace PA_MultiplayerGalacticWar
 		// System name and type (i.e. map)
 		public string Name = StarSystemInfos.Names.RandomElement() + StarSystemInfos.Name_Suffix.RandomElement();
 		public string Type = StarSystemInfos.Types.RandomElement();
-		public int ID = -1;
+		public int ID = -1; // Map ID
+		public int Index = -1; // Array Index
 
 		// Team colour
 		public Color Colour = new Color( 0.6f, 0.5f, 0.5f );
@@ -39,13 +40,19 @@ namespace PA_MultiplayerGalacticWar
 		{
 			ID = StarSystemInfos.Types.IndexOf( Type );
 
-			SelectCircle = new Entity_Image( x, y, "resources/selected.png" );
+			string file;
+
+			file = Helper.FindFile( new string[] { "resources/selected.png" } );
+			if ( file != null )
 			{
-				SelectCircle.image.Scale = 0.5f;
-				SelectCircle.image.Alpha = 0;
-				SelectCircle.image.Scroll = 1;
+				SelectCircle = new Entity_Image( x, y, file );
+				{
+					SelectCircle.image.Scale = 0.5f;
+					SelectCircle.image.Alpha = 0;
+					SelectCircle.image.Scroll = 1;
+				}
+				AddGraphics( SelectCircle.Graphic );
 			}
-			AddGraphics( SelectCircle.Graphic );
 
 			Owner = new Entity_Image( x, y, "resources/owner.png" );
 			{
@@ -153,6 +160,8 @@ namespace PA_MultiplayerGalacticWar
 			Selected = true;
 			SelectCircle.image.Alpha = 1;
 
+			Scene.Instance.GetEntity<Entity_Galaxy>().UpdateSelection( Index, true );
+
 			Scene.Instance.Add( UI );
 		}
 
@@ -160,6 +169,8 @@ namespace PA_MultiplayerGalacticWar
 		{
 			Selected = false;
 			SelectCircle.image.Alpha = 0;
+
+			Scene.Instance.GetEntity<Entity_Galaxy>().UpdateSelection( Index, false );
 
 			Scene.Instance.Remove( UI );
 		}

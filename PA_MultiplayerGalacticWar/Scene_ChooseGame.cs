@@ -138,5 +138,15 @@ namespace PA_MultiplayerGalacticWar
 				Game.Instance.Close();
 			}
         }
+
+		public override void End()
+		{
+			base.End();
+
+			Remove( Button_New );
+			Remove( Button_Continue );
+			Remove( Button_Load );
+			Remove( Button_Quit );
+		}
 	}
 }

@@ -35,8 +35,11 @@ namespace PA_MultiplayerGalacticWar
 		{
 			base.Update();
 
-			X = Game.Instance.Input.MouseScreenX;
-			Y = Game.Instance.Input.MouseScreenY;
+			X = (float) Game.Instance.Input.MouseScreenX / Scene.Instance.CameraZoom;
+			Y = (float) Game.Instance.Input.MouseScreenY / Scene.Instance.CameraZoom;
+
+			// Scale to be zoom independant
+			Graphic.Scale = 1.0f / Scene.Instance.CameraZoom;
 
 			// Always draw on top
 			Scene.Instance.BringToFront( this );

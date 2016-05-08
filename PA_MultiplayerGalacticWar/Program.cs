@@ -19,6 +19,7 @@ namespace PA_MultiplayerGalacticWar
 	{
 		static public float CloseTime = -1;
 		static public bool Clicked = false;
+		static public Music Music;
 
 		// Loaded upgrade cards
 		static public List<string> Cards_Loaded_Commander;
@@ -52,8 +53,8 @@ namespace PA_MultiplayerGalacticWar
 			{
 				//game.MouseVisible = true;
 			}
-			Music music = AudioManager.PlayMusic( "resources/audio/music.ogg" );
-			music.Volume = 0.2f;
+			Music = AudioManager.PlayMusic( "resources/audio/music.ogg" );
+			Music.Volume = 0.2f;
 
 			// Load JSON
 			{

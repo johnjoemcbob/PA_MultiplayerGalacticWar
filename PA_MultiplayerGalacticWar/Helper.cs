@@ -14,6 +14,10 @@ namespace PA_MultiplayerGalacticWar
 {
 	class Helper
 	{
+		static public bool DEBUG = false;
+
+        static public Color Colour_Unowned = new Color( 0.2f, 0.4f, 0.7f, 1 );
+
 		// Ensure all directories in path exist
 		static public void CreateDirectory( string path )
 		{

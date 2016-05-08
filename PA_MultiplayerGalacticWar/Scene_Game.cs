@@ -23,6 +23,10 @@ namespace PA_MultiplayerGalacticWar
 
 		private List<Entity_UIPanel_Card> PossibleCards = new List<Entity_UIPanel_Card>();
 
+		// Zooming
+		private float Zoom = 1;
+		private float ZoomTarget = 1;
+
 		public Scene_Game( string load = "" )
 		{
 			Filename = load;
@@ -65,13 +69,26 @@ namespace PA_MultiplayerGalacticWar
 		{
 			base.Update();
 
-			LoadGame();
+			TryLoadGame();
+			//UpdateZoom();
 
 			if ( Game.Instance.Input.KeyPressed( Key.Escape ) )
 			{
 				Game.Instance.RemoveScene();
 				Game.Instance.AddScene( new Scene_ChooseGame() );
 			}
+		}
+
+		private void UpdateZoom()
+		{
+			// Update the camera's zoom
+			if ( Input.MouseWheelDelta != 0 )
+			{
+				ZoomTarget += ( Input.MouseWheelDelta / 10 );
+				ZoomTarget = Math.Max( 1, Math.Min( 2, ZoomTarget ) );
+			}
+			Zoom += ( ZoomTarget - Zoom ) * Game.Instance.DeltaTime;
+			Scene.Instance.CameraZoom = Zoom;
 		}
 
 		public override void End()
@@ -140,7 +157,7 @@ namespace PA_MultiplayerGalacticWar
 			SetupGame();
 		}
 
-		private void LoadGame()
+		private void TryLoadGame()
 		{
 			if ( FileToLoad == null ) return;
 

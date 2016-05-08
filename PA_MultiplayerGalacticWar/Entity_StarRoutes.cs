@@ -25,6 +25,7 @@ namespace PA_MultiplayerGalacticWar
 	{
         private List<PARoute> StarRoutes = new List<PARoute>();
 		private List<PARoute> StarRoutesOffsets = new List<PARoute>();
+		private List<Vector2> StarIDs = new List<Vector2>();
 
 		public Entity_StarRoutes( Scene scene, Vector2[] routes, Vector2[] positions, string path_pa, string path_mod )
 		{
@@ -41,7 +42,7 @@ namespace PA_MultiplayerGalacticWar
 						half.X,
 						half.Y
 					);
-					paroute.Colour1 = new Color( 0.6f, 0.5f, 0.5f );
+					paroute.Colour1 = Helper.Colour_Unowned;
 					paroute.Node2 = (int) route.Y;
 					paroute.Position2 = new Vector4(
 						half.X,
@@ -49,12 +50,14 @@ namespace PA_MultiplayerGalacticWar
 						positions[paroute.Node2].X,
 						positions[paroute.Node2].Y
 					);
-					paroute.Colour2 = new Color( 0.6f, 0.5f, 0.5f );
+					paroute.Colour2 = Helper.Colour_Unowned;
 				}
 				// Add original positions for offsets
 				StarRoutesOffsets.Add( paroute );
 				// Add current for actual use
 				StarRoutes.Add( paroute );
+				// Add system indices for hiding and displaying logic
+				StarIDs.Add( route );
 			}
 		}
 
@@ -62,10 +65,16 @@ namespace PA_MultiplayerGalacticWar
 		{
 			base.Render();
 
-			foreach ( PARoute route in StarRoutes )
+            int selected = Scene.Instance.GetEntity<Entity_Galaxy>().SelectedSystem;
+			int id = 0;
+            foreach ( PARoute route in StarRoutes )
 			{
-				Draw.Line( route.Position1.X, route.Position1.Y, route.Position1.Z, route.Position1.W, route.Colour1, 2 );
-				Draw.Line( route.Position2.X, route.Position2.Y, route.Position2.Z, route.Position2.W, route.Colour2, 2 );
+				if ( ( StarIDs.ElementAt( id ).X == selected ) || ( StarIDs.ElementAt( id ).Y == selected ) || Helper.DEBUG )
+				{
+					Draw.Line( route.Position1.X, route.Position1.Y, route.Position1.Z, route.Position1.W, route.Colour1, 8 );
+					Draw.Line( route.Position2.X, route.Position2.Y, route.Position2.Z, route.Position2.W, route.Colour2, 8 );
+				}
+				id++;
 			}
 		}
 

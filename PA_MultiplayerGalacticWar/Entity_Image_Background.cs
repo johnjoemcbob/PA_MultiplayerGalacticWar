@@ -62,7 +62,7 @@ namespace PA_MultiplayerGalacticWar
 				file = Helper.FindFile( new string[] { Program.PATH_PA + "media/ui/main/game/galactic_war/gw_play/nebula0"+ nebula + ".png", "resources/galaxy.png" } );
 				if ( file != null )
 				{
-					AddImage( file, Scale );
+					AddImage( file, Scale + ( ( 8 - nebula ) * 0.05f ) );
 				}
 			}
 
