@@ -242,7 +242,6 @@ namespace PA_MultiplayerGalacticWar
 
 									indexother = (int) other.X;
 									index = group[groupid][system];
-									Console.WriteLine( groupid + " " + groupother );
 								}
 							}
 						}
@@ -253,7 +252,7 @@ namespace PA_MultiplayerGalacticWar
 					StarConnections.Add( new Vector2( index, indexother ) );
 				}
 
-				// TEMP TEST
+				// Do this to all groups until only one remains (recursive)
 				if ( group.Count > 2 )
 				{
 					Generate_ConnectAll();

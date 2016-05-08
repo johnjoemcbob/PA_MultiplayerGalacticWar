@@ -220,13 +220,6 @@ namespace PA_MultiplayerGalacticWar
 
 		public void SaveGame()
 		{
-			// Save player states
-			foreach ( Info_Player player in CurrentPlayers )
-			{
-				player.SaveCommander();
-				player.SaveArmy();
-			}
-
 			// Add the saving text to the screen
 			LoadUI = new Entity_UIPanel_FileIO();
 			{
@@ -240,6 +233,13 @@ namespace PA_MultiplayerGalacticWar
 
 		public void ThreadSaveGame()
 		{
+			// Save player states
+			foreach ( Info_Player player in CurrentPlayers )
+			{
+				player.SaveCommander();
+				player.SaveArmy();
+			}
+
 			// Save game state
 			if ( !Directory.Exists( "data/" ) )
 			{
