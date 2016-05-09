@@ -17,9 +17,12 @@ namespace PA_MultiplayerGalacticWar
 {
 	class Program
 	{
+		// ID for the player on this client
+		static public int ThisPlayer = 0;
+
 		static public float CloseTime = -1;
 		static public bool Clicked = false;
-		static public Music Music;
+		//static public Music Music;
 
 		// Loaded upgrade cards
 		static public List<string> Cards_Loaded_Commander;
@@ -89,6 +92,9 @@ namespace PA_MultiplayerGalacticWar
 
 			// Cleanup
 			AudioManager.Cleanup();
+			//Music.Stop();
+			//Music.Dispose();
+			//Music = null;
         }
 
 		static List<string> LoadCards( string directory )

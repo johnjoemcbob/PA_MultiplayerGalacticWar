@@ -85,6 +85,14 @@ namespace PA_MultiplayerGalacticWar.Entity
 		{
 			base.Update();
 
+			// Update the text
+			if ( Label != Text_Label.String )
+			{
+				Text_Label.String = Label;
+				Text_Label.CenterOrigin();
+			}
+
+			// Movement logic
 			ButtonCameraBounds = new Vector4(
 				Image.image.X + ButtonBounds.X - ( Image.image.ScaledWidth * ( 0.5f + Offset.X ) ),
 				Image.image.Y + ButtonBounds.Y - ( Image.image.ScaledHeight * ( 1.5f + Offset.Y ) ),
@@ -107,6 +115,7 @@ namespace PA_MultiplayerGalacticWar.Entity
 				ButtonCameraBounds.Y
 			);
 
+			// Click logic
 			Vector2 mouse = new Vector2( Scene.Instance.MouseRawX, Scene.Instance.MouseRawY );
             if ( Helper.PointWithinRect( mouse, ButtonCameraBounds ) )
 			{

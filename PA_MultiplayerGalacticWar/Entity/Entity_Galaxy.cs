@@ -44,7 +44,6 @@ namespace PA_MultiplayerGalacticWar.Entity
 
 			// Draw routes between the systems
 			StarRoutes = new Entity_StarRoutes( scene, StarConnections.ToArray(), StarPositions.ToArray(), path_pa, path_mod );
-			scene.Add( StarRoutes );
 
 			// Create the systems
 			foreach ( Vector2 pos in StarPositions )
@@ -52,12 +51,25 @@ namespace PA_MultiplayerGalacticWar.Entity
 				Entity_StarSystem starsystem = new Entity_StarSystem( scene, pos.X, pos.Y, path_pa, path_mod );
 				{
 					starsystem.Index = StarSystems.Count;
-					StarSystems.Add( starsystem );
 				}
-				scene.Add( starsystem );
+				StarSystems.Add( starsystem );
 			}
+			// Save neighbours to each star system
+			Generate_SaveNeighbour();
 
 			Layer = Helper.Layer_Star;
+		}
+
+		public override void Added()
+		{
+			base.Added();
+
+			Scene.Add( StarRoutes );
+
+			foreach ( Entity_StarSystem starsystem in StarSystems )
+			{
+				Scene.Add( starsystem );
+			}
 		}
 
 		public override void Update()
@@ -319,5 +331,36 @@ namespace PA_MultiplayerGalacticWar.Entity
 			}
 			return new Vector2( index, mindistance );
 		}
- }
+
+		private void Generate_SaveNeighbour()
+		{
+			// Save references of each neighbour to the star systems
+			int id = 0;
+			foreach ( Entity_StarSystem system in StarSystems )
+			{
+				foreach ( Vector2 con in StarConnections )
+				{
+					// Find reference to this system and another
+					if ( ( con.X == id ) || ( con.Y == id ) )
+					{
+						// Add connection reference
+						int other = (int) con.X;
+						{
+							if ( other == id )
+							{
+								other = (int) con.Y;
+							}
+						}
+						system.AddConnection( StarSystems.ElementAt( other ) );
+					}
+				}
+				id++;
+			}
+		}
+
+		public Entity_StarSystem GetRandomSystem()
+		{
+			return StarSystems.RandomElement();
+		}
+	}
 }

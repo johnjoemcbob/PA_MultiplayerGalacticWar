@@ -5,9 +5,6 @@
 using System;
 using System.IO;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Newtonsoft.Json;
 
 namespace PA_MultiplayerGalacticWar
@@ -18,6 +15,7 @@ namespace PA_MultiplayerGalacticWar
 		public string UberID;
 		public string FactionName;
 		public int ModelID;
+		public string Colour;
 		public List<string> CommanderCards;
 		public List<string> Cards;
 	};
@@ -44,6 +42,7 @@ namespace PA_MultiplayerGalacticWar
 		public string CommanderPath = "";
 		public dynamic Commander_Loaded;
 		public List<UnitType> Units_Loaded = new List<UnitType>();
+		public List<Entity.Entity_PlayerArmy> Armies = new List<Entity.Entity_PlayerArmy>();
 
 		public void Initialise()
 		{
@@ -85,44 +84,6 @@ namespace PA_MultiplayerGalacticWar
 			writer.Close();
 		}
 
-		// Load all units once per application, used by all players
-		static public void SetupAllArmy()
-		{
-			if ( AllUnits != null ) return;
-
-			string directory = GetArmyFilePath();
-
-			// Find all unit files which are NOT the commanders
-			AllUnits = new List<string>();
-			{
-				LoadArmy_ProcessDirectory( ref AllUnits, directory, directory );
-			}
-
-			// Setup same folder structure in mod
-			string basedir = GetBaseFilePath();
-			foreach ( string unit in AllUnits )
-			{
-				// Ensure all the slashes are forward
-				string temp = unit.Replace( "\\", "/" );
-
-				// Substring each part of the path by forwardslash
-				string[] dirs = temp.Split( '/' );
-				string curdir = basedir;
-				foreach ( string dir in dirs )
-				{
-					// Isn't file, check for directory existance or create
-					if ( !dir.Contains( ".json" ) )
-					{
-						curdir += "/" + dir;
-						if ( !Directory.Exists( curdir ) )
-						{
-							Directory.CreateDirectory( curdir );
-						}
-					}
-				}
-			}
-		}
-
 		public void LoadArmy()
 		{
 			string directory = Program.PATH_PA + "media/pa/units/";
@@ -153,32 +114,6 @@ namespace PA_MultiplayerGalacticWar
 				else
 				{
 					Console.WriteLine( "Skipping Base Class: " + unit );
-				}
-			}
-		}
-
-		static public void LoadArmy_ProcessDirectory( ref List<string> file_units, string basedir, string curdir )
-		{
-			// Process the list of files found in the directory
-			string[] fileEntries = Directory.GetFiles( curdir, "*.json" );
-			foreach ( string filename in fileEntries )
-			{
-				// Ignore unit_list.json
-				if ( !filename.Contains( "unit_list.json" ) )
-				{
-					// Remove unit path prefix
-					file_units.Add( filename.Substring( basedir.Length ) );
-				}
-			}
-
-			// Recurse into subdirectories of this directory
-			string[] subdirectoryEntries = Directory.GetDirectories( curdir );
-			foreach ( string subdirectory in subdirectoryEntries )
-			{
-				// Ignore commander files, these are loaded separately
-				if ( !subdirectory.Contains( "commander" ) )
-				{
-					LoadArmy_ProcessDirectory( ref file_units, basedir, subdirectory );
 				}
 			}
 		}
@@ -244,6 +179,95 @@ namespace PA_MultiplayerGalacticWar
 			}
 		}
 
+		public string GetFilePath()
+		{
+			return "pa/units/commanders/" + CommanderPath + ".json";
+		}
+
+		public string GetUniqueUnitFilePath( string unit )
+		{
+			return unit.Substring( 0, unit.Length - 5 ) + Commander.ModelID + ".json";
+        }
+
+		public void SetColour( Otter.Color colour )
+		{
+			Commander.Colour = colour.ColorString;
+		}
+
+		static public string GetArmyFilePath()
+		{
+			return Program.PATH_PA + "media/pa/units/";
+		}
+
+		static public string GetBaseFilePath()
+		{
+			return Program.PATH_MOD + "pa/units";
+        }
+
+		// Load all units once per application, used by all players
+		static public void SetupAllArmy()
+		{
+			if ( AllUnits != null ) return;
+
+			string directory = GetArmyFilePath();
+
+			// Find all unit files which are NOT the commanders
+			AllUnits = new List<string>();
+			{
+				LoadArmy_ProcessDirectory( ref AllUnits, directory, directory );
+			}
+
+			// Setup same folder structure in mod
+			string basedir = GetBaseFilePath();
+			foreach ( string unit in AllUnits )
+			{
+				// Ensure all the slashes are forward
+				string temp = unit.Replace( "\\", "/" );
+
+				// Substring each part of the path by forwardslash
+				string[] dirs = temp.Split( '/' );
+				string curdir = basedir;
+				foreach ( string dir in dirs )
+				{
+					// Isn't file, check for directory existance or create
+					if ( !dir.Contains( ".json" ) )
+					{
+						curdir += "/" + dir;
+						if ( !Directory.Exists( curdir ) )
+						{
+							Directory.CreateDirectory( curdir );
+						}
+					}
+				}
+			}
+		}
+
+		static public void LoadArmy_ProcessDirectory( ref List<string> file_units, string basedir, string curdir )
+		{
+			// Process the list of files found in the directory
+			string[] fileEntries = Directory.GetFiles( curdir, "*.json" );
+			foreach ( string filename in fileEntries )
+			{
+				// Ignore unit_list.json
+				if ( !filename.Contains( "unit_list.json" ) )
+				{
+					// Remove unit path prefix
+					file_units.Add( filename.Substring( basedir.Length ) );
+				}
+			}
+
+			// Recurse into subdirectories of this directory
+			string[] subdirectoryEntries = Directory.GetDirectories( curdir );
+			foreach ( string subdirectory in subdirectoryEntries )
+			{
+				// Ignore commander files, these are loaded separately
+				if ( !subdirectory.Contains( "commander" ) )
+				{
+					LoadArmy_ProcessDirectory( ref file_units, basedir, subdirectory );
+				}
+			}
+		}
+
 		static public void EndSetupArmy( string directory )
 		{
 			string basedir = Program.PATH_MOD + "pa/units";
@@ -270,25 +294,5 @@ namespace PA_MultiplayerGalacticWar
 				writer.Close();
 			}
 		}
-
-		public string GetFilePath()
-		{
-			return "pa/units/commanders/" + CommanderPath + ".json";
-		}
-
-		public string GetUniqueUnitFilePath( string unit )
-		{
-			return unit.Substring( 0, unit.Length - 5 ) + Commander.ModelID + ".json";
-        }
-
-		static public string GetArmyFilePath()
-		{
-			return Program.PATH_PA + "media/pa/units/";
-		}
-
-		static public string GetBaseFilePath()
-		{
-			return Program.PATH_MOD + "pa/units";
-        }
 	}
 }

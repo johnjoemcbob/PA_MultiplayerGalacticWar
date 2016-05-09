@@ -116,5 +116,19 @@ namespace PA_MultiplayerGalacticWar
 			Vector2 screenoff = new Vector2( Game.Instance.Width * off.X, Game.Instance.Height * off.Y );
 			return ( pos + screenoff );
 		}
+
+		// Entity checking helpers
+		public static bool AnyInScene<T>( List<T> entities )
+		{
+			foreach ( T entity in entities )
+			{
+				Otter.Entity ent = (Otter.Entity) (object) entity;
+				if ( ent.IsInScene )
+				{
+					return true;
+				}
+			}
+			return false;
+		}
     }
 }

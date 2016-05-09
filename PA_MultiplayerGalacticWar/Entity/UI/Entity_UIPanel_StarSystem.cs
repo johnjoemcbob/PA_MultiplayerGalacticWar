@@ -20,13 +20,15 @@ namespace PA_MultiplayerGalacticWar.Entity
 
 		public string Label = "";
 		public string SystemType = "";
-		public int SystemID = 0;
+		public Entity_StarSystem System = null;
 
 		private Entity_Image Image_Background;
 		private Text Text_Label;
 		private Text Text_SystemType;
 		private Text Text_SystemInfo;
-		private Entity_UI_Button Button_War;
+		private Entity_UI_Button Button_Action;
+
+		private Entity_PlayerArmy Army;
 
 		public Entity_UIPanel_StarSystem( float x, float y, string name, string systemtype )
 		{
@@ -65,7 +67,7 @@ namespace PA_MultiplayerGalacticWar.Entity
 			}
 			Image_Background.AddGraphic( Text_SystemType );
 			// System information (i.e. number of planets)
-			Text_SystemInfo = new Text( "(Planets: " + StarSystemInfos.Infos[SystemID].Planets + ")", Program.Font, 12 );
+			Text_SystemInfo = new Text( "(Planets: N/A)", Program.Font, 12 );
 			{
 				Text_SystemInfo.CenterOrigin();
 				Text_SystemInfo.SetPosition( new Vector2( 0, -48 ) );
@@ -73,32 +75,17 @@ namespace PA_MultiplayerGalacticWar.Entity
 				Text_SystemInfo.Color = Color.Shade( 0.7f );
 			}
 			Image_Background.AddGraphic( Text_SystemInfo );
-			// Button WAR
-			Button_War = new Entity_UI_Button();
+			// Button Action
+			Button_Action = new Entity_UI_Button();
 			{
-				Button_War.Colour_Default = Color.Red;
-				Button_War.Colour_Hover = Color.Red * Color.Shade( 0.8f );
-				Button_War.Label = "WAR";
-
 				Vector2 pos = new Vector2( X - Game.Instance.HalfWidth, Y - Game.Instance.HalfHeight + 72 );
-				Button_War.Offset.Y = -1;
-				Button_War.ButtonBounds = new Vector4( pos.X, pos.Y, 128, 48 );
-				Button_War.Scroll = new Vector2( 0, 0 );
+				Button_Action.Offset.Y = -1;
+				Button_Action.ButtonBounds = new Vector4( pos.X, pos.Y, 128, 48 );
+				Button_Action.Scroll = new Vector2( 0, 0 );
 
-				Button_War.OnPressed = delegate ( Entity_UI_Button self )
-				{
-					self.Image.image.Color = self.Colour_Hover * Color.Gray;
-					AudioManager.PlaySound( "resources/audio/ui_click.wav" );
-				};
-				Button_War.OnReleased = delegate ( Entity_UI_Button self )
-				{
-					Console.WriteLine( "WAR " + Label );
-					( (Scene_Game) Scene.Instance ).SaveGame();
-					AudioManager.PlaySound( "resources/audio/ui_click.wav" );
-				};
-
-				Button_War.Layer = Helper.Layer_UI;
+				Button_Action.Layer = Helper.Layer_UI;
 			}
+			UpdateButton();
 
 			// Add ui press collider
 			AddCollider<BoxCollider>( new BoxCollider( Width, Height ) );
@@ -113,8 +100,10 @@ namespace PA_MultiplayerGalacticWar.Entity
 			base.Added();
 
 			Scene.Instance.Add( Image_Background );
-			Scene.Instance.Add( Button_War );
-		}
+			Scene.Instance.Add( Button_Action );
+
+			Text_SystemInfo.String = "(Planets: " + StarSystemInfos.Infos[System.ID].Planets + ")";
+        }
 
 		public override void Update()
 		{
@@ -129,7 +118,57 @@ namespace PA_MultiplayerGalacticWar.Entity
 			base.Removed();
 
 			Scene.Instance.Remove( Image_Background );
-			Scene.Instance.Remove( Button_War );
+			Scene.Instance.Remove( Button_Action );
+		}
+
+		private void UpdateButton()
+		{
+			// Move
+			if ( ( Army == null ) || ( Army.Player != Program.ThisPlayer ) )
+			{
+				Button_Action.Colour_Default = Color.Green;
+				Button_Action.Colour_Hover = Color.Green * Color.Shade( 0.8f );
+				Button_Action.Label = "Move To";
+
+				Button_Action.OnPressed = delegate ( Entity_UI_Button self )
+				{
+					self.Image.image.Color = self.Colour_Hover * Color.Gray;
+					AudioManager.PlaySound( "resources/audio/ui_click.wav" );
+				};
+				Button_Action.OnReleased = delegate ( Entity_UI_Button self )
+				{
+					Entity_PlayerArmy.GetAllByPlayer( Program.ThisPlayer )[0].MoveToSystem( System );
+					AudioManager.PlaySound( "resources/audio/ui_click.wav" );
+				};
+			}
+			// WAR
+			else
+			{
+				Button_Action.Colour_Default = Color.Red;
+				Button_Action.Colour_Hover = Color.Red * Color.Shade( 0.8f );
+				Button_Action.Label = "WAR";
+
+				Button_Action.OnPressed = delegate ( Entity_UI_Button self )
+				{
+					self.Image.image.Color = self.Colour_Hover * Color.Gray;
+					AudioManager.PlaySound( "resources/audio/ui_click.wav" );
+				};
+				Button_Action.OnReleased = delegate ( Entity_UI_Button self )
+				{
+					Console.WriteLine( "WAR " + Label );
+					( (Scene_Game) Scene.Instance ).SaveGame();
+					AudioManager.PlaySound( "resources/audio/ui_click.wav" );
+				};
+			}
+		}
+
+		public void UpdatePlayerArmy( Entity_PlayerArmy army )
+		{
+			// Update Flag
+			Army = army;
+
+			// Check if in scene, if so; update actual buttons
+			UpdateButton();
 		}
 	}
 }

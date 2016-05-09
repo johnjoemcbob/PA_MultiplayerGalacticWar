@@ -32,6 +32,8 @@ namespace PA_MultiplayerGalacticWar
 
 		private Entity_UIPanel_FileIO LoadUI = null;
 
+		private Entity_Galaxy Galaxy;
+
 		// Zooming
 		private float Zoom = 1;
 		private float ZoomTarget = 1;
@@ -46,7 +48,8 @@ namespace PA_MultiplayerGalacticWar
 		{
 			base.Begin();
 
-			Add( new Entity_Galaxy( this, Program.PATH_PA, Program.PATH_MOD ) );
+			// Setup galaxy & star system information: BEFORE LOADING
+			Galaxy = new Entity_Galaxy( this, Program.PATH_PA, Program.PATH_MOD );
 
 			// Temp
 			PossibleCards.Add( new Entity_UIPanel_Card(
@@ -69,6 +72,11 @@ namespace PA_MultiplayerGalacticWar
 
 			// Cursor last
 			Add( new Entity_Cursor( Program.PATH_PA + "media/ui/main/shared/img/icons/cursor.png" ) );
+		}
+
+		private void Initialise()
+		{
+			Add( Galaxy );
 		}
 
 		public override void UpdateFirst()
@@ -103,6 +111,10 @@ namespace PA_MultiplayerGalacticWar
 				if ( Thread_Save != null )
 				{
 					Thread_Save.Abort();
+				}
+				else
+				{
+					Initialise();
 				}
 			}
 			if ( !FileToSave && Quit )
@@ -169,6 +181,7 @@ namespace PA_MultiplayerGalacticWar
 						commander.UberID = "\"7420260152538080746\""; //"friends":"[\"11035761434068835310\",\"16024636805495278681\",\"6884095390246756552\"]",
 						commander.FactionName = "Legion";
 						commander.ModelID = 0;
+						commander.Colour = Color.Random.ColorString;
 						commander.CommanderCards = new List<string>();
 						{
 							commander.CommanderCards.Add( "Miner Upgrade" );
@@ -277,15 +290,30 @@ namespace PA_MultiplayerGalacticWar
 		private void SetupGame()
 		{
 			Info_Player.SetupAllArmy();
+			int playerid = 0;
             foreach ( CommanderType com in CurrentGame.Commanders )
 			{
+				Entity_StarSystem start = Galaxy.GetRandomSystem();
+
 				Info_Player player = new Info_Player();
 				{
 					player.Commander = com;
 					player.CommanderPath = Program.PATH_COMMANDER[com.ModelID];
+
+					// Add their initial army
+					Entity_PlayerArmy army = new Entity_PlayerArmy();
+					{
+						army.Player = playerid;
+						army.MoveToSystem( start );
+					}
+					player.Armies.Add( army );
 				}
 				player.Initialise();
                 CurrentPlayers.Add( player );
+				Scene.Instance.Add( player.Armies[0] );
+				start.SetOwner( player.Armies[0].Player );
+
+				playerid++;
             }
 		}
 	}
