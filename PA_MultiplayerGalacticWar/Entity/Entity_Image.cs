@@ -9,9 +9,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PA_MultiplayerGalacticWar
+namespace PA_MultiplayerGalacticWar.Entity
 {
-	class Entity_Image : Entity
+	class Entity_Image : Otter.Entity
 	{
 		public bool LerpToTarget = true;
         public Graphic image;
@@ -34,7 +34,9 @@ namespace PA_MultiplayerGalacticWar
 
 			Target.X = x;
 			Target.Y = y;
-        }
+
+			Layer = Helper.Layer_UI;
+		}
 
 		public override void Update()
 		{

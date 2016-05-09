@@ -9,6 +9,8 @@ using System.Collections.Generic;
 using System.Threading;
 using Newtonsoft.Json;
 
+using PA_MultiplayerGalacticWar.Entity;
+
 namespace PA_MultiplayerGalacticWar
 {
 	class Scene_Game : Scene
@@ -16,14 +18,17 @@ namespace PA_MultiplayerGalacticWar
 		public Info_Game CurrentGame;
 		public List<Info_Player> CurrentPlayers = new List<Info_Player>();
 
+		// File input & output
 		private string Filename = "";
 		private string FileToLoad = "";
-		private bool FileToSave = true;
-
-		private List<Entity_UIPanel_Card> PossibleCards = new List<Entity_UIPanel_Card>();
-
 		private Thread Thread_Load = null;
 		private Thread Thread_Save = null;
+		private bool FileToSave = true;
+
+		// Flag to quit after pressing escape & after saving
+		private bool Quit = false;
+
+		private List<Entity_UIPanel_Card> PossibleCards = new List<Entity_UIPanel_Card>();
 
 		private Entity_UIPanel_FileIO LoadUI = null;
 
@@ -58,7 +63,6 @@ namespace PA_MultiplayerGalacticWar
 
 			// Threading
 			Thread_Load = new Thread( new ThreadStart( this.ThreadLoadGame ) );
-			Thread_Save = new Thread( new ThreadStart( this.ThreadSaveGame ) );
 			FileToSave = true;
 
 			Game.Instance.QuitButton.Clear();
@@ -78,13 +82,30 @@ namespace PA_MultiplayerGalacticWar
 		{
 			base.Update();
 
+			UpdateFileIO();
+			//UpdateZoom();
+
+			if ( Game.Instance.Input.KeyPressed( Key.Escape ) )
+			{
+				// Launch saving thread, scene will be switched when the thread joins
+				SaveGame();
+				Quit = true;
+			}
+		}
+
+		private void UpdateFileIO()
+		{
 			// Loading thread & UI
-			if ( Thread_Load.IsAlive || Thread_Save.IsAlive ) return;
+			if ( Thread_Load.IsAlive || ( ( Thread_Save != null ) && Thread_Save.IsAlive ) ) return;
 			if ( ( FileToLoad == null ) && LoadUI.IsInScene )
 			{
 				Remove( LoadUI );
-            }
-			if ( !FileToSave )
+				if ( Thread_Save != null )
+				{
+					Thread_Save.Abort();
+				}
+			}
+			if ( !FileToSave && Quit )
 			{
 				// Change state
 				Game.Instance.RemoveScene();
@@ -92,17 +113,6 @@ namespace PA_MultiplayerGalacticWar
 			}
 
 			TryLoadGame();
-			//UpdateZoom();
-
-			if ( Game.Instance.Input.KeyPressed( Key.Escape ) )
-			{
-				// Launch saving thread, scene will be switched when the thread joins
-				SaveGame();
-
-				// Change state
-				//Game.Instance.RemoveScene();
-				//Game.Instance.AddScene( new Scene_ChooseGame() );
-			}
 		}
 
 		private void UpdateZoom()
@@ -220,6 +230,8 @@ namespace PA_MultiplayerGalacticWar
 
 		public void SaveGame()
 		{
+			if ( ( Thread_Save != null ) && Thread_Save.IsAlive ) return;
+
 			// Add the saving text to the screen
 			LoadUI = new Entity_UIPanel_FileIO();
 			{
@@ -228,6 +240,7 @@ namespace PA_MultiplayerGalacticWar
 			Add( LoadUI );
 
 			// Start at thread to load the content
+			Thread_Save = new Thread( new ThreadStart( this.ThreadSaveGame ) );
 			Thread_Save.Start();
 		}
 

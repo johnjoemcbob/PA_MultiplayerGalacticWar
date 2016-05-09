@@ -9,11 +9,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PA_MultiplayerGalacticWar
+namespace PA_MultiplayerGalacticWar.Entity
 {
-	class Entity_UIPanel_StarSystem : Entity
+	class Entity_UIPanel_StarSystem : Otter.Entity
 	{
-		public static int Width = 196;
+		public static int Width = 256;
 		public static int Height = 212;
 		public static int HalfWidth = Width / 2;
 		public static int HalfHeight = Height / 2;
@@ -43,6 +43,8 @@ namespace PA_MultiplayerGalacticWar
 
 				Image_Background.image.Scroll = 0;
 				//Image_Background.SetTarget( center );
+
+				Image_Background.Layer = Helper.Layer_UI;
 			}
 			// System name
 			Text_Label = new Text( Label, Program.Font, 20 );
@@ -94,13 +96,17 @@ namespace PA_MultiplayerGalacticWar
 					( (Scene_Game) Scene.Instance ).SaveGame();
 					AudioManager.PlaySound( "resources/audio/ui_click.wav" );
 				};
+
+				Button_War.Layer = Helper.Layer_UI;
 			}
 
 			// Add ui press collider
 			AddCollider<BoxCollider>( new BoxCollider( Width, Height ) );
 			Collider.CenterOrigin();
             Collider.SetPosition( -Game.Instance.HalfWidth, -Game.Instance.HalfHeight );
-		}
+
+			Layer = Helper.Layer_UI;
+        }
 
 		public override void Added()
 		{

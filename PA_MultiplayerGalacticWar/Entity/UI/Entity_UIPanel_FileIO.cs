@@ -9,9 +9,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PA_MultiplayerGalacticWar
+namespace PA_MultiplayerGalacticWar.Entity
 {
-	class Entity_UIPanel_FileIO : Entity
+	class Entity_UIPanel_FileIO : Otter.Entity
 	{
 		public int NumCircles = 6;
 		public string Label = "Loading";
@@ -33,7 +33,7 @@ namespace PA_MultiplayerGalacticWar
 				}
 			}
 
-			X = -Game.Instance.Width / 2;
+			X = ( -Game.Instance.Width / 2 ) + 8;
 			Y = Game.Instance.Height / 2;
 		}
 
@@ -49,7 +49,9 @@ namespace PA_MultiplayerGalacticWar
 				Text_Label.Y = Game.Instance.Height / 2;
 			}
 			AddGraphic( Text_Label );
-        }
+
+			Layer = Helper.Layer_UI;
+		}
 
 		public override void Update()
 		{
@@ -68,10 +70,6 @@ namespace PA_MultiplayerGalacticWar
 				}
 			}
             Text_Label.String = Label + Ellipsis;
-
-			// Layer order
-			Scene.BringForward( this );
-			Scene.BringForward( Scene.GetEntity<Entity_Cursor>() );
 		}
 
 		public override void Render()

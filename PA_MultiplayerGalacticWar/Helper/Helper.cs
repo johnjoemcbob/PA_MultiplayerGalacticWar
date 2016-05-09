@@ -14,9 +14,19 @@ namespace PA_MultiplayerGalacticWar
 {
 	class Helper
 	{
+		// Flags
 		static public bool DEBUG = false;
 
+		// Colours
         static public Color Colour_Unowned = new Color( 0.2f, 0.4f, 0.7f, 1 );
+
+		// Layers
+		static public int Layer_Background = 1000;
+		static public int Layer_StarRoute = 900;
+		static public int Layer_Star = 800;
+        static public int Layer_Player = 700;
+		static public int Layer_UI = 600;
+		static public int Layer_Cursor = 0;
 
 		// Ensure all directories in path exist
 		static public void CreateDirectory( string path )

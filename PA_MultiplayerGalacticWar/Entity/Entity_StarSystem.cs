@@ -4,17 +4,13 @@
 
 using Otter;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 // Add random system map selector
 // Add lines connecting to others
 
-namespace PA_MultiplayerGalacticWar
+namespace PA_MultiplayerGalacticWar.Entity
 {
-	class Entity_StarSystem : Entity
+	class Entity_StarSystem : Otter.Entity
 	{
 		// System name and type (i.e. map)
 		public string Name = StarSystemInfos.Names.RandomElement() + StarSystemInfos.Name_Suffix.RandomElement();
@@ -82,7 +78,16 @@ namespace PA_MultiplayerGalacticWar
 			// Add button press collider
 			AddCollider<BoxCollider>( new BoxCollider( 48, 48 ) );
 			Collider.SetPosition( -24, -24 );
-        }
+
+			Entity_PlayerArmy army = new Entity_PlayerArmy();
+			{
+				army.X = X;
+				army.Y = Y;
+			}
+            Scene.Instance.Add( army );
+
+			Layer = Helper.Layer_Star;
+		}
 
 		public override void Update()
 		{

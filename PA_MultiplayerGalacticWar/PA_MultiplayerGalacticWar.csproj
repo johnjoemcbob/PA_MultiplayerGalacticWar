@@ -45,29 +45,29 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AudioManager.cs" />
-    <Compile Include="Commander.cs" />
-    <Compile Include="Entity_Cursor.cs" />
-    <Compile Include="Entity_Galaxy.cs" />
-    <Compile Include="Entity_Image.cs" />
-    <Compile Include="Entity_Image_Background.cs" />
-    <Compile Include="Entity_StarRoutes.cs" />
-    <Compile Include="Entity_StarSystem.cs" />
-    <Compile Include="Entity_UIPanel_Card.cs" />
-    <Compile Include="Entity_UIPanel_FileIO.cs" />
-    <Compile Include="Entity_UIPanel_StarSystem.cs" />
-    <Compile Include="Entity_UI_Button.cs" />
-    <Compile Include="Entity_UI_ButtonLerp.cs" />
-    <Compile Include="Helper.cs" />
-    <Compile Include="Info_Game.cs" />
-    <Compile Include="Info_Player.cs" />
+    <Compile Include="Helper\AudioManager.cs" />
+    <Compile Include="Entity\Entity_Image_Background.cs" />
+    <Compile Include="Entity\Entity_PlayerArmy.cs" />
+    <Compile Include="Info\Commander.cs" />
+    <Compile Include="Entity\UI\Elements\Entity_Cursor.cs" />
+    <Compile Include="Entity\Entity_Galaxy.cs" />
+    <Compile Include="Entity\Entity_Image.cs" />
+    <Compile Include="Entity\Entity_StarRoutes.cs" />
+    <Compile Include="Entity\Entity_StarSystem.cs" />
+    <Compile Include="Entity\UI\Entity_UIPanel_Card.cs" />
+    <Compile Include="Entity\UI\Entity_UIPanel_FileIO.cs" />
+    <Compile Include="Entity\UI\Entity_UIPanel_StarSystem.cs" />
+    <Compile Include="Entity\UI\Elements\Entity_UI_Button.cs" />
+    <Compile Include="Entity\UI\Elements\Entity_UI_ButtonLerp.cs" />
+    <Compile Include="Helper\Helper.cs" />
+    <Compile Include="Info\Info_Game.cs" />
+    <Compile Include="Info\Info_Player.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Scene_ChooseGame.cs" />
-    <Compile Include="Scene_Game.cs" />
-    <Compile Include="StarSystemNames.cs" />
-    <Compile Include="Unit.cs" />
-    <Compile Include="UnitList.cs" />
+    <Compile Include="Scene\Scene_ChooseGame.cs" />
+    <Compile Include="Scene\Scene_Game.cs" />
+    <Compile Include="Info\StarSystemNames.cs" />
+    <Compile Include="Info\UnitList.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
@@ -82,6 +82,7 @@
       <Name>Otter</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

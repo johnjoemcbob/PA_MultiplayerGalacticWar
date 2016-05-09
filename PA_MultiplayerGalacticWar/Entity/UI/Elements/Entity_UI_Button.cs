@@ -9,11 +9,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PA_MultiplayerGalacticWar
+namespace PA_MultiplayerGalacticWar.Entity
 {
 	delegate void MouseEvent( Entity_UI_Button self );
 
-	class Entity_UI_Button : Entity
+	class Entity_UI_Button : Otter.Entity
 	{
 		public string Label = "New Game";
 		public Vector2 Offset = Vector2.Zero;
@@ -64,6 +64,8 @@ namespace PA_MultiplayerGalacticWar
                 Image.SetTarget( Center + new Vector2( ButtonBounds.X, ButtonBounds.Y ) );
 				Image.image.ScrollX = Scroll.X;
 				Image.image.ScrollY = Scroll.Y;
+
+				Image.Layer = Helper.Layer_UI;
 			}
 			Scene.Instance.Add( Image );
 
@@ -75,7 +77,9 @@ namespace PA_MultiplayerGalacticWar
 				Text_Label.ScrollY = Scroll.Y;
 			}
 			Image.AddGraphic( Text_Label );
-        }
+
+			Layer = Helper.Layer_UI;
+		}
 
 		public override void Update()
 		{

@@ -25,16 +25,32 @@ namespace PA_MultiplayerGalacticWar
 	{
 		public static string[] Names = new string[]
 		{
+			// Default
 			"Xerus",
 			"Turo",
 			"Joun",
 			"Quanerto",
+			// People
 			"Maveus",
 			"Nawewa",
 			"Jemblie",
 			"CTRE-5N",
 			"Cusp",
-			"Contus"
+			"Etherool",
+			"Contus",
+			"Dzolu",
+			// Games
+			"Nominis", // Honour
+			"Saliet Agunt", // Leap Carnival
+			"Caelum Veu", // SkyView
+			"Lacum Repere", // Dungeon Crawler
+			"Uirgae Infirma", // Tragic Magic
+            "Pater Fornicem", // DadSim
+			"Prandium", // BreakfastSim
+			"Aeternum", // Aeon
+			"Terminus Oppidum", // Frontier Town
+            "Ovum Cicero", // Fry an Egg
+			"Sanctum Inveneris", // ECTO-DETECT-O
 		};
 		public static string[] Name_Suffix = new string[]
 		{

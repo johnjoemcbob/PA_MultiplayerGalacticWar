@@ -9,7 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PA_MultiplayerGalacticWar
+namespace PA_MultiplayerGalacticWar.Entity
 {
 	struct PARoute
 	{
@@ -21,7 +21,7 @@ namespace PA_MultiplayerGalacticWar
 		public Color Colour2;
 	};
 
-	class Entity_StarRoutes : Entity
+	class Entity_StarRoutes : Otter.Entity
 	{
         private List<PARoute> StarRoutes = new List<PARoute>();
 		private List<PARoute> StarRoutesOffsets = new List<PARoute>();
@@ -59,6 +59,8 @@ namespace PA_MultiplayerGalacticWar
 				// Add system indices for hiding and displaying logic
 				StarIDs.Add( route );
 			}
+
+			Layer = Helper.Layer_StarRoute;
 		}
 
 		public override void Render()

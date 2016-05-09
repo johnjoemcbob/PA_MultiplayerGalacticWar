@@ -9,6 +9,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using PA_MultiplayerGalacticWar.Entity;
+
 namespace PA_MultiplayerGalacticWar
 {
 	class Scene_ChooseGame : Scene

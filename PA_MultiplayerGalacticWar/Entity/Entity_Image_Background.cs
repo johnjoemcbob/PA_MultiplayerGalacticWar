@@ -4,14 +4,10 @@
 
 using Otter;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace PA_MultiplayerGalacticWar
+namespace PA_MultiplayerGalacticWar.Entity
 {
-	class Entity_Image_Background : Entity
+	class Entity_Image_Background : Otter.Entity
 	{
 		static public float Scale = 0.75f; // 1.25f;
 
@@ -77,6 +73,8 @@ namespace PA_MultiplayerGalacticWar
 			//	}
 			//	scene.Add( Background_Galaxy );
 			//}
+
+			Layer = Helper.Layer_Background;
 		}
 
 		public override void Update()

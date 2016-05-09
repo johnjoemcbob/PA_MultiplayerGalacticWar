@@ -9,7 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PA_MultiplayerGalacticWar
+namespace PA_MultiplayerGalacticWar.Entity
 {
 	class Entity_UI_ButtonLerp : Entity_UI_Button
 	{
@@ -67,6 +67,8 @@ namespace PA_MultiplayerGalacticWar
 				Sound sound = AudioManager.PlaySound( "resources/audio/ui_hover_loop.wav" );
 				sound.Stop();
 			};
+
+			Layer = Helper.Layer_UI;
 		}
 
 		public override void Added()

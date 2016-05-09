@@ -9,9 +9,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PA_MultiplayerGalacticWar
+namespace PA_MultiplayerGalacticWar.Entity
 {
-	class Entity_UIPanel_Card : Entity
+	class Entity_UIPanel_Card : Otter.Entity
 	{
 		public string Label = "Test Card";
 		public string Description = "Description Text\nYeah!";
@@ -58,6 +58,8 @@ namespace PA_MultiplayerGalacticWar
 				Image_Background.NineSlice( Program.PATH_PA + "media/ui/main/shared/img/panel/img_menu_panel.png", 24, 24, 256, 364 );
 
 				//Image_Background.SetTarget( center );
+
+				Image_Background.Layer = Helper.Layer_UI;
 			}
 			Scene.Instance.Add( Image_Background );
 
@@ -114,8 +116,12 @@ namespace PA_MultiplayerGalacticWar
 					Scene.Instance.Remove( this );
 					AudioManager.PlaySound( "resources/audio/ui_click.wav" );
 				};
+
+				Button_Choose.Layer = Helper.Layer_UI;
 			}
 			Scene.Instance.Add( Button_Choose );
+
+			Layer = Helper.Layer_UI;
 		}
 
 		public override void Removed()

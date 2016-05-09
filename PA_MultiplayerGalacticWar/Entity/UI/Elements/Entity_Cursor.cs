@@ -9,9 +9,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PA_MultiplayerGalacticWar
+namespace PA_MultiplayerGalacticWar.Entity
 {
-	class Entity_Cursor : Entity
+	class Entity_Cursor : Otter.Entity
 	{
 		public string File = "";
 
@@ -24,6 +24,8 @@ namespace PA_MultiplayerGalacticWar
 				AddGraphic( new Image( File ) );
 				Graphic.CenterOrigin();
 			}
+
+			Layer = Helper.Layer_Cursor;
 		}
 
 		public override void Added()
@@ -40,9 +42,6 @@ namespace PA_MultiplayerGalacticWar
 
 			// Scale to be zoom independant
 			Graphic.Scale = 1.0f / Scene.Instance.CameraZoom;
-
-			// Always draw on top
-			Scene.Instance.BringToFront( this );
 		}
 	}
 }

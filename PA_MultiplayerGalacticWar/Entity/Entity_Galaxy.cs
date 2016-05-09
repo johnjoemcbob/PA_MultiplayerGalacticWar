@@ -9,9 +9,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PA_MultiplayerGalacticWar
+namespace PA_MultiplayerGalacticWar.Entity
 {
-	class Entity_Galaxy : Entity
+	class Entity_Galaxy : Otter.Entity
 	{
 		public int MaxSystems = 40;
 		public float MinSystemDistance = 50;
@@ -56,6 +56,8 @@ namespace PA_MultiplayerGalacticWar
 				}
 				scene.Add( starsystem );
 			}
+
+			Layer = Helper.Layer_Star;
 		}
 
 		public override void Update()
