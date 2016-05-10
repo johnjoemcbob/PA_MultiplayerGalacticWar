@@ -58,7 +58,7 @@ namespace PA_MultiplayerGalacticWar.Entity
 			}
 			Image_Background.AddGraphic( Text_Label );
 			// System type (i.e. map)
-			Text_SystemType = new Text( "(" + SystemType + ")", Program.Font, 16 );
+			Text_SystemType = new Text( "(SystemType)", Program.Font, 16 );
 			{
 				Text_SystemType.CenterOrigin();
 				Text_SystemType.SetPosition( new Vector2( 0, -62 ) );
@@ -101,8 +101,6 @@ namespace PA_MultiplayerGalacticWar.Entity
 
 			Scene.Instance.Add( Image_Background );
 			Scene.Instance.Add( Button_Action );
-
-			Text_SystemInfo.String = "(Planets: " + StarSystemInfos.Infos[System.ID].Planets + ")";
         }
 
 		public override void Update()
@@ -169,6 +167,18 @@ namespace PA_MultiplayerGalacticWar.Entity
 
 			// Check if in scene, if so; update actual buttons
 			UpdateButton();
+		}
+
+		public void UpdateText()
+		{
+			Text_Label.String = Label;
+			Text_Label.CenterOrigin();
+
+			Text_SystemType.String = "(" + SystemType + ")";
+			Text_SystemType.CenterOrigin();
+
+			Text_SystemInfo.String = "(Planets: " + StarSystemInfos.Infos[System.MapID].Planets + ")";
+			Text_SystemInfo.CenterOrigin();
 		}
 	}
 }

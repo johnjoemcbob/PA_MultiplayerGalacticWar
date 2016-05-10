@@ -24,6 +24,7 @@ namespace PA_MultiplayerGalacticWar
 		private Thread Thread_Load = null;
 		private Thread Thread_Save = null;
 		private bool FileToSave = true;
+		private bool IsNewGame = false;
 
 		// Flag to quit after pressing escape & after saving
 		private bool Quit = false;
@@ -74,8 +75,10 @@ namespace PA_MultiplayerGalacticWar
 			Add( new Entity_Cursor( Program.PATH_PA + "media/ui/main/shared/img/icons/cursor.png" ) );
 		}
 
-		private void Initialise()
+		private void TryInitialise()
 		{
+			if ( Galaxy.IsInScene ) return;
+
 			Add( Galaxy );
 		}
 
@@ -112,19 +115,21 @@ namespace PA_MultiplayerGalacticWar
 				{
 					Thread_Save.Abort();
 				}
-				else
+			}
+			if ( !FileToSave )
+			{
+				Remove( LoadUI );
+
+				if ( Quit )
 				{
-					Initialise();
+					// Change state
+					Game.Instance.RemoveScene();
+					Game.Instance.AddScene( new Scene_ChooseGame() );
 				}
 			}
-			if ( !FileToSave && Quit )
-			{
-				// Change state
-				Game.Instance.RemoveScene();
-				Game.Instance.AddScene( new Scene_ChooseGame() );
-			}
+			TryInitialise();
 
-			TryLoadGame();
+			TryInitialLoadGame();
 		}
 
 		private void UpdateZoom()
@@ -175,7 +180,7 @@ namespace PA_MultiplayerGalacticWar
 				CurrentGame.Commanders = new List<CommanderType>();
 				for ( int com = 0; com < CurrentGame.Players; com++ )
 				{
-					CommanderType commander;
+					CommanderType commander = new CommanderType();
 					{
 						commander.PlayerName = "Matthew";
 						commander.UberID = "\"7420260152538080746\""; //"friends":"[\"11035761434068835310\",\"16024636805495278681\",\"6884095390246756552\"]",
@@ -190,18 +195,34 @@ namespace PA_MultiplayerGalacticWar
 						{
 							commander.Cards.Add( "Advanced Bots" );
 						}
+						commander.Armies = new List<ArmyType>();
+						{
+							ArmyType army;
+							{
+								army.Name = "";
+								army.Strength = 1;
+								army.SystemPosition = Rand.Int( 0, Galaxy.MaxSystems );
+							}
+							commander.Armies.Add( army );
+						}
 					}
 					CurrentGame.Commanders.Add( commander );
 				}
-			}
-			SaveGame();
 
+				// Generate the initial galaxy
+				Galaxy.Generate();
+            }
+			Galaxy.Initialise();
+			Galaxy.Generate_Info();
 			SetupGame();
+
+			IsNewGame = true;
+			SaveGame();
 		}
 
-		private void TryLoadGame()
+		private void TryInitialLoadGame()
 		{
-			if ( ( FileToLoad == null ) || ( Thread_Load.IsAlive ) ) return;
+			if ( ( FileToLoad == null ) || ( ( Thread_Load != null ) && Thread_Load.IsAlive ) || ( Thread_Save != null ) ) return;
 
 			if ( FileToLoad == "" )
 			{
@@ -233,6 +254,7 @@ namespace PA_MultiplayerGalacticWar
 			CurrentGame = JsonConvert.DeserializeObject<Info_Game>( Helper.ReadFile( FileToLoad ) );
 			FileToLoad = null;
 
+			Galaxy.Initialise( CurrentGame.Galaxy );
 			SetupGame();
 
 			foreach ( Info_Player player in CurrentPlayers )
@@ -277,6 +299,12 @@ namespace PA_MultiplayerGalacticWar
 				Filename = "data/game" + num + ".json";
 			}
 
+			// Get the new info about each player
+			CurrentGame.SavePlayers( !IsNewGame );
+
+			// Get the new info about the galaxies
+			CurrentGame.SaveGalaxy( Galaxy );
+
 			// Write back out
 			StreamWriter writer = new StreamWriter( Filename );
 			{
@@ -285,7 +313,8 @@ namespace PA_MultiplayerGalacticWar
 			writer.Close();
 
 			FileToSave = false;
-        }
+			IsNewGame = false;
+		}
 
 		private void SetupGame()
 		{
@@ -293,25 +322,39 @@ namespace PA_MultiplayerGalacticWar
 			int playerid = 0;
             foreach ( CommanderType com in CurrentGame.Commanders )
 			{
-				Entity_StarSystem start = Galaxy.GetRandomSystem();
-
 				Info_Player player = new Info_Player();
 				{
 					player.Commander = com;
 					player.CommanderPath = Program.PATH_COMMANDER[com.ModelID];
 
-					// Add their initial army
-					Entity_PlayerArmy army = new Entity_PlayerArmy();
+					// Load their armies
+					if ( player.Commander.Armies != null )
 					{
-						army.Player = playerid;
-						army.MoveToSystem( start );
+						foreach ( ArmyType armytype in player.Commander.Armies )
+						{
+							Entity_PlayerArmy army = new Entity_PlayerArmy();
+							{
+								army.Player = playerid;
+								army.MoveToSystem( Galaxy.GetSystemByID( armytype.SystemPosition ) );
+							}
+							player.Armies.Add( army );
+						}
 					}
-					player.Armies.Add( army );
 				}
 				player.Initialise();
                 CurrentPlayers.Add( player );
 				Scene.Instance.Add( player.Armies[0] );
-				start.SetOwner( player.Armies[0].Player );
+
+				// NOTE: Depends on player being in the CurrentPlayers list first
+				// Load the owned systems from the json into the galaxy map
+				if ( player.Commander.OwnedSystems != null )
+				{
+					foreach ( int systemid in player.Commander.OwnedSystems )
+					{
+						Entity_StarSystem system = Galaxy.GetSystemByID( systemid );
+						system.SetOwner( playerid );
+					}
+				}
 
 				playerid++;
             }

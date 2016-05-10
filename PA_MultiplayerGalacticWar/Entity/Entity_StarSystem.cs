@@ -14,9 +14,9 @@ namespace PA_MultiplayerGalacticWar.Entity
 	class Entity_StarSystem : Otter.Entity
 	{
 		// System name and type (i.e. map)
-		public string Name = StarSystemInfos.Names.RandomElement() + StarSystemInfos.Name_Suffix.RandomElement();
-		public string Type = StarSystemInfos.Types.RandomElement();
-		public int ID = -1; // Map ID
+		public string Name = "";
+		public string Type = "";
+		public int MapID = -1; // Map ID
 		public int Index = -1; // Array Index
 		public int Owner = -1; // Player Owner Index
 
@@ -41,8 +41,6 @@ namespace PA_MultiplayerGalacticWar.Entity
 
 		public Entity_StarSystem( Scene scene, float x, float y, string path_pa, string path_mod ) : base( x, y )
 		{
-			ID = StarSystemInfos.Types.IndexOf( Type );
-
 			string file;
 
 			file = Helper.FindFile( new string[] { "resources/selected.png" } );
@@ -253,12 +251,24 @@ namespace PA_MultiplayerGalacticWar.Entity
 			Visible = visible;
 		}
 
+		public void UpdateText()
+		{
+			UI.Label = Name;
+			UI.SystemType = Type;
+			UI.UpdateText();
+		}
+
 		public void SetOwner( int owner )
 		{
 			Owner = owner;
 
 			Colour = new Otter.Color( ( (Scene_Game) Scene.Instance ).CurrentPlayers.ToArray()[Owner].Commander.Colour );
 			Image_Owner.image.Color = Colour;
+		}
+
+		public List<Entity_StarSystem> GetNeighbours()
+		{
+			return Neighbours;
 		}
 	}
 }

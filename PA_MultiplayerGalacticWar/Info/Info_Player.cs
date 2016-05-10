@@ -9,15 +9,26 @@ using Newtonsoft.Json;
 
 namespace PA_MultiplayerGalacticWar
 {
+	struct ArmyType
+	{
+		public string Name;
+		public int SystemPosition;
+		public int Strength; // Not actually implemented, could be used later for multiple armies
+	};
+
 	struct CommanderType
 	{
+		// Setup
 		public string PlayerName;
 		public string UberID;
 		public string FactionName;
 		public int ModelID;
 		public string Colour;
+		// Gameplay
 		public List<string> CommanderCards;
 		public List<string> Cards;
+		public List<ArmyType> Armies;
+		public List<int> OwnedSystems;
 	};
 
 	struct UnitType
@@ -42,6 +53,7 @@ namespace PA_MultiplayerGalacticWar
 		public string CommanderPath = "";
 		public dynamic Commander_Loaded;
 		public List<UnitType> Units_Loaded = new List<UnitType>();
+		public List<int> OwnedSystems = new List<int>();
 		public List<Entity.Entity_PlayerArmy> Armies = new List<Entity.Entity_PlayerArmy>();
 
 		public void Initialise()
@@ -194,6 +206,16 @@ namespace PA_MultiplayerGalacticWar
 			Commander.Colour = colour.ColorString;
 		}
 
+		public void AddOwnedSystem( int system )
+		{
+			if ( Commander.OwnedSystems == null )
+			{
+				Commander.OwnedSystems = new List<int>();
+            }
+			Commander.OwnedSystems.Add( system );
+		}
+
+#region static
 		static public string GetArmyFilePath()
 		{
 			return Program.PATH_PA + "media/pa/units/";
@@ -294,5 +316,6 @@ namespace PA_MultiplayerGalacticWar
 				writer.Close();
 			}
 		}
+#endregion
 	}
 }

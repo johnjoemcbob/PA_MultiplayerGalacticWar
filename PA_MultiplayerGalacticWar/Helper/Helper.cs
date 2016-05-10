@@ -15,7 +15,7 @@ namespace PA_MultiplayerGalacticWar
 	class Helper
 	{
 		// Flags
-		static public bool DEBUG = false;
+		static public bool DEBUG = true;
 
 		// Colours
         static public Color Colour_Unowned = new Color( 0.2f, 0.4f, 0.7f, 1 );
