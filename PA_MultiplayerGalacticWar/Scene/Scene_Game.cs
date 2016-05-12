@@ -216,6 +216,17 @@ namespace PA_MultiplayerGalacticWar
 			Galaxy.Generate_Info();
 			SetupGame();
 
+			// Add ownership of the starting locations to those players
+			int playerid = 0;
+			foreach ( CommanderType player in CurrentGame.Commanders )
+			{
+				foreach ( ArmyType army in player.Armies )
+				{
+					Galaxy.GetSystemByID( army.SystemPosition ).SetOwner( playerid );
+				}
+				playerid++;
+			}
+
 			IsNewGame = true;
 			SaveGame();
 		}
@@ -256,6 +267,7 @@ namespace PA_MultiplayerGalacticWar
 
 			Galaxy.Initialise( CurrentGame.Galaxy );
 			SetupGame();
+			Galaxy.InitialisePlayers();
 
 			foreach ( Info_Player player in CurrentPlayers )
 			{
@@ -300,7 +312,7 @@ namespace PA_MultiplayerGalacticWar
 			}
 
 			// Get the new info about each player
-			CurrentGame.SavePlayers( !IsNewGame );
+			CurrentGame.SavePlayers( CurrentPlayers, !IsNewGame );
 
 			// Get the new info about the galaxies
 			CurrentGame.SaveGalaxy( Galaxy );
@@ -326,24 +338,24 @@ namespace PA_MultiplayerGalacticWar
 				{
 					player.Commander = com;
 					player.CommanderPath = Program.PATH_COMMANDER[com.ModelID];
-
-					// Load their armies
-					if ( player.Commander.Armies != null )
-					{
-						foreach ( ArmyType armytype in player.Commander.Armies )
-						{
-							Entity_PlayerArmy army = new Entity_PlayerArmy();
-							{
-								army.Player = playerid;
-								army.MoveToSystem( Galaxy.GetSystemByID( armytype.SystemPosition ) );
-							}
-							player.Armies.Add( army );
-						}
-					}
 				}
 				player.Initialise();
-                CurrentPlayers.Add( player );
-				Scene.Instance.Add( player.Armies[0] );
+				CurrentPlayers.Add( player );
+
+				// Load their armies
+				if ( player.Commander.Armies != null )
+				{
+					foreach ( ArmyType armytype in player.Commander.Armies )
+					{
+						Entity_PlayerArmy army = new Entity_PlayerArmy();
+						{
+							army.Player = playerid;
+							army.MoveToSystem( Galaxy.GetSystemByID( armytype.SystemPosition ) );
+						}
+						player.Armies.Add( army );
+						Scene.Instance.Add( army );
+					}
+				}
 
 				// NOTE: Depends on player being in the CurrentPlayers list first
 				// Load the owned systems from the json into the galaxy map
@@ -358,6 +370,32 @@ namespace PA_MultiplayerGalacticWar
 
 				playerid++;
             }
+		}
+
+		public int GetPlayerTurn()
+		{
+			return CurrentGame.CurrentTurn;
+        }
+		public bool GetIsPlayerTurn( int player )
+		{
+			return ( GetPlayerTurn() == player );
+		}
+		public void SetNextPlayerTurn()
+		{
+			CurrentGame.CurrentTurn++;
+			CurrentGame.Turns++;
+            if ( CurrentGame.CurrentTurn >= CurrentGame.Players )
+			{
+				CurrentGame.CurrentTurn = 0;
+			}
+
+			// temp
+			Program.ThisPlayer = CurrentGame.CurrentTurn;
+			foreach ( Entity_StarSystem system in Galaxy.GetSystems() )
+			{
+				system.CheckVisibility();
+				system.SetSelected( false );
+			}
 		}
 	}
 }

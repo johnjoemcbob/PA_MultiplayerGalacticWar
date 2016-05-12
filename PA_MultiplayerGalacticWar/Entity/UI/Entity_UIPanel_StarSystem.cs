@@ -122,7 +122,7 @@ namespace PA_MultiplayerGalacticWar.Entity
 		private void UpdateButton()
 		{
 			// Move
-			if ( ( Army == null ) || ( Army.Player != Program.ThisPlayer ) )
+			if ( Army == null )
 			{
 				Button_Action.Colour_Default = Color.Green;
 				Button_Action.Colour_Hover = Color.Green * Color.Shade( 0.8f );
@@ -135,7 +135,7 @@ namespace PA_MultiplayerGalacticWar.Entity
 				};
 				Button_Action.OnReleased = delegate ( Entity_UI_Button self )
 				{
-					Entity_PlayerArmy.GetAllByPlayer( Program.ThisPlayer )[0].MoveToSystem( System );
+					System.Action_Move();
 					AudioManager.PlaySound( "resources/audio/ui_click.wav" );
 				};
 			}
@@ -145,6 +145,7 @@ namespace PA_MultiplayerGalacticWar.Entity
 				Button_Action.Colour_Default = Color.Red;
 				Button_Action.Colour_Hover = Color.Red * Color.Shade( 0.8f );
 				Button_Action.Label = "WAR";
+				Button_Action.UpdateGraphic();
 
 				Button_Action.OnPressed = delegate ( Entity_UI_Button self )
 				{
@@ -153,8 +154,7 @@ namespace PA_MultiplayerGalacticWar.Entity
 				};
 				Button_Action.OnReleased = delegate ( Entity_UI_Button self )
 				{
-					Console.WriteLine( "WAR " + Label );
-					( (Scene_Game) Scene.Instance ).SaveGame();
+					System.Action_War();
 					AudioManager.PlaySound( "resources/audio/ui_click.wav" );
 				};
 			}

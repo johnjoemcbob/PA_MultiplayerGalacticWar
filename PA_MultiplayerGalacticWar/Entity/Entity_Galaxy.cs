@@ -91,6 +91,14 @@ namespace PA_MultiplayerGalacticWar.Entity
 
 			TryAddToScene();
         }
+		// Called after the players are loaded in
+		public void InitialisePlayers()
+		{
+			foreach ( Entity_StarSystem system in StarSystems )
+			{
+				system.CheckVisibility();
+			}
+		}
 
 		public override void Added()
 		{
@@ -126,6 +134,8 @@ namespace PA_MultiplayerGalacticWar.Entity
 		public override void Update()
 		{
 			base.Update();
+
+			if ( Helper.IsLoading() ) return;
 		}
 
 		public void UpdateSelection( int id, bool selected )

@@ -32,8 +32,11 @@ namespace PA_MultiplayerGalacticWar.Entity
 		// Lerp
 		private float Time_Lerp;
 		// Selection
-		private bool Selected = false;
+		private bool Interactable = true;
+        private bool Selected = false;
 		private bool Hover = false;
+
+		private float LastClick = 0;
 
 		private List<Entity_StarSystem> Neighbours = new List<Entity_StarSystem>();
 
@@ -85,6 +88,7 @@ namespace PA_MultiplayerGalacticWar.Entity
 			Collider.SetPosition( -24, -24 );
 
 			Visible = false;
+			Interactable = false;
 
 			Layer = Helper.Layer_Star;
 		}
@@ -93,9 +97,26 @@ namespace PA_MultiplayerGalacticWar.Entity
 		{
 			base.Update();
 
+			if ( Helper.IsLoading() ) return;
+
+			UpdateInput();
+			UpdateAnimation();
+		}
+
+		private void UpdateInput()
+		{
+			UpdateInputHover();
+			UpdateInputKey();
+			UpdateInputSelection();
+        }
+
+		private void UpdateInputHover()
+		{
 			// Logic for hovering
-			int x = (int) ( Input.MouseScreenX / Scene.Instance.CameraZoom );
-			int y = (int) ( Input.MouseScreenY / Scene.Instance.CameraZoom );
+			Vector2 mouse = GetMousePosition();
+			int x = (int) mouse.X;
+			int y = (int) mouse.Y;
+
 			if ( Collider.Overlap( 0.5f, 0.5f, x, y ) )
 			{
 				Hover = true;
@@ -104,16 +125,45 @@ namespace PA_MultiplayerGalacticWar.Entity
 			{
 				Hover = false;
 			}
+		}
+
+		// Key shortcuts when system is selected
+		private void UpdateInputKey()
+		{
+			if ( !Selected ) return;
+
+			if ( Game.Instance.Input.KeyPressed( Key.M ) )
+			{
+				if ( HasPlayerArmy == null )
+				{
+					Action_Move();
+                }
+			}
+		}
+
+		private void UpdateInputSelection()
+		{
 			// Logic for selecting
-			if ( Program.Clicked && Visible )
+			Vector2 mouse = GetMousePosition();
+			int x = (int) mouse.X;
+			int y = (int) mouse.Y;
+
+            if ( Program.Clicked && Interactable )
 			{
 				bool uihit = ( UI.Collider.Overlap( 0.5f, 0.5f, x, y ) && Helper.AnyInScene<Entity_UIPanel_StarSystem>( Scene.Instance.GetEntities<Entity_UIPanel_StarSystem>() ) );
-                if ( !uihit && Collider.Overlap( 0.5f, 0.5f, x, y ) )
+				if ( !uihit && Collider.Overlap( 0.5f, 0.5f, x, y ) )
 				{
 					Select();
+
+					// Double click logic
+					if ( LastClick >= Game.Instance.Timer )
+					{
+						Action_Move();
+					}
+					LastClick = Game.Instance.Timer + 15;
 				}
 				else if ( !uihit )
-                {
+				{
 					Deselect();
 				}
 			}
@@ -121,7 +171,10 @@ namespace PA_MultiplayerGalacticWar.Entity
 			{
 				Deselect();
 			}
+		}
 
+		private void UpdateAnimation()
+		{
 			// Pulse slightly
 			float extradist = 2;
 			{
@@ -149,6 +202,22 @@ namespace PA_MultiplayerGalacticWar.Entity
 				dist = 0.1f;
 				Image_Star.Graphic.Color.R = 0.9f - ( lerp * dist );
 				Image_Star.Graphic.Color.G = 0.9f - ( lerp * dist );
+			}
+
+			// Dim unknown/previouslyknown systems into fog of war
+			if ( !Interactable && ( Owner != Program.ThisPlayer ) )
+			{
+				Image_Owner.image.Color = Helper.Colour_Unowned;
+				Image_Owner.image.Alpha = 0.2f;
+            }
+			else
+			{
+				if ( Owner != -1 )
+				{
+					SetOwner( Owner );
+					Image_Owner.image.Color = new Color( ( (Scene_Game) Scene.Instance ).CurrentGame.Commanders[Owner].Colour );
+				}
+				Image_Owner.image.Alpha = 1;
 			}
 		}
 
@@ -181,6 +250,13 @@ namespace PA_MultiplayerGalacticWar.Entity
 			Scene.Instance.Remove( UI );
 		}
 
+		private Vector2 GetMousePosition()
+		{
+			int x = (int) ( Input.MouseScreenX / Scene.Instance.CameraZoom );
+			int y = (int) ( Input.MouseScreenY / Scene.Instance.CameraZoom );
+			return new Vector2( x, y );
+		}
+
 		public void AddConnection( Entity_StarSystem other )
 		{
 			Neighbours.Add( other );
@@ -199,6 +275,13 @@ namespace PA_MultiplayerGalacticWar.Entity
 
 			// Update UI
 			UI.UpdatePlayerArmy( army );
+
+			// Add to list of systems this player has been to
+			( (Scene_Game) Scene.Instance ).CurrentPlayers[army.Player].AddVisitedSystem( Index );
+			foreach ( Entity_StarSystem neighbour in Neighbours )
+			{
+				( (Scene_Game) Scene.Instance ).CurrentPlayers[army.Player].AddVisitedSystem( neighbour.Index );
+			}
 		}
 
 		public void RemovePlayer()
@@ -237,6 +320,7 @@ namespace PA_MultiplayerGalacticWar.Entity
 
 		public void CheckVisibility()
 		{
+			// Check for immediate neighbour
 			bool visible = false;
 			{
 				foreach ( Entity_PlayerArmy army in VisibleBy )
@@ -248,8 +332,37 @@ namespace PA_MultiplayerGalacticWar.Entity
 					}
 				}
 			}
-			Visible = visible;
-		}
+			// Check for two-jump neighbour
+			bool semivisible = false;
+			{
+				if ( !visible )
+				{
+					foreach ( Entity_StarSystem neighbour in Neighbours )
+					{
+						if ( neighbour.Visible && neighbour.Interactable )
+						{
+							semivisible = true;
+							break;
+						}
+					}
+				}
+				if ( Owner == Program.ThisPlayer )
+				{
+					semivisible = true;
+				}
+			}
+			// Check for loaded system visibility
+			if ( !semivisible )
+			{
+				if ( ( (Scene_Game) Scene.Instance ).CurrentPlayers[Program.ThisPlayer].HasVisitedSystem( Index ) )
+				{
+					semivisible = true;
+				}
+			}
+
+			Visible = visible || semivisible;
+			Interactable = visible;
+        }
 
 		public void UpdateText()
 		{
@@ -258,12 +371,51 @@ namespace PA_MultiplayerGalacticWar.Entity
 			UI.UpdateText();
 		}
 
+		public void Action_Move()
+		{
+			if ( !( (Scene_Game) Scene ).GetIsPlayerTurn( Program.ThisPlayer ) ) return;
+			if ( HasPlayerArmy != null ) return;
+
+			Entity_PlayerArmy.GetAllByPlayer( Program.ThisPlayer )[0].MoveToSystem( this );
+			AfterAction();
+		}
+
+		public void Action_War()
+		{
+			if ( !( (Scene_Game) Scene ).GetIsPlayerTurn( Program.ThisPlayer ) ) return;
+
+			Console.WriteLine( "WAR " + Name );
+			( (Scene_Game) Scene.Instance ).SaveGame();
+			AfterAction();
+		}
+
+		private void AfterAction()
+		{
+			( (Scene_Game) Scene ).SetNextPlayerTurn();
+		}
+
+		public void SetSelected( bool select )
+		{
+			if ( select )
+			{
+				Select();
+            }
+			else
+			{
+				Deselect();
+			}
+		}
+
 		public void SetOwner( int owner )
 		{
+			if ( owner == -1 ) return;
+
 			Owner = owner;
 
 			Colour = new Otter.Color( ( (Scene_Game) Scene.Instance ).CurrentPlayers.ToArray()[Owner].Commander.Colour );
 			Image_Owner.image.Color = Colour;
+
+			CheckVisibility();
 		}
 
 		public List<Entity_StarSystem> GetNeighbours()

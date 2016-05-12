@@ -6,16 +6,13 @@ using Otter;
 using System;
 using System.IO;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PA_MultiplayerGalacticWar
 {
 	class Helper
 	{
 		// Flags
-		static public bool DEBUG = true;
+		static public bool DEBUG = false;
 
 		// Colours
         static public Color Colour_Unowned = new Color( 0.2f, 0.4f, 0.7f, 1 );
@@ -129,6 +126,10 @@ namespace PA_MultiplayerGalacticWar
 				}
 			}
 			return false;
+		}
+		public static bool IsLoading()
+		{
+			return AnyInScene<Entity.Entity_UIPanel_FileIO>( Otter.Scene.Instance.GetEntities<Entity.Entity_UIPanel_FileIO>() );
 		}
     }
 }

@@ -21,12 +21,20 @@ namespace PA_MultiplayerGalacticWar
 		public List<StarSystemType> StarSystems;
 	};
 
+	struct TurnType
+	{
+		public int Player;
+		public int ActionID;
+		public string Data;
+	};
+
     class Info_Game
 	{
 		public string StartDate;
 		public int Players;
 		public List<CommanderType> Commanders;
 		public int Turns = 0;
+		public int CurrentTurn = 0;
 		// Also store galaxy map & star system ownership
 		public GalaxyType Galaxy = new GalaxyType();
 
@@ -51,8 +59,11 @@ namespace PA_MultiplayerGalacticWar
 					}
 					foreach ( Entity.Entity_StarSystem neighbour in system.GetNeighbours() )
 					{
-						starsystemtype.Neighbours.Add( neighbour.Index );
-					}
+						if ( !starsystemtype.Neighbours.Contains( neighbour.Index ) )
+						{
+							starsystemtype.Neighbours.Add( neighbour.Index );
+						}
+                    }
 					starsystemtype.Name = system.Name;
 					starsystemtype.Type = system.Type;
 					starsystemtype.MapID = system.MapID;
@@ -61,16 +72,16 @@ namespace PA_MultiplayerGalacticWar
 			}
 		}
 
-		public void SavePlayers( bool update = true )
+		public void SavePlayers( List<Info_Player> players, bool update = true )
 		{
 			if ( !update ) return;
 
 			int id = 0;
 			List<CommanderType> commanders = new List<CommanderType>();
-			foreach ( CommanderType commander in Commanders )
+			foreach ( Info_Player player in players )
 			{
 				// Reference to new variable
-				CommanderType com = commander;
+				CommanderType com = player.Commander;
 				// Change data
 				{
 					// Add each army and their positions
@@ -114,8 +125,15 @@ namespace PA_MultiplayerGalacticWar
 						}
 					}
 				}
+				commanders.Add( com );
 				id++;
 			}
+
+			// Remove old player data
+			Commanders.Clear();
+
+			// Add this new data
+			Commanders = new List<CommanderType>( commanders );
 		}
 	}
 }

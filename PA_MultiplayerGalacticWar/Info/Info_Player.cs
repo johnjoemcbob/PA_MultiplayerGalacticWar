@@ -22,6 +22,7 @@ namespace PA_MultiplayerGalacticWar
 		public string PlayerName;
 		public string UberID;
 		public string FactionName;
+		public int FactionID;
 		public int ModelID;
 		public string Colour;
 		// Gameplay
@@ -29,6 +30,7 @@ namespace PA_MultiplayerGalacticWar
 		public List<string> Cards;
 		public List<ArmyType> Armies;
 		public List<int> OwnedSystems;
+		public List<int> VisitedSystems;
 	};
 
 	struct UnitType
@@ -53,7 +55,6 @@ namespace PA_MultiplayerGalacticWar
 		public string CommanderPath = "";
 		public dynamic Commander_Loaded;
 		public List<UnitType> Units_Loaded = new List<UnitType>();
-		public List<int> OwnedSystems = new List<int>();
 		public List<Entity.Entity_PlayerArmy> Armies = new List<Entity.Entity_PlayerArmy>();
 
 		public void Initialise()
@@ -206,16 +207,46 @@ namespace PA_MultiplayerGalacticWar
 			Commander.Colour = colour.ColorString;
 		}
 
+		public void AddVisitedSystem( int system )
+		{
+			if ( Commander.VisitedSystems == null )
+			{
+				Commander.VisitedSystems = new List<int>();
+			}
+			if ( !Commander.VisitedSystems.Contains( system ) )
+			{
+				Commander.VisitedSystems.Add( system );
+			}
+		}
+
 		public void AddOwnedSystem( int system )
 		{
 			if ( Commander.OwnedSystems == null )
 			{
 				Commander.OwnedSystems = new List<int>();
-            }
-			Commander.OwnedSystems.Add( system );
+			}
+			if ( !Commander.OwnedSystems.Contains( system ) )
+			{
+				Commander.OwnedSystems.Add( system );
+			}
 		}
 
-#region static
+		public bool HasVisitedSystem( int system )
+		{
+			bool flag = false;
+			{
+				if ( Commander.VisitedSystems != null )
+				{
+					if ( Commander.VisitedSystems.Contains( system ) )
+					{
+						flag = true;
+					}
+				}
+			}
+			return flag;
+		}
+
+		#region static
 		static public string GetArmyFilePath()
 		{
 			return Program.PATH_PA + "media/pa/units/";

@@ -85,12 +85,7 @@ namespace PA_MultiplayerGalacticWar.Entity
 		{
 			base.Update();
 
-			// Update the text
-			if ( Label != Text_Label.String )
-			{
-				Text_Label.String = Label;
-				Text_Label.CenterOrigin();
-			}
+			if ( Helper.IsLoading() ) return;
 
 			// Movement logic
 			ButtonCameraBounds = new Vector4(
@@ -164,6 +159,18 @@ namespace PA_MultiplayerGalacticWar.Entity
 			base.Removed();
 
 			Scene.Instance.Remove( Image );
+		}
+
+		public void UpdateGraphic()
+		{
+			if ( Text_Label == null ) return;
+
+			// Text
+			Text_Label.String = Label;
+			Text_Label.CenterOrigin();
+
+			// Colour
+			Image.image.Color = Colour_Default;
 		}
 
 		public static void GlobalUpdate()
