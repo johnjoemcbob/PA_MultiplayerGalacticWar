@@ -35,6 +35,7 @@ namespace PA_MultiplayerGalacticWar
 		public List<CommanderType> Commanders;
 		public int Turns = 0;
 		public int CurrentTurn = 0;
+		public List<TurnType> TurnHistory;
 		// Also store galaxy map & star system ownership
 		public GalaxyType Galaxy = new GalaxyType();
 

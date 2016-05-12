@@ -25,6 +25,10 @@ namespace PA_MultiplayerGalacticWar
 		static public int Layer_UI = 600;
 		static public int Layer_Cursor = 0;
 
+		// Action Types
+		static public int ACTION_MOVE = 0;
+		static public int ACTION_WAR = 1;
+
 		// Ensure all directories in path exist
 		static public void CreateDirectory( string path )
 		{

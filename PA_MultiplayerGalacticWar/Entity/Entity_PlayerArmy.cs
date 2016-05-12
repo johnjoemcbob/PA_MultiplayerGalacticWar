@@ -51,6 +51,8 @@ namespace PA_MultiplayerGalacticWar.Entity
 			Sound_Move = AudioManager.PlaySound( "resources/audio/player_move_loop.wav", true );
 			Sound_Move.Volume = 0.1f;
 
+			Visible = false;
+
 			Layer = Helper.Layer_Player;
         }
 

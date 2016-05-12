@@ -354,7 +354,8 @@ namespace PA_MultiplayerGalacticWar.Entity
 			// Check for loaded system visibility
 			if ( !semivisible )
 			{
-				if ( ( (Scene_Game) Scene.Instance ).CurrentPlayers[Program.ThisPlayer].HasVisitedSystem( Index ) )
+				List<Info_Player> player = ( (Scene_Game) Scene.Instance ).CurrentPlayers;
+                if ( ( player.Count > Program.ThisPlayer ) && player[Program.ThisPlayer].HasVisitedSystem( Index ) )
 				{
 					semivisible = true;
 				}
@@ -377,7 +378,7 @@ namespace PA_MultiplayerGalacticWar.Entity
 			if ( HasPlayerArmy != null ) return;
 
 			Entity_PlayerArmy.GetAllByPlayer( Program.ThisPlayer )[0].MoveToSystem( this );
-			AfterAction();
+			AfterAction( Helper.ACTION_MOVE, "" + Index );
 		}
 
 		public void Action_War()
@@ -386,12 +387,13 @@ namespace PA_MultiplayerGalacticWar.Entity
 
 			Console.WriteLine( "WAR " + Name );
 			( (Scene_Game) Scene.Instance ).SaveGame();
-			AfterAction();
+			AfterAction( Helper.ACTION_WAR, Index + " " );
 		}
 
-		private void AfterAction()
+		private void AfterAction( int action, string data )
 		{
-			( (Scene_Game) Scene ).SetNextPlayerTurn();
+			( (Scene_Game) Scene ).DoTurn( action, data );
+            ( (Scene_Game) Scene ).SetNextPlayerTurn();
 		}
 
 		public void SetSelected( bool select )

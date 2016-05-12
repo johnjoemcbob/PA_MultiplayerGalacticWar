@@ -31,7 +31,9 @@ namespace PA_MultiplayerGalacticWar
 
 		private List<Entity_UIPanel_Card> PossibleCards = new List<Entity_UIPanel_Card>();
 
-		private Entity_UIPanel_FileIO LoadUI = null;
+		// UI
+		private Entity_UIPanel_TurnSwitch UI_TurnSwitch = new Entity_UIPanel_TurnSwitch();
+		private Entity_UIPanel_FileIO UI_Load = null;
 
 		private Entity_Galaxy Galaxy;
 
@@ -108,9 +110,9 @@ namespace PA_MultiplayerGalacticWar
 		{
 			// Loading thread & UI
 			if ( Thread_Load.IsAlive || ( ( Thread_Save != null ) && Thread_Save.IsAlive ) ) return;
-			if ( ( FileToLoad == null ) && LoadUI.IsInScene )
+			if ( ( FileToLoad == null ) && UI_Load.IsInScene )
 			{
-				Remove( LoadUI );
+				Remove( UI_Load );
 				if ( Thread_Save != null )
 				{
 					Thread_Save.Abort();
@@ -118,7 +120,7 @@ namespace PA_MultiplayerGalacticWar
 			}
 			if ( !FileToSave )
 			{
-				Remove( LoadUI );
+				Remove( UI_Load );
 
 				if ( Quit )
 				{
@@ -204,9 +206,16 @@ namespace PA_MultiplayerGalacticWar
 								army.SystemPosition = Rand.Int( 0, Galaxy.MaxSystems );
 							}
 							commander.Armies.Add( army );
+
+							// Store initial state
+							SetPlayerTurn( com );
+							DoTurn( Helper.ACTION_MOVE, "" + army.SystemPosition );
 						}
 					}
 					CurrentGame.Commanders.Add( commander );
+
+					// Revert back to player 1 having first turn
+					SetPlayerTurn( 0 );
 				}
 
 				// Generate the initial galaxy
@@ -245,8 +254,8 @@ namespace PA_MultiplayerGalacticWar
 				if ( File.Exists( FileToLoad ) )
 				{
 					// Add the loading text to the screen
-					LoadUI = new Entity_UIPanel_FileIO();
-                    Add( LoadUI );
+					UI_Load = new Entity_UIPanel_FileIO();
+                    Add( UI_Load );
 
 					// Start at thread to load the content
 					Thread_Load.Start();
@@ -280,11 +289,11 @@ namespace PA_MultiplayerGalacticWar
 			if ( ( Thread_Save != null ) && Thread_Save.IsAlive ) return;
 
 			// Add the saving text to the screen
-			LoadUI = new Entity_UIPanel_FileIO();
+			UI_Load = new Entity_UIPanel_FileIO();
 			{
-				LoadUI.Label = "Saving";
+				UI_Load.Label = "Saving";
 			}
-			Add( LoadUI );
+			Add( UI_Load );
 
 			// Start at thread to load the content
 			Thread_Save = new Thread( new ThreadStart( this.ThreadSaveGame ) );
@@ -372,6 +381,21 @@ namespace PA_MultiplayerGalacticWar
             }
 		}
 
+		public void DoTurn( int action, string data )
+		{
+			if ( CurrentGame.TurnHistory == null )
+			{
+				CurrentGame.TurnHistory = new List<TurnType>();
+            }
+
+			TurnType turn;
+			{
+				turn.ActionID = action;
+				turn.Player = CurrentGame.CurrentTurn;
+				turn.Data = data;
+			}
+			CurrentGame.TurnHistory.Add( turn );
+        }
 		public int GetPlayerTurn()
 		{
 			return CurrentGame.CurrentTurn;
@@ -384,10 +408,23 @@ namespace PA_MultiplayerGalacticWar
 		{
 			CurrentGame.CurrentTurn++;
 			CurrentGame.Turns++;
-            if ( CurrentGame.CurrentTurn >= CurrentGame.Players )
+			if ( CurrentGame.CurrentTurn >= CurrentGame.Players )
 			{
 				CurrentGame.CurrentTurn = 0;
 			}
+			SetPlayerTurn( CurrentGame.CurrentTurn );
+        }
+		public void SetPlayerTurn( int turn )
+		{
+			CurrentGame.CurrentTurn = turn;
+
+			// Show turn switch UI
+			if ( UI_TurnSwitch.IsInScene )
+			{
+				//Remove( UI_TurnSwitch );
+			}
+			Add( UI_TurnSwitch );
+			UI_TurnSwitch.Initialise();
 
 			// temp
 			Program.ThisPlayer = CurrentGame.CurrentTurn;

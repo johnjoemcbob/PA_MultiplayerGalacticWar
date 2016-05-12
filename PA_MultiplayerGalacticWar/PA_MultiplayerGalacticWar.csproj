@@ -45,6 +45,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Entity\UI\Entity_UIPanel_TurnSwitch.cs" />
     <Compile Include="Helper\AudioManager.cs" />
     <Compile Include="Entity\Entity_Image_Background.cs" />
     <Compile Include="Entity\Entity_PlayerArmy.cs" />
@@ -71,6 +72,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <None Include="Shader\text_turn.frag" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\..\..\JSON.NET\Source\Src\Newtonsoft.Json\Newtonsoft.Json.Portable40.csproj">

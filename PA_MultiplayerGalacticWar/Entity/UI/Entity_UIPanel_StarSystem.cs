@@ -126,7 +126,7 @@ namespace PA_MultiplayerGalacticWar.Entity
 			{
 				Button_Action.Colour_Default = Color.Green;
 				Button_Action.Colour_Hover = Color.Green * Color.Shade( 0.8f );
-				Button_Action.Label = "Move To";
+				Button_Action.Label = "MOVE TO";
 
 				Button_Action.OnPressed = delegate ( Entity_UI_Button self )
 				{
