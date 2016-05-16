@@ -21,10 +21,14 @@ namespace PA_MultiplayerGalacticWar
 		// File input & output
 		private string Filename = "";
 		private string FileToLoad = "";
+		private string JSONToLoad = "";
 		private Thread Thread_Load = null;
 		private Thread Thread_Save = null;
 		private bool FileToSave = true;
 		private bool IsNewGame = false;
+
+		// Networking
+		private string IPToConnect = "";
 
 		// Flag to quit after pressing escape & after saving
 		private bool Quit = false;
@@ -45,6 +49,10 @@ namespace PA_MultiplayerGalacticWar
 		{
 			Filename = load;
 			FileToLoad = load;
+		}
+		public Scene_Game( string ip, bool join )
+		{
+			IPToConnect = ip;
 		}
 
 		public override void Begin()
@@ -67,9 +75,18 @@ namespace PA_MultiplayerGalacticWar
 				Add( card );
 			}
 
-			// Threading
-			Thread_Load = new Thread( new ThreadStart( this.ThreadLoadGame ) );
-			FileToSave = true;
+			// Load thread
+			if ( FileToLoad != "" )
+			{
+				Thread_Load = new Thread( new ThreadStart( this.ThreadLoadGame ) );
+				FileToSave = true;
+			}
+			// Connect to server
+			if ( IPToConnect != "" )
+			{
+				CurrentGame = new Info_Game();
+				NetworkManager.Connect( IPToConnect );
+			}
 
 			Game.Instance.QuitButton.Clear();
 
@@ -95,6 +112,8 @@ namespace PA_MultiplayerGalacticWar
 		{
 			base.Update();
 
+			NetworkManager.Update();
+
 			UpdateFileIO();
 			//UpdateZoom();
 
@@ -109,7 +128,7 @@ namespace PA_MultiplayerGalacticWar
 		private void UpdateFileIO()
 		{
 			// Loading thread & UI
-			if ( Thread_Load.IsAlive || ( ( Thread_Save != null ) && Thread_Save.IsAlive ) ) return;
+			if ( ( ( Thread_Load != null ) && Thread_Load.IsAlive ) || ( ( Thread_Save != null ) && Thread_Save.IsAlive ) ) return;
 			if ( ( FileToLoad == null ) && UI_Load.IsInScene )
 			{
 				Remove( UI_Load );
@@ -242,7 +261,7 @@ namespace PA_MultiplayerGalacticWar
 
 		private void TryInitialLoadGame()
 		{
-			if ( ( FileToLoad == null ) || ( ( Thread_Load != null ) && Thread_Load.IsAlive ) || ( Thread_Save != null ) ) return;
+			if ( ( FileToLoad == null ) || ( IPToConnect != "" ) || ( ( Thread_Load != null ) && Thread_Load.IsAlive ) || ( Thread_Save != null ) ) return;
 
 			if ( FileToLoad == "" )
 			{
@@ -271,7 +290,12 @@ namespace PA_MultiplayerGalacticWar
 
 		public void ThreadLoadGame()
 		{
-			CurrentGame = JsonConvert.DeserializeObject<Info_Game>( Helper.ReadFile( FileToLoad ) );
+			string json = JSONToLoad;
+            if ( JSONToLoad == "" )
+			{
+				json = Helper.ReadFile( FileToLoad );
+			}
+			CurrentGame = JsonConvert.DeserializeObject<Info_Game>( json );
 			FileToLoad = null;
 
 			Galaxy.Initialise( CurrentGame.Galaxy );
@@ -282,6 +306,21 @@ namespace PA_MultiplayerGalacticWar
 			{
 				ApplyCards( player, player.Commander.CommanderCards, player.Commander.Cards );
 			}
+		}
+
+		public void LoadFromJSON( string json )
+		{
+			// Add the loading text to the screen
+			UI_Load = new Entity_UIPanel_FileIO();
+			Add( UI_Load );
+
+			// Start at thread to load the content
+			JSONToLoad = json;
+			if ( Thread_Load == null )
+			{
+				Thread_Load = new Thread( new ThreadStart( this.ThreadLoadGame ) );
+			}
+			Thread_Load.Start();
 		}
 
 		public void SaveGame()

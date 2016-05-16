@@ -3,11 +3,6 @@
 // 30/03/16
 
 using Otter;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 using PA_MultiplayerGalacticWar.Entity;
 
@@ -18,7 +13,8 @@ namespace PA_MultiplayerGalacticWar
 		Entity_UI_Button Button_New;
 		Entity_UI_Button Button_Continue;
 		Entity_UI_Button Button_Load;
-		Entity_UI_Button Button_Quit;
+		Entity_UI_Button Button_Join;
+        Entity_UI_Button Button_Quit;
 
 		public override void Begin()
 		{
@@ -70,6 +66,7 @@ namespace PA_MultiplayerGalacticWar
 				{
 					Game.Instance.RemoveScene();
 					Game.Instance.AddScene( new Scene_Game( "data/game1.json" ) );
+					NetworkManager.Host();
 					AudioManager.PlaySound( "resources/audio/ui_click.wav" );
 				};
 			}
@@ -88,15 +85,36 @@ namespace PA_MultiplayerGalacticWar
 				{
 					Game.Instance.RemoveScene();
 					Game.Instance.AddScene( new Scene_Game( "data/game2.json" ) );
+					NetworkManager.Host();
 					AudioManager.PlaySound( "resources/audio/ui_click.wav" );
 				};
 			}
 			Add( Button_Load );
+			Button_Join = new Entity_UI_ButtonLerp();
+			{
+                Button_Join.Label = "JOIN GAME";
+				Button_Join.Colour_Default = Color.Orange;
+				Button_Join.Colour_Hover = Color.Orange * Color.Gray;
+				Vector2 pos = new Vector2( 0, 125 );
+				Button_Join.ButtonBounds = new Vector4( pos.X, pos.Y, 256, 48 );
+				Button_Join.OnPressed = delegate ( Entity_UI_Button self )
+				{
+					self.Image.image.Color = self.Colour_Hover * Color.Gray;
+					AudioManager.PlaySound( "resources/audio/ui_click.wav" );
+				};
+				Button_Join.OnReleased = delegate ( Entity_UI_Button self )
+				{
+					Game.Instance.RemoveScene();
+					Game.Instance.AddScene( new Scene_Game( "127.0.0.1", true ) );
+					AudioManager.PlaySound( "resources/audio/ui_click.wav" );
+				};
+			}
+			Add( Button_Join );
 			Button_Quit = new Entity_UI_ButtonLerp();
 			{
 				Button_Quit.Colour_Hover = Color.Red;
 				Button_Quit.Label = "QUIT";
-				Vector2 pos = new Vector2( 0, 250 );
+				Vector2 pos = new Vector2( 0, 325 );
 				Button_Quit.ButtonBounds = new Vector4( pos.X, pos.Y, 256, 48 );
 				Button_Quit.OnPressed = delegate ( Entity_UI_Button self )
 				{

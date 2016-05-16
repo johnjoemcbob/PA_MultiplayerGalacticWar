@@ -3,6 +3,7 @@
 // 30/03/16
 
 using System.Collections.Generic;
+using Newtonsoft.Json;
 
 namespace PA_MultiplayerGalacticWar
 {
@@ -135,6 +136,11 @@ namespace PA_MultiplayerGalacticWar
 
 			// Add this new data
 			Commanders = new List<CommanderType>( commanders );
+		}
+
+		public string GetNetworkString()
+		{
+			return JsonConvert.SerializeObject( this );
 		}
 	}
 }

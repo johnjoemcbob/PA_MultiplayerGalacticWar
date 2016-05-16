@@ -134,11 +134,12 @@ namespace PA_MultiplayerGalacticWar.Entity
 
 			if ( Game.Instance.Input.KeyPressed( Key.M ) )
 			{
-				if ( HasPlayerArmy == null )
-				{
-					Action_Move();
-                }
+				Action_Move();
 			}
+			if ( Game.Instance.Input.KeyPressed( Key.W ) )
+			{
+				Action_War();
+            }
 		}
 
 		private void UpdateInputSelection()
@@ -158,8 +159,9 @@ namespace PA_MultiplayerGalacticWar.Entity
 					// Double click logic
 					if ( LastClick >= Game.Instance.Timer )
 					{
+						Action_War();
 						Action_Move();
-					}
+                    }
 					LastClick = Game.Instance.Timer + 15;
 				}
 				else if ( !uihit )
@@ -384,6 +386,7 @@ namespace PA_MultiplayerGalacticWar.Entity
 		public void Action_War()
 		{
 			if ( !( (Scene_Game) Scene ).GetIsPlayerTurn( Program.ThisPlayer ) ) return;
+			if ( HasPlayerArmy == null ) return;
 
 			Console.WriteLine( "WAR " + Name );
 			( (Scene_Game) Scene.Instance ).SaveGame();

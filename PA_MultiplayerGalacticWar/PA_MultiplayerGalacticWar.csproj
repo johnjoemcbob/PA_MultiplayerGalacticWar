@@ -49,6 +49,7 @@
     <Compile Include="Helper\AudioManager.cs" />
     <Compile Include="Entity\Entity_Image_Background.cs" />
     <Compile Include="Entity\Entity_PlayerArmy.cs" />
+    <Compile Include="Helper\NetworkManager.cs" />
     <Compile Include="Info\Commander.cs" />
     <Compile Include="Entity\UI\Elements\Entity_Cursor.cs" />
     <Compile Include="Entity\Entity_Galaxy.cs" />
@@ -78,6 +79,10 @@
     <ProjectReference Include="..\..\..\..\..\..\JSON.NET\Source\Src\Newtonsoft.Json\Newtonsoft.Json.Portable40.csproj">
       <Project>{959f7f85-c98b-4876-971a-9036224578e4}</Project>
       <Name>Newtonsoft.Json.Portable40</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\..\LidgrenNetworkCSharp\Lidgren.Network\Lidgren.Network.csproj">
+      <Project>{49ba1c69-6104-41ac-a5d8-b54fa9f696e8}</Project>
+      <Name>Lidgren.Network</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\..\..\..\..\Otter2D\Otter\Otter.csproj">
       <Project>{236485c2-a7ba-4dcd-808a-b3a634764402}</Project>
