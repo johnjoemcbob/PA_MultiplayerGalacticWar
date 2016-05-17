@@ -240,6 +240,7 @@ namespace PA_MultiplayerGalacticWar.Entity
 			Scene.Instance.GetEntity<Entity_Galaxy>().UpdateSelection( Index, true );
 
 			Scene.Instance.Add( UI );
+			UI.UpdateButton();
 		}
 
 		private void Deselect()
@@ -276,7 +277,7 @@ namespace PA_MultiplayerGalacticWar.Entity
 			}
 
 			// Update UI
-			UI.UpdatePlayerArmy( army );
+			UI.UpdateButton();
 
 			// Add to list of systems this player has been to
 			( (Scene_Game) Scene.Instance ).CurrentPlayers[army.Player].AddVisitedSystem( Index );
@@ -298,7 +299,7 @@ namespace PA_MultiplayerGalacticWar.Entity
 			RemoveVisibleBy( HasPlayerArmy );
 
 			// Update UI
-			UI.UpdatePlayerArmy( null );
+			UI.UpdateButton();
 
 			HasPlayerArmy = null;
 		}

@@ -4,30 +4,40 @@
 
 using Otter;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PA_MultiplayerGalacticWar.Entity
 {
 	class Entity_UIPanel_FileIO : Otter.Entity
 	{
-		public int NumCircles = 6;
+		// Visual information
 		public string Label = "Loading";
 		public string Ellipsis = "";
+		public int NumCircles = 6;
+		public float RadiusOverall = 30;
+		public float RadiusCircle = 8;
 
+		// Circle positions
+		private Vector2[] Position;
+		private float[] Radius;
 		private Vector2[] Target;
 		private Vector2[] Offset;
+
+		// Individual elements
 		private Text Text_Label;
 
+		// Constructor: Initialise circle positions & position this ui at the bottom left
 		public Entity_UIPanel_FileIO()
 		{
+			// Initialise the arrays and their elements to be non-null
+			Position = new Vector2[NumCircles];
+			Radius = new float[NumCircles];
 			Target = new Vector2[NumCircles];
 			Offset = new Vector2[NumCircles];
 			{
 				for ( int circle = 0; circle < NumCircles; circle++ )
 				{
+					Position[circle] = new Vector2();
+					Radius[circle] = 0;
 					Target[circle] = new Vector2();
 					Offset[circle] = new Vector2();
 				}
@@ -37,6 +47,7 @@ namespace PA_MultiplayerGalacticWar.Entity
 			Y = Game.Instance.Height / 2;
 		}
 
+		// Added To Scene: Initiailise individual elements
 		public override void Added()
 		{
 			base.Added();
@@ -53,45 +64,52 @@ namespace PA_MultiplayerGalacticWar.Entity
 			Layer = Helper.Layer_UI;
 		}
 
+		// Updated In Scene: Update the animated elements
 		public override void Update()
 		{
 			base.Update();
 
-			// Update text
+			UpdateText();
+			UpdateCircles();
+        }
+
+		// Updated In Scene: Update the text ellipsis
+		private void UpdateText()
+		{
+			float time = Game.Instance.Timer / 10;
+			if ( ( time % 2 ) == 0 )
 			{
-				float time = Game.Instance.Timer / 10;
-				if ( ( time % 2 ) == 0 )
+				Ellipsis += ".";
+				if ( Ellipsis.Length > 3 )
 				{
-					Ellipsis += ".";
-					if ( Ellipsis.Length > 3 )
-					{
-						Ellipsis = "";
-					}
+					Ellipsis = "";
 				}
 			}
-            Text_Label.String = Label + Ellipsis;
+			Text_Label.String = Label + Ellipsis;
 		}
 
-		public override void Render()
+		// Updated In Scene: Update the circle positions & mouse reactions
+		private void UpdateCircles()
 		{
-			base.Render();
-
-			float radius = 30;
-			float circleradius = 8;
-            float time = Game.Instance.Timer / 20;
+			float time = Game.Instance.Timer / 20;
 			float slowtime = Game.Instance.Timer / 10;
+
 			int circleid = 0;
 			for ( float circle = 0; circle < Math.PI * 2; circle += (float) Math.PI / ( NumCircles / 2 ) )
 			{
-				// Circle position plus the entity's offset
-				float x = (float) Math.Sin( time + circle ) * radius;
-				x += X;
-				float y = (float) Math.Cos( time + circle ) * radius;
-				y += Y;
+				// Move this individual circle around in a circular pattern
+				Position[circleid] = new Vector2(
+					X + ( (float) Math.Sin( time + circle ) * RadiusOverall ),
+					Y + ( (float) Math.Cos( time + circle ) * RadiusOverall )
+				);
+
+				// Circle radius slow pulse
+				Radius[circleid] = RadiusCircle + ( (float) Math.Sin( slowtime + circle ) * 2 );
+
 				// React to the mouse
 				{
 					Vector2 mouse = new Vector2( Scene.Instance.MouseX, Scene.Instance.MouseY );
-					Vector2 circ = new Vector2( x, y );
+					Vector2 circ = Position[circleid];
 					if ( Vector2.Distance( mouse, circ ) < 100 )
 					{
 						Vector2 dir = ( mouse - circ ).Normalized();
@@ -106,21 +124,30 @@ namespace PA_MultiplayerGalacticWar.Entity
 				}
 				// Lerp to react position
 				{
-					Offset[circleid].X += ( Target[circleid].X - Offset[circleid].X ) * Game.Instance.DeltaTime * 0.01f;
-					Offset[circleid].Y += ( Target[circleid].Y - Offset[circleid].Y ) * Game.Instance.DeltaTime * 0.01f;
+					Offset[circleid].X += ( Target[circleid].X - Offset[circleid].X ) * Game.Instance.DeltaTime * 0.1f;
+					Offset[circleid].Y += ( Target[circleid].Y - Offset[circleid].Y ) * Game.Instance.DeltaTime * 0.1f;
 				}
-				// Draw circle
-				float offsetx = radius + ( circleradius * 1 );
-				float offsety = radius * 3;
-				Draw.Circle(
-					x + Offset[circleid].X + offsetx + Scene.CameraCenterX,
-					y + Offset[circleid].Y - offsety + Scene.CameraCenterY,
-					circleradius + ( (float) Math.Sin( slowtime + circle ) * 2 ),
-					Color.White
-				);
 				// Iterate
 				circleid++;
 				if ( circleid == NumCircles ) break;
+			}
+		}
+
+		// Render To Scene: Draw individual circles
+		public override void Render()
+		{
+			base.Render();
+
+			for ( int circleid = 0; circleid < NumCircles; circleid++ )
+			{
+				float offsetx = RadiusOverall + ( RadiusCircle * 1 );
+				float offsety = RadiusOverall * 3;
+				Draw.Circle(
+					Position[circleid].X + Offset[circleid].X + offsetx + Scene.CameraCenterX,
+					Position[circleid].Y + Offset[circleid].Y - offsety + Scene.CameraCenterY,
+					Radius[circleid],
+					Color.White
+				);
             }
 		}
 	}

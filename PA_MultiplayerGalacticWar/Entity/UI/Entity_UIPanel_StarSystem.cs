@@ -3,33 +3,32 @@
 // 02/04/16
 
 using Otter;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PA_MultiplayerGalacticWar.Entity
 {
 	class Entity_UIPanel_StarSystem : Otter.Entity
 	{
+		// Panel sizing
 		public static int Width = 256;
 		public static int Height = 212;
 		public static int HalfWidth = Width / 2;
 		public static int HalfHeight = Height / 2;
 
+		// Visual information
 		public string Label = "";
 		public string SystemType = "";
+
+		// Linked star system
 		public Entity_StarSystem System = null;
 
+		// Individual elements
 		private Entity_Image Image_Background;
 		private Text Text_Label;
 		private Text Text_SystemType;
 		private Text Text_SystemInfo;
 		private Entity_UI_Button Button_Action;
 
-		private Entity_PlayerArmy Army;
-
+		// Constructor: Initialise the individual elements
 		public Entity_UIPanel_StarSystem( float x, float y, string name, string systemtype )
 		{
 			X = x;
@@ -95,6 +94,7 @@ namespace PA_MultiplayerGalacticWar.Entity
 			Layer = Helper.Layer_UI;
         }
 
+		// Added To Scene: Add individual elements
 		public override void Added()
 		{
 			base.Added();
@@ -103,6 +103,7 @@ namespace PA_MultiplayerGalacticWar.Entity
 			Scene.Instance.Add( Button_Action );
         }
 
+		// Update In Scene: Update collider position to follow the camera
 		public override void Update()
 		{
 			base.Update();
@@ -111,6 +112,7 @@ namespace PA_MultiplayerGalacticWar.Entity
 			Collider.SetPosition( -Game.Instance.HalfWidth + Scene.Instance.CameraCenterX, -Game.Instance.HalfHeight + Scene.Instance.CameraCenterY );
 		}
 
+		// Removed From Scene: Remove individual elements
 		public override void Removed()
 		{
 			base.Removed();
@@ -119,10 +121,13 @@ namespace PA_MultiplayerGalacticWar.Entity
 			Scene.Instance.Remove( Button_Action );
 		}
 
-		private void UpdateButton()
+		// Called when the linked system's state changes (e.g. an army moves there)
+		public void UpdateButton()
 		{
+			if ( System == null ) return;
+
 			// Move
-			if ( Army == null )
+			if ( System.HasPlayerArmy == null )
 			{
 				Button_Action.Colour_Default = Color.Green;
 				Button_Action.Colour_Hover = Color.Green * Color.Shade( 0.8f );
@@ -160,15 +165,7 @@ namespace PA_MultiplayerGalacticWar.Entity
 			}
 		}
 
-		public void UpdatePlayerArmy( Entity_PlayerArmy army )
-		{
-			// Update Flag
-			Army = army;
-
-			// Check if in scene, if so; update actual buttons
-			UpdateButton();
-		}
-
+		// Called when the system visual information is loaded/updated
 		public void UpdateText()
 		{
 			Text_Label.String = Label;

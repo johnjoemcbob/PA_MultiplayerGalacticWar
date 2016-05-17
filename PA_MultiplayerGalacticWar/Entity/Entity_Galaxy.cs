@@ -3,16 +3,14 @@
 // 18/03/16
 
 using Otter;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PA_MultiplayerGalacticWar.Entity
 {
 	class Entity_Galaxy : Otter.Entity
 	{
+		// System descriptors
 		public int MaxSystems = 40;
 		public float MinSystemDistance = 50;
 		public float MaxPathDistance = 50;
@@ -21,12 +19,6 @@ namespace PA_MultiplayerGalacticWar.Entity
 		// Currently selected star system
 		public int SelectedSystem = -1;
 
-		// Scene entities
-		private Entity_Image_Background Background;
-		private Entity_Image Galaxy;
-		private List<Entity_StarSystem> StarSystems = new List<Entity_StarSystem>();
-		private Entity_StarRoutes StarRoutes;
-
 		// Galaxy generation
 		private GalaxyType GalaxyInfo;
         private List<Vector2> StarPositions = new List<Vector2>();
@@ -34,18 +26,21 @@ namespace PA_MultiplayerGalacticWar.Entity
 		private List<int> StarOwners = new List<int>();
 		private bool Generated = false;
 
+		// Individual elements
+		private Entity_Image_Background Background;
+		private List<Entity_StarSystem> StarSystems = new List<Entity_StarSystem>();
+		private Entity_StarRoutes StarRoutes;
+
+		// Constructor: Initialise individual elements
 		public Entity_Galaxy( Scene scene, string path_pa, string path_mod )
 		{
 			Background = new Entity_Image_Background( scene, path_pa, path_mod );
-			{
-				Galaxy = Background.GetGalaxy();
-			}
 			scene.Add( Background );
 
 			Layer = Helper.Layer_Star;
 		}
 
-		// To be called before Added but after Constructor, for saving/loading purposes
+		// Called before Added but after Constructor: for saving/loading purposes
 		public void Initialise( GalaxyType galaxy )
 		{
 			GalaxyInfo = galaxy;
@@ -91,7 +86,8 @@ namespace PA_MultiplayerGalacticWar.Entity
 
 			TryAddToScene();
         }
-		// Called after the players are loaded in
+
+		// Called after the players are loaded in: To check which systems are visible to this player
 		public void InitialisePlayers()
 		{
 			foreach ( Entity_StarSystem system in StarSystems )
@@ -100,6 +96,7 @@ namespace PA_MultiplayerGalacticWar.Entity
 			}
 		}
 
+		// Added To Scene: Add the individual elements if they have not already been added
 		public override void Added()
 		{
 			base.Added();
@@ -107,6 +104,7 @@ namespace PA_MultiplayerGalacticWar.Entity
 			TryAddToScene();
 		}
 
+		// Called when Added: Add individual elements to the scene (i.e. start systems)
 		private void TryAddToScene()
 		{
 			if ( ( Scene == null ) || ( StarRoutes == null ) || StarRoutes.IsInScene ) return;
@@ -131,13 +129,7 @@ namespace PA_MultiplayerGalacticWar.Entity
             }
 		}
 
-		public override void Update()
-		{
-			base.Update();
-
-			if ( Helper.IsLoading() ) return;
-		}
-
+		// Called from individual star systems when they are selected: To give the galaxy knowledge of the currently selected (for drawing StarRoutes)
 		public void UpdateSelection( int id, bool selected )
 		{
 			if ( selected )
@@ -150,6 +142,7 @@ namespace PA_MultiplayerGalacticWar.Entity
 			}
 		}
 
+		// Called from Scene_Game.NewGame: To create a new galaxy map
 		public void Generate()
 		{
 			// Generate initial random star system positions
@@ -170,6 +163,7 @@ namespace PA_MultiplayerGalacticWar.Entity
 			Generated = true;
         }
 
+		// Called from Generate: To generate random star system positions
 		private void Generate_StarSystems()
 		{
 			for ( int system = 0; system < MaxSystems; system++ )
@@ -210,6 +204,7 @@ namespace PA_MultiplayerGalacticWar.Entity
 			}
 		}
 
+		// Called from Generate: To generate paths between close systems
 		private void Generate_InitialPaths()
 		{
 			int id = 0;
@@ -232,6 +227,7 @@ namespace PA_MultiplayerGalacticWar.Entity
 			}
 		}
 
+		// Called from Generate: To ensure each system has at least one connection
 		private void Generate_PatchIsolatedSystems()
 		{
 			List<bool> connected = new List<bool>( MaxSystems );
@@ -264,6 +260,7 @@ namespace PA_MultiplayerGalacticWar.Entity
 			}
 		}
 
+		// Called from Generate: To connect all collections of systems so that each one is accessible
 		private void Generate_ConnectAll()
 		{
 			List<bool> listconnected = new List<bool>( MaxSystems );
@@ -342,6 +339,7 @@ namespace PA_MultiplayerGalacticWar.Entity
 
 		}
 
+		// Called from Generate_ConnectAll: To assist in identifying groups of star systems
 		private void Generate_ConnectAll_AddToGroup( int groupid, int id, ref List<List<int>> group )
 		{
 			// Add to the group
@@ -370,6 +368,9 @@ namespace PA_MultiplayerGalacticWar.Entity
 			}
 		}
 
+		// Called from Generate_PatchIsolatedSystems & Generate_ConnectAll: To find the closest other star system
+		// OR
+		// To find the closest other star system within a group (i.e. to link two groups together)
 		private Vector2 Generate_FindClosestNeighbour( int system, List<int> neighbours = null )
 		{
 			int index = -1;
@@ -398,6 +399,7 @@ namespace PA_MultiplayerGalacticWar.Entity
 			return new Vector2( index, mindistance );
 		}
 
+		// Called from Initialise, after generation and being Added: To give each system a reference of its neighbours
 		private void Generate_SaveNeighbour()
 		{
 			// Save references of each neighbour to the star systems
@@ -424,6 +426,7 @@ namespace PA_MultiplayerGalacticWar.Entity
 			}
 		}
 
+		// Called from Generate: To give each system a random set of visual information
 		public void Generate_Info()
 		{
 			// Generate a name and type for each system
@@ -435,11 +438,8 @@ namespace PA_MultiplayerGalacticWar.Entity
 				system.UpdateText();
 			}
 		}
-		public Entity_StarSystem GetRandomSystem()
-		{
-			return StarSystems.RandomElement();
-		}
 
+		// Called from outside: Useful for identifying systems by their unique ID rather than their array index
 		public Entity_StarSystem GetSystemByID( int systemid )
 		{
 			Entity_StarSystem system = null;
@@ -456,14 +456,10 @@ namespace PA_MultiplayerGalacticWar.Entity
 			return system;
 		}
 
+		// Called in Info_Game.Save_Galaxy: To get a reference to each star system in the game
 		public List<Entity_StarSystem> GetSystems()
 		{
 			return StarSystems;
-		}
-
-		public bool GetWasGenerated()
-		{
-			return Generated;
 		}
 	}
 }

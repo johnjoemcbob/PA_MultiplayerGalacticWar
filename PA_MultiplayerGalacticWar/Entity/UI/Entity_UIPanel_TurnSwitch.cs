@@ -4,13 +4,11 @@
 
 using Otter;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PA_MultiplayerGalacticWar.Entity
 {
+	// Turn Switch Text Entry/Exit Animation State
 	enum TurnSwitchAnimationState
 	{
 		Entry = 0,
@@ -20,17 +18,20 @@ namespace PA_MultiplayerGalacticWar.Entity
 
 	class Entity_UIPanel_TurnSwitch : Otter.Entity
 	{
+		// Visual information
 		public string Label = "{0} TO PLAY";
 
-		private Lerper Lerp;
-		private Text Text_Label;
-
+		// Animation state variables
 		private float EnabledTime = 0;
 		private TurnSwitchAnimationState State = TurnSwitchAnimationState.Entry;
 		private float TimeBeforeMiddle = 10;
 		private float TimeBeforeLeave = 60;
 		private float TimeBeforeDisable = 0;
 
+		// Individual elements
+		private Text Text_Label;
+
+		// Constructor: Initialise the animation & individual elements, and position the panel in the top center
 		public Entity_UIPanel_TurnSwitch()
 		{
 			X = Game.Instance.HalfWidth;
@@ -52,12 +53,15 @@ namespace PA_MultiplayerGalacticWar.Entity
 			Layer = Helper.Layer_UI;
 		}
 
+		// Added To Scene: Add the individual elements
 		public override void Added()
 		{
 			base.Added();
 
 			AddGraphic( Text_Label );
 		}
+
+		// Called when turn switches: To reset and begin playing the animation
 		public void Initialise()
 		{
 			Scene_Game scene = (Scene_Game) Scene;
@@ -73,6 +77,7 @@ namespace PA_MultiplayerGalacticWar.Entity
 			State = TurnSwitchAnimationState.Entry;
 		}
 
+		// Update In Scene: Animate
 		public override void Update()
 		{
 			base.Update();
@@ -130,6 +135,7 @@ namespace PA_MultiplayerGalacticWar.Entity
 			}
 		}
 
+		// Called from Update: Current time the animation has been playing for
 		private float GetElapsedTime()
 		{
 			return ( Game.Instance.Timer - EnabledTime );

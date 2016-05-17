@@ -4,19 +4,17 @@
 
 using Otter;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PA_MultiplayerGalacticWar.Entity
 {
 	class Entity_UIPanel_Card : Otter.Entity
 	{
+		// Card visual information
 		public string Label = "Test Card";
 		public string Description = "Description Text\nYeah!";
 		public string IconFile = "";
 
+		// Card individual elements
 		private Entity_Image Image_Background;
 		private Entity_Image Image_Icon;
 		private Entity_Image Image_Button_Background;
@@ -24,6 +22,7 @@ namespace PA_MultiplayerGalacticWar.Entity
 		private Text Text_Description;
 		private Entity_UI_Button Button_Choose;
 
+		// Constructor: Position the card & initialise
 		public Entity_UIPanel_Card( float x, float y, string label = "Test Card", string description = "Description", string iconfile = "" )
 		{
 			X = x;
@@ -31,12 +30,14 @@ namespace PA_MultiplayerGalacticWar.Entity
 			Initialise( label, description, iconfile );
         }
 
+		// Constructor: Initialise
 		public Entity_UIPanel_Card( string label = "Test Card", string description = "Description", string iconfile = "" )
 		{
 			Initialise( label, description, iconfile );
 		}
 
-		public void Initialise( string label, string description, string iconfile )
+		// Called from constructor: Initialise visual information variables
+		private void Initialise( string label, string description, string iconfile )
 		{
 			if ( iconfile == "" )
 			{
@@ -48,6 +49,7 @@ namespace PA_MultiplayerGalacticWar.Entity
 			IconFile = iconfile;
 		}
 
+		// Added To Scene: Initialise individual elements
 		public override void Added()
 		{
 			base.Added();
@@ -124,6 +126,7 @@ namespace PA_MultiplayerGalacticWar.Entity
 			Layer = Helper.Layer_UI;
 		}
 
+		// Removed From Scene: Remove individual elements (which are not properly attached to this card)
 		public override void Removed()
 		{
 			base.Removed();

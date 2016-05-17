@@ -3,11 +3,6 @@
 // 30/03/16
 
 using Otter;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PA_MultiplayerGalacticWar.Entity
 {
@@ -15,28 +10,42 @@ namespace PA_MultiplayerGalacticWar.Entity
 
 	class Entity_UI_Button : Otter.Entity
 	{
-		public string Label = "New Game";
+		// Label string to display on top of the button
+		public string Label = "DEFAULT TEXT";
+
+		// Button positioning
 		public Vector2 Offset = Vector2.Zero;
 		public Vector2 Origin = new Vector2( 0.5f, 0.5f );
 		public Vector2 Center = new Vector2( Game.Instance.HalfWidth, Game.Instance.HalfHeight );
+
+		// Clickable boundary
         public Vector4 ButtonBounds = new Vector4();
 		public Vector4 ButtonCameraBounds = new Vector4();
-		public MouseEvent OnPressed = delegate( Entity_UI_Button self ) {};
-		public MouseEvent OnUnPressed = delegate ( Entity_UI_Button self ) {};
-		public MouseEvent OnReleased = delegate ( Entity_UI_Button self ) {};
-		public MouseEvent OnHover = delegate ( Entity_UI_Button self ) {};
-		public MouseEvent WhileHover = delegate ( Entity_UI_Button self ) {};
-		public MouseEvent OnUnHover = delegate ( Entity_UI_Button self ) {};
+
+		// Button callbacks
+		public MouseEvent OnPressed = delegate ( Entity_UI_Button self ) { };
+		public MouseEvent OnUnPressed = delegate ( Entity_UI_Button self ) { };
+		public MouseEvent OnReleased = delegate ( Entity_UI_Button self ) { };
+		public MouseEvent OnHover = delegate ( Entity_UI_Button self ) { };
+		public MouseEvent WhileHover = delegate ( Entity_UI_Button self ) { };
+		public MouseEvent OnUnHover = delegate ( Entity_UI_Button self ) { };
+
+		// Button graphic camera scroll
 		public Vector2 Scroll = new Vector2( 0, -0.1f );
+
+		// Button event change colours
 		public Color Colour_Default = Color.White;
 		public Color Colour_Hover = Color.Green;
 
+		// Button status
 		public bool Hover = false;
-
-		public Entity_Image Image;
-		protected Text Text_Label;
 		protected bool Pressed = false;
 
+		// Button individual elements
+		public Entity_Image Image;
+		protected Text Text_Label;
+
+		// Constructor: Initialise base mouse hover callbacks
 		public Entity_UI_Button()
 		{
 			OnHover = delegate ( Entity_UI_Button self )
@@ -50,6 +59,7 @@ namespace PA_MultiplayerGalacticWar.Entity
 			};
 		}
 
+		// Added To Scene: Initialise the button graphics
 		public override void Added()
 		{
 			base.Added();
@@ -81,20 +91,27 @@ namespace PA_MultiplayerGalacticWar.Entity
 			Layer = Helper.Layer_UI;
 		}
 
+		// Update In Scene: Move the button clickable boundaries with the camera & run click logic
 		public override void Update()
 		{
 			base.Update();
 
+			// Can't click buttons when the game is loading
 			if ( Helper.IsLoading() ) return;
 
-			// Movement logic
+			UpdateBounds();
+			UpdateClick();
+		}
+
+		// Update In Scene: Update the bounds of the clickable button as the camera moves around
+		private void UpdateBounds()
+		{
 			ButtonCameraBounds = new Vector4(
 				Image.image.X + ButtonBounds.X - ( Image.image.ScaledWidth * ( 0.5f + Offset.X ) ),
 				Image.image.Y + ButtonBounds.Y - ( Image.image.ScaledHeight * ( 1.5f + Offset.Y ) ),
 				Image.image.ScaledWidth,
 				Image.image.ScaledHeight
 			);
-			//if ( (  == 0 ) )
 			{
 				ButtonCameraBounds += new Vector4(
 					Scene.Instance.CameraCenterX * ( 1 - Scroll.X ),
@@ -103,16 +120,21 @@ namespace PA_MultiplayerGalacticWar.Entity
 					0
 				);
 			}
-			ButtonCameraBounds += new Vector4(
-				0,
-				0,
-				ButtonCameraBounds.X,
-				ButtonCameraBounds.Y
-			);
+			{
+				ButtonCameraBounds += new Vector4(
+					0,
+					0,
+					ButtonCameraBounds.X,
+					ButtonCameraBounds.Y
+				);
+			}
+		}
 
-			// Click logic
+		// Update In Scene: Mouse clickable/hoverable logic
+		private void UpdateClick()
+		{
 			Vector2 mouse = new Vector2( Scene.Instance.MouseRawX, Scene.Instance.MouseRawY );
-            if ( Helper.PointWithinRect( mouse, ButtonCameraBounds ) )
+			if ( Helper.PointWithinRect( mouse, ButtonCameraBounds ) )
 			{
 				if ( Program.Clicked )
 				{
@@ -135,7 +157,7 @@ namespace PA_MultiplayerGalacticWar.Entity
 			{
 				Hover = false;
 				OnUnHover( this );
-            }
+			}
 			if ( ( !Program.Clicked ) && Pressed )
 			{
 				OnUnPressed( this );
@@ -144,16 +166,10 @@ namespace PA_MultiplayerGalacticWar.Entity
 			if ( Hover )
 			{
 				WhileHover( this );
-            }
+			}
 		}
 
-		public override void Render()
-		{
-			base.Render();
-
-			//Draw.Rectangle( ButtonCameraBounds.X, ButtonCameraBounds.Y, ButtonCameraBounds.Z - ButtonCameraBounds.X, ButtonCameraBounds.W - ButtonCameraBounds.Y );
-		}
-
+		// Removed From Scene: Remove the button image (which is not properly attached to this button)
 		public override void Removed()
 		{
 			base.Removed();
@@ -161,6 +177,7 @@ namespace PA_MultiplayerGalacticWar.Entity
 			Scene.Instance.Remove( Image );
 		}
 
+		// Called from outside: To amend the button visuals with any recent variable changes
 		public void UpdateGraphic()
 		{
 			if ( Text_Label == null ) return;
@@ -173,6 +190,7 @@ namespace PA_MultiplayerGalacticWar.Entity
 			Image.image.Color = Colour_Default;
 		}
 
+		// Called only once ever each update - even between many buttons: For clickable logic
 		public static void GlobalUpdate()
 		{
 			Program.Clicked = Scene.Instance.Input.MouseButtonPressed( MouseButton.Left );

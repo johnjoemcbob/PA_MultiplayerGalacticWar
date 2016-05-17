@@ -3,18 +3,15 @@
 // 05/04/16
 
 using Otter;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PA_MultiplayerGalacticWar.Entity
 {
 	class Entity_Cursor : Otter.Entity
 	{
+		// The cursor graphic file location
 		public string File = "";
 
+		// Constructor: Prepare graphics for when added to the scene
 		public Entity_Cursor( string file )
 		{
 			File = file;
@@ -28,11 +25,7 @@ namespace PA_MultiplayerGalacticWar.Entity
 			Layer = Helper.Layer_Cursor;
 		}
 
-		public override void Added()
-		{
-			base.Added();
-		}
-
+		// Update In Scene: Graphic should follow the real cursor (which is hidden from view)
 		public override void Update()
 		{
 			base.Update();

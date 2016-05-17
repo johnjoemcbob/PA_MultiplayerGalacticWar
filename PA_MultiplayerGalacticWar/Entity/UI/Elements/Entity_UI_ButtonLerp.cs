@@ -4,10 +4,6 @@
 
 using Otter;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PA_MultiplayerGalacticWar.Entity
 {
@@ -26,6 +22,10 @@ namespace PA_MultiplayerGalacticWar.Entity
 		public float TargetRotation = 0;
 		public Vector2 TargetScale = Vector2.Zero;
 
+		// Hover sound
+		public Sound Sound_Hover = null;
+
+		// Constructor: Initialise base mouse hover callbacks
 		public Entity_UI_ButtonLerp()
 		{
 			OnHover = delegate ( Entity_UI_Button self )
@@ -49,9 +49,12 @@ namespace PA_MultiplayerGalacticWar.Entity
 					}
 					selfl.TargetPosition = mouse * 20;
 
-					Sound sound = AudioManager.PlaySound( "resources/audio/ui_hover_loop.wav" );
-					sound.Volume = 0.2f + Math.Abs( Game.Instance.Input.MouseDeltaX * 0.2f ) + Math.Abs( Game.Instance.Input.MouseDeltaX * 0.2f );
-					sound.Pitch = 0.9f + ( mouse.X * 0.1f ) + ( mouse.Y * 0.1f );
+					if ( Sound_Hover == null )
+					{
+						Sound_Hover = AudioManager.PlaySound( "resources/audio/ui_hover_loop.wav" );
+						Sound_Hover.Volume = 0.2f + Math.Abs( Game.Instance.Input.MouseDeltaX * 0.2f ) + Math.Abs( Game.Instance.Input.MouseDeltaX * 0.2f );
+						Sound_Hover.Pitch = 0.9f + ( mouse.X * 0.1f ) + ( mouse.Y * 0.1f );
+					}
                 }
 			};
 			OnUnHover = delegate ( Entity_UI_Button self )
@@ -64,20 +67,37 @@ namespace PA_MultiplayerGalacticWar.Entity
 					selfl.TargetScale = Vector2.Zero;
 				}
 
-				Sound sound = AudioManager.PlaySound( "resources/audio/ui_hover_loop.wav" );
-				sound.Stop();
+				if ( Sound_Hover != null )
+				{
+					Sound_Hover.Stop();
+					Sound_Hover = null;
+                }
 			};
 
 			Layer = Helper.Layer_UI;
 		}
 
+		// Added To Scene: Initialise the button
 		public override void Added()
 		{
 			base.Added();
 
-			Initialise();
-        }
+			InitialiseDefault();
+		}
 
+		// Added To Scene: Initialise the button default transforms
+		public void InitialiseDefault()
+		{
+			DefaultPosition = new Vector2( X, Y );
+			DefaultRotation = Image.image.Angle;
+			DefaultScale = new Vector2( Image.image.ScaleX, Image.image.ScaleY );
+
+			DefaultTextPosition = new Vector2( Text_Label.X - Image.image.X, Text_Label.Y - Image.image.Y );
+			DefaultTextRotation = Text_Label.Angle - Image.image.Angle;
+			DefaultTextScale = new Vector2( Text_Label.ScaleX - Image.image.ScaleX, Text_Label.ScaleY - Image.image.ScaleY );
+		}
+
+		// Update In Scene: Interpolate the button depending on its clicked/hovered state
 		public override void Update()
 		{
 			base.Update();
@@ -100,21 +120,14 @@ namespace PA_MultiplayerGalacticWar.Entity
 			}
 		}
 
+		// Removed From Scene: Stop the button hovering sound
 		public override void Removed()
 		{
-			Sound sound = AudioManager.PlaySound( "resources/audio/ui_hover_loop.wav" );
-			sound.Stop();
-		}
-
-		public void Initialise()
-		{
-			DefaultPosition = new Vector2( X, Y );
-			DefaultRotation = Image.image.Angle;
-			DefaultScale = new Vector2( Image.image.ScaleX, Image.image.ScaleY );
-
-			DefaultTextPosition = new Vector2( Text_Label.X - Image.image.X, Text_Label.Y - Image.image.Y );
-			DefaultTextRotation = Text_Label.Angle - Image.image.Angle;
-			DefaultTextScale = new Vector2( Text_Label.ScaleX - Image.image.ScaleX, Text_Label.ScaleY - Image.image.ScaleY );
-		}
+			if ( Sound_Hover != null )
+			{
+				Sound_Hover.Stop();
+				Sound_Hover = null;
+			}
+        }
 	}
 }

@@ -11,10 +11,6 @@ namespace PA_MultiplayerGalacticWar.Entity
 	{
 		static public float Scale = 0.75f; // 1.25f;
 
-		// Images
-		private Entity_Image Background_Stars1;
-		private Entity_Image Background_Stars2;
-		private Entity_Image Background_Galaxy;
 		// Camera
 		private Vector2 CameraTarget;
 		private Vector2 CameraPos;
@@ -41,18 +37,6 @@ namespace PA_MultiplayerGalacticWar.Entity
 				AddImage( file, Scale );
 			}
 
-			//file = Helper.FindFile( new string[] { Program.PATH_PA + "media/ui/main/game/galactic_war/gw_play/nebula.png", "resources/galaxy.png" } );
-			//if ( file != null )
-			//{
-			//	AddImage( file, Scale );
-			//}
-
-			//file = Helper.FindFile( new string[] { Program.PATH_PA + "media/ui/main/game/galactic_war/gw_play/nebula.png", "resources/galaxy.png" } );
-			//if ( file != null )
-			//{
-			//	AddImage( file, Scale );
-			//}
-
 			for ( int nebula = 8; nebula > 0; nebula-- )
 			{
 				file = Helper.FindFile( new string[] { Program.PATH_PA + "media/ui/main/game/galactic_war/gw_play/nebula0"+ nebula + ".png", "resources/galaxy.png" } );
@@ -61,18 +45,6 @@ namespace PA_MultiplayerGalacticWar.Entity
 					AddImage( file, Scale + ( ( 8 - nebula ) * 0.05f ) );
 				}
 			}
-
-			//file = Helper.FindFile( new string[] { Program.PATH_PA + "media/ui/main/game/galactic_war/gw_play/nebula08.png", "resources/galaxy.png" } );
-			//if ( file != null )
-			//{
-			//	Background_Galaxy = new Entity_Image( 0, 0, file );
-			//	{
-			//		Background_Galaxy.image.Scale = 0.5f;
-			//		Background_Galaxy.image.CenterOrigin();
-			//		Background_Galaxy.image.Scroll = 1;
-			//	}
-			//	scene.Add( Background_Galaxy );
-			//}
 
 			Layer = Helper.Layer_Background;
 		}
@@ -105,8 +77,6 @@ namespace PA_MultiplayerGalacticWar.Entity
 
 				current++;
             }
-			//Background_Galaxy.image.X = CameraPos.X;
-			//Background_Galaxy.image.Y = CameraPos.Y;
 		}
 
 		private void AddImage( string file, float scale = 0.5f )
@@ -118,11 +88,6 @@ namespace PA_MultiplayerGalacticWar.Entity
 				image.Scroll = 1;
 			}
 			AddGraphic( image );
-		}
-
-		public Entity_Image GetGalaxy()
-		{
-			return Background_Galaxy;
 		}
 	}
 }
