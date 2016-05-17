@@ -135,7 +135,7 @@ namespace PA_MultiplayerGalacticWar.Entity
 				};
 				Button_Action.OnReleased = delegate ( Entity_UI_Button self )
 				{
-					System.Action_Move();
+					System.TryAction_Move();
 					AudioManager.PlaySound( "resources/audio/ui_click.wav" );
 				};
 			}
@@ -154,7 +154,7 @@ namespace PA_MultiplayerGalacticWar.Entity
 				};
 				Button_Action.OnReleased = delegate ( Entity_UI_Button self )
 				{
-					System.Action_War();
+					System.TryAction_War();
 					AudioManager.PlaySound( "resources/audio/ui_click.wav" );
 				};
 			}

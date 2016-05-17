@@ -11,6 +11,7 @@ namespace PA_MultiplayerGalacticWar.Entity
 	class Entity_PlayerArmy : Otter.Entity
 	{
 		public int Player = 0;
+		public int PlayerArmyID = 0;
 		public Entity_StarSystem System = null;
 
 		private Vector2 Target;

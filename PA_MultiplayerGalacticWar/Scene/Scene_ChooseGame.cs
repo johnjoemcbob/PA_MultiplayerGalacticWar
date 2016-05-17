@@ -48,6 +48,7 @@ namespace PA_MultiplayerGalacticWar
 				{
 					Game.Instance.RemoveScene();
 					Game.Instance.AddScene( new Scene_Game() );
+					NetworkManager.Host();
 					AudioManager.PlaySound( "resources/audio/ui_click.wav" );
 				};
 			}

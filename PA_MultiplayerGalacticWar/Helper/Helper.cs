@@ -26,8 +26,8 @@ namespace PA_MultiplayerGalacticWar
 		static public int Layer_Cursor = 0;
 
 		// Action Types
-		static public int ACTION_MOVE = 0;
-		static public int ACTION_WAR = 1;
+		public const int ACTION_MOVE = 0;
+		public const int ACTION_WAR = 1;
 
 		// Ensure all directories in path exist
 		static public void CreateDirectory( string path )
@@ -135,5 +135,33 @@ namespace PA_MultiplayerGalacticWar
 		{
 			return AnyInScene<Entity.Entity_UIPanel_FileIO>( Otter.Scene.Instance.GetEntities<Entity.Entity_UIPanel_FileIO>() );
 		}
-    }
+
+		public static Scene_Game GetGameScene()
+		{
+			return ( (Scene_Game) Scene.Instance );
+		}
+
+		public static Entity.Entity_PlayerArmy GetPlayerArmy( int player, int armyid )
+		{
+			foreach ( Entity.Entity_PlayerArmy army in Scene.Instance.GetEntities<Entity.Entity_PlayerArmy>() )
+			{
+				if ( ( army.Player == player ) && ( army.PlayerArmyID == armyid ) )
+				{
+					return army;
+				}
+			}
+			return null;
+		}
+
+		// From: http://stackoverflow.com/questions/20879457/remove-junk-value-from-string
+		public static string TrimNullTerminatedString( string s )
+		{
+			if ( s == null )
+				throw new NotImplementedException();
+			int i = s.IndexOf( '\0' );
+			if ( i >= 0 )
+				return s.Substring( 0, i );
+			return s;
+		}
+	}
 }

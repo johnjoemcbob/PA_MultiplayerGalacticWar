@@ -228,7 +228,7 @@ namespace PA_MultiplayerGalacticWar
 
 							// Store initial state
 							SetPlayerTurn( com );
-							DoTurn( Helper.ACTION_MOVE, "" + army.SystemPosition );
+							DoTurn( Helper.ACTION_MOVE, army.SystemPosition, com, 0, false );
 						}
 					}
 					CurrentGame.Commanders.Add( commander );
@@ -420,8 +420,29 @@ namespace PA_MultiplayerGalacticWar
             }
 		}
 
-		public void DoTurn( int action, string data )
+		public void DoTurn( int action, int systemid, int player, int armyid, bool doturn = true )
 		{
+			// Actually perform the turn if received confirmation
+			if ( doturn )
+			{
+				Entity_PlayerArmy army = Helper.GetPlayerArmy( player, armyid );
+				Entity_StarSystem system = Galaxy.GetSystemByID( systemid );
+				switch ( action )
+				{
+					case Helper.ACTION_MOVE:
+						system.Action_Move( army );
+						break;
+
+					case Helper.ACTION_WAR:
+						system.Action_War( army );
+						break;
+
+					default:
+						break;
+				}
+            }
+
+			// Add to turn history
 			if ( CurrentGame.TurnHistory == null )
 			{
 				CurrentGame.TurnHistory = new List<TurnType>();
@@ -430,8 +451,8 @@ namespace PA_MultiplayerGalacticWar
 			TurnType turn;
 			{
 				turn.ActionID = action;
-				turn.Player = CurrentGame.CurrentTurn;
-				turn.Data = data;
+				turn.Player = player;
+				turn.Data = systemid + " " + armyid;
 			}
 			CurrentGame.TurnHistory.Add( turn );
         }
@@ -466,12 +487,12 @@ namespace PA_MultiplayerGalacticWar
 			UI_TurnSwitch.Initialise();
 
 			// temp
-			Program.ThisPlayer = CurrentGame.CurrentTurn;
-			foreach ( Entity_StarSystem system in Galaxy.GetSystems() )
-			{
-				system.CheckVisibility();
-				system.SetSelected( false );
-			}
+			//Program.ThisPlayer = CurrentGame.CurrentTurn;
+			//foreach ( Entity_StarSystem system in Galaxy.GetSystems() )
+			//{
+			//	system.CheckVisibility();
+			//	system.SetSelected( false );
+			//}
 		}
 	}
 }

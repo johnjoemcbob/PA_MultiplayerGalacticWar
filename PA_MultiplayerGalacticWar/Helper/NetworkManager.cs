@@ -1,10 +1,19 @@
 ﻿using Otter;
 using System;
 using System.Text;
+using Newtonsoft.Json;
 using Lidgren.Network;
 
 namespace PA_MultiplayerGalacticWar
 {
+	struct NetworkTurnType
+	{
+		public int Action;
+		public int System;
+		public int Player;
+		public int Army;
+	};
+
 	class NetworkManager
 	{
 		public const int MESSAGE_INITIAL = 0;
@@ -45,6 +54,8 @@ namespace PA_MultiplayerGalacticWar
 
 		static public void Update()
 		{
+			if ( NetworkHandler == null ) return;
+
 			// Check peers for messages
 			foreach ( NetConnection connection in NetworkHandler.Connections )
 			{
@@ -90,7 +101,7 @@ namespace PA_MultiplayerGalacticWar
 		{
 			// Handle custom messages
 			var data = message.Data;
-			string datastr = Encoding.Default.GetString( data );
+			string datastr = Helper.TrimNullTerminatedString( Encoding.Default.GetString( data ) );
             //Console.WriteLine( "Data: " + datastr );
 
 			// Get message id from the first char of the message
@@ -131,7 +142,15 @@ namespace PA_MultiplayerGalacticWar
 
 					break;
 				case MESSAGE_TURN_REQUEST:
-					
+					NetworkTurnType turn = JsonConvert.DeserializeObject<NetworkTurnType>( datacore );
+					Console.WriteLine( "TurnRequest: " + datacore );
+					SendTurnConfirm( turn.Action, turn.System, turn.Player, turn.Army );
+
+					break;
+				case MESSAGE_TURN_CONFIRM:
+					NetworkTurnType turnconfirm = JsonConvert.DeserializeObject<NetworkTurnType>( datacore );
+					Console.WriteLine( "TurnConfirm: " + datacore );
+					Helper.GetGameScene().DoTurn( turnconfirm.Action, turnconfirm.System, turnconfirm.Player, turnconfirm.Army );
 
 					break;
 				default:
@@ -156,7 +175,7 @@ namespace PA_MultiplayerGalacticWar
 			}
 		}
 
-		static private void Send( NetConnection sendto, int id, string data )
+		static public void Send( NetConnection sendto, int id, string data )
 		{
 			NetOutgoingMessage msg = NetworkHandler.CreateMessage();
 			{
@@ -165,17 +184,61 @@ namespace PA_MultiplayerGalacticWar
 			NetworkHandler.SendMessage( msg, sendto, NetDeliveryMethod.ReliableOrdered );
 		}
 
-		static private void SendInitialState( NetConnection sendto )
+		static public void SendInitialState( NetConnection sendto )
 		{
 			Info_Game game = ( (Scene_Game) Scene.Instance ).CurrentGame;
 			Send( sendto, MESSAGE_PLAYERID, NetworkHandler.ConnectionsCount.ToString() );
 			Send( sendto, MESSAGE_INITIAL, game.GetNetworkString() );
         }
 
-		static private void SendTurnRequest( NetConnection sendto )
+		static public void SendTurnRequest( int action, int system, int player, int playerarmy )
 		{
-			Info_Game game = ( (Scene_Game) Scene.Instance ).CurrentGame;
-			Send( sendto, MESSAGE_INITIAL, game.GetNetworkString() );
+			if ( NetworkHandler == null ) return;
+
+			if ( Server )
+			{
+				// Server host has no need to confirm, skip straight to sending the confirmed turns to all clients
+				Console.WriteLine( "HOST is skipping turn request" );
+				SendTurnConfirm( action, system, player, playerarmy );
+            }
+			else
+			{
+				// Client sends to server to confirm action
+				Console.WriteLine( "CLIENT is doing turn request" );
+				NetworkTurnType turn = new NetworkTurnType();
+				{
+					turn.Action = action;
+					turn.System = system;
+					turn.Player = player;
+					turn.Army = playerarmy;
+				}
+				string turndata = JsonConvert.SerializeObject( turn );
+                foreach ( NetConnection connection in NetworkHandler.Connections )
+				{
+					Send( connection, MESSAGE_TURN_REQUEST, turndata );
+				}
+			}
+		}
+
+		static public void SendTurnConfirm( int action, int system, int player, int playerarmy )
+		{
+			// Extra logic on server host to also confirm the turn on their own game client
+			if ( Server )
+			{
+				Helper.GetGameScene().DoTurn( action, system, player, playerarmy );
+            }
+			NetworkTurnType turn = new NetworkTurnType();
+			{
+				turn.Action = action;
+				turn.System = system;
+				turn.Player = player;
+				turn.Army = playerarmy;
+			}
+			string turndata = JsonConvert.SerializeObject( turn );
+			foreach ( NetConnection connection in NetworkHandler.Connections )
+			{
+				Send( connection, MESSAGE_TURN_CONFIRM, turndata );
+			}
 		}
 	}
 }

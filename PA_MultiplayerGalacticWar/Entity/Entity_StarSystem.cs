@@ -134,11 +134,11 @@ namespace PA_MultiplayerGalacticWar.Entity
 
 			if ( Game.Instance.Input.KeyPressed( Key.M ) )
 			{
-				Action_Move();
+				TryAction_Move();
 			}
 			if ( Game.Instance.Input.KeyPressed( Key.W ) )
 			{
-				Action_War();
+				TryAction_War();
             }
 		}
 
@@ -159,8 +159,8 @@ namespace PA_MultiplayerGalacticWar.Entity
 					// Double click logic
 					if ( LastClick >= Game.Instance.Timer )
 					{
-						Action_War();
-						Action_Move();
+						TryAction_War();
+						TryAction_Move();
                     }
 					LastClick = Game.Instance.Timer + 15;
 				}
@@ -374,28 +374,43 @@ namespace PA_MultiplayerGalacticWar.Entity
 			UI.UpdateText();
 		}
 
-		public void Action_Move()
+		public void TryAction_Move()
 		{
 			if ( !( (Scene_Game) Scene ).GetIsPlayerTurn( Program.ThisPlayer ) ) return;
 			if ( HasPlayerArmy != null ) return;
 
-			Entity_PlayerArmy.GetAllByPlayer( Program.ThisPlayer )[0].MoveToSystem( this );
-			AfterAction( Helper.ACTION_MOVE, "" + Index );
+			NetworkManager.SendTurnRequest( Helper.ACTION_MOVE, Index, Program.ThisPlayer, 0 );
 		}
 
-		public void Action_War()
+		public void TryAction_War()
 		{
 			if ( !( (Scene_Game) Scene ).GetIsPlayerTurn( Program.ThisPlayer ) ) return;
 			if ( HasPlayerArmy == null ) return;
 
-			Console.WriteLine( "WAR " + Name );
-			( (Scene_Game) Scene.Instance ).SaveGame();
-			AfterAction( Helper.ACTION_WAR, Index + " " );
+			NetworkManager.SendTurnRequest( Helper.ACTION_WAR, Index, Program.ThisPlayer, 0 );
 		}
 
-		private void AfterAction( int action, string data )
+		public void Action_Move( Entity_PlayerArmy army )
 		{
-			( (Scene_Game) Scene ).DoTurn( action, data );
+			if ( !( (Scene_Game) Scene ).GetIsPlayerTurn( army.Player ) ) return;
+			if ( HasPlayerArmy != null ) return;
+
+			army.MoveToSystem( this );
+			AfterAction();
+		}
+
+		public void Action_War( Entity_PlayerArmy army )
+		{
+			if ( !( (Scene_Game) Scene ).GetIsPlayerTurn( army.Player ) ) return;
+			if ( HasPlayerArmy == null ) return;
+
+			Console.WriteLine( "WAR " + Name );
+			( (Scene_Game) Scene.Instance ).SaveGame();
+			AfterAction();
+		}
+
+		private void AfterAction()
+		{
             ( (Scene_Game) Scene ).SetNextPlayerTurn();
 		}
 
