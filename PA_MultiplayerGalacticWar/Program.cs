@@ -92,6 +92,7 @@ namespace PA_MultiplayerGalacticWar
 
 			// Cleanup
 			AudioManager.Cleanup();
+			NetworkManager.Cleanup();
 			//Music.Stop();
 			//Music.Dispose();
 			//Music = null;

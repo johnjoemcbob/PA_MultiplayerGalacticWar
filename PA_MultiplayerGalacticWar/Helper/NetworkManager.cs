@@ -69,6 +69,15 @@ namespace PA_MultiplayerGalacticWar
 			}
 		}
 
+		// Called by cleanup to clear any connections and sockets
+		static public void Cleanup()
+		{
+			if ( NetworkHandler == null ) return;
+
+			NetworkHandler.Shutdown( "Left Game" );
+			NetworkHandler = null;
+        }
+
 		static private void ParseMessage( NetIncomingMessage message )
 		{
 			Console.WriteLine( "Received message with type: " + message.MessageType );
@@ -95,14 +104,17 @@ namespace PA_MultiplayerGalacticWar
 						+ message.MessageType );
 					break;
 			}
+			NetworkHandler.Recycle( message );
 		}
 
 		static private void ParseMessage_Data( NetIncomingMessage message )
 		{
 			// Handle custom messages
 			var data = message.Data;
-			string datastr = Helper.TrimNullTerminatedString( Encoding.Default.GetString( data ) );
-            //Console.WriteLine( "Data: " + datastr );
+			//string datastr = Helper.TrimNullTerminatedString( Encoding.Default.GetString( data ) );
+			//string datastr = Encoding.ASCII.GetString( data );
+			string datastr = message.ReadString();
+			//Console.WriteLine( "Data: " + datastr );
 
 			// Get message id from the first char of the message
 			int id = -1;
@@ -179,7 +191,9 @@ namespace PA_MultiplayerGalacticWar
 		{
 			NetOutgoingMessage msg = NetworkHandler.CreateMessage();
 			{
-				msg.Write( id.ToString() + " " + data );
+				//Byte[] bytes = Encoding.ASCII.GetBytes( id.ToString() + "@" + data );
+				//msg.Write( bytes );
+				msg.Write( id.ToString() + "@" + data );
 			}
 			NetworkHandler.SendMessage( msg, sendto, NetDeliveryMethod.ReliableOrdered );
 		}

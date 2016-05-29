@@ -20,6 +20,9 @@ namespace PA_MultiplayerGalacticWar
 		{
 			base.Begin();
 
+			// Clear any current connections
+			NetworkManager.Cleanup();
+
 			// Add background
 			Add( new Entity_Image_Background( this, Program.PATH_PA, Program.PATH_MOD ) );
 
