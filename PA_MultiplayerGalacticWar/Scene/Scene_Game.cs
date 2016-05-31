@@ -8,6 +8,7 @@ using System.IO;
 using System.Collections.Generic;
 using System.Threading;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 using PA_MultiplayerGalacticWar.Entity;
 
@@ -15,9 +16,15 @@ namespace PA_MultiplayerGalacticWar
 {
 	class Scene_Game : Scene
 	{
+		#region Variable Declaration
+		#region Variable Declaration: Defines
+		private const int CARD_REWARD_MAX = 3;
+		#endregion
+		#region Variable Declaration: Game Data
 		public Info_Game CurrentGame;
 		public List<Info_Player> CurrentPlayers = new List<Info_Player>();
-
+		#endregion
+		#region Variable Declaration: File IO
 		// File input & output
 		private string Filename = "";
 		private string FileToLoad = "";
@@ -26,25 +33,32 @@ namespace PA_MultiplayerGalacticWar
 		private Thread Thread_Save = null;
 		private bool FileToSave = true;
 		private bool IsNewGame = false;
-
+		#endregion
+		#region Variable Declaration: Networking
 		// Networking
 		private string IPToConnect = "";
-
-		// Flag to quit after pressing escape & after saving
-		private bool Quit = false;
-
+		#endregion
+		#region Variable Declaration: UI
 		private List<Entity_UIPanel_Card> PossibleCards = new List<Entity_UIPanel_Card>();
 
 		// UI
 		private Entity_UIPanel_TurnSwitch UI_TurnSwitch = new Entity_UIPanel_TurnSwitch();
 		private Entity_UIPanel_FileIO UI_Load = null;
-
+		#endregion
+		#region Variable Declaration: Game Objects
 		private Entity_Galaxy Galaxy;
+		#endregion
+		#region Variable Declaration: Other
+		// Flag to quit after pressing escape & after saving
+		private bool Quit = false;
 
 		// Zooming
 		private float Zoom = 1;
 		private float ZoomTarget = 1;
+		#endregion
+		#endregion
 
+		#region Initialise
 		public Scene_Game( string load = "" )
 		{
 			Filename = load;
@@ -62,18 +76,8 @@ namespace PA_MultiplayerGalacticWar
 			// Setup galaxy & star system information: BEFORE LOADING
 			Galaxy = new Entity_Galaxy( this, Program.PATH_PA, Program.PATH_MOD );
 
-			// Temp
-			PossibleCards.Add( new Entity_UIPanel_Card(
-				-256, 0,
-				"Foreman Commander",
-				"Your commander is specialised in\nproducing metal.\n\nGain a 100% increase to base metal\nproduction."
-			) );
-			PossibleCards.Add( new Entity_UIPanel_Card( 0, 0, "Tech Storage", "Gain an extra slot to store new\ntechnology in." ) );
-			PossibleCards.Add( new Entity_UIPanel_Card( 256, 0, "Powerhouse Commander", "Your commander is specialised in\nproducing energy.\n\nGain a 50% increase to base energy\nproduction." ) );
-			foreach ( Entity_UIPanel_Card card in PossibleCards )
-			{
-				Add( card );
-			}
+			// Temp testing
+			DisplayWinRewardSelection();
 
 			// Load thread
 			if ( FileToLoad != "" )
@@ -100,7 +104,9 @@ namespace PA_MultiplayerGalacticWar
 
 			Add( Galaxy );
 		}
+		#endregion
 
+		#region Update
 		public override void UpdateFirst()
 		{
 			base.UpdateFirst();
@@ -164,10 +170,12 @@ namespace PA_MultiplayerGalacticWar
 			Zoom += ( ZoomTarget - Zoom ) * Game.Instance.DeltaTime;
 			Scene.Instance.CameraZoom = Zoom;
 		}
+		#endregion
 
+		#region Cards
 		public void PickCard( Entity_UIPanel_Card pickedcard )
 		{
-			// Remove all other cards
+			// Remove all cards UI from the screen
 			foreach ( Entity_UIPanel_Card card in PossibleCards )
 			{
 				if ( ( card != null ) && ( card.Scene == this ) )
@@ -177,7 +185,7 @@ namespace PA_MultiplayerGalacticWar
 			}
 
 			// Apply this card to the winning player
-			//Program.AddCard(  );
+			CurrentGame.Commanders[Program.ThisPlayer].Cards.Add( pickedcard.Label );
 		}
 
 		private void ApplyCards( Info_Player player, List<string> commandercards, List<string> cards )
@@ -191,6 +199,46 @@ namespace PA_MultiplayerGalacticWar
 			Info_Player.EndSetupArmy( Program.PATH_PA + "media/pa/units/" );
 		}
 
+		// Called when a player wins a match on the client of that player; to give the choice of rewards
+		public void DisplayWinRewardSelection()
+		{
+			// Find all cards (make a copy to remove elements from)
+			List<dynamic> cards_all = new List<dynamic>( Program.Cards_Commander );
+
+			// Choose possible (i.e. some can only be unlocked once)
+
+			// Choose from possible using weightings
+			JObject[] cards_possiblereward = new JObject[CARD_REWARD_MAX];
+			{
+				for ( int card = 0; card < CARD_REWARD_MAX; card++ )
+				{
+					// Choose a card
+					JObject cardjson = cards_all.RandomElement();
+
+					// Remove it from current possible and add to the visible
+					cards_all.Remove( cardjson );
+					cards_possiblereward[card] = cardjson;
+				}
+			}
+
+			// Display these cards to the player for selection
+			int[] card_position = new int[] { -256, 0, 256 };
+			for ( int card = 0; card < CARD_REWARD_MAX; card++ )
+			{
+				PossibleCards.Add( new Entity_UIPanel_Card(
+					card_position[card], 0,
+					cards_possiblereward[card]["display_name"].ToString(),
+					cards_possiblereward[card]["description"].ToString()
+				) );
+			}
+			foreach ( Entity_UIPanel_Card card in PossibleCards )
+			{
+				Add( card );
+			}
+		}
+		#endregion
+
+		#region Save/Load/Initialise
 		private void NewGame()
 		{
 			// Create new
@@ -239,7 +287,7 @@ namespace PA_MultiplayerGalacticWar
 
 				// Generate the initial galaxy
 				Galaxy.Generate();
-            }
+			}
 			Galaxy.Initialise();
 			Galaxy.Generate_Info();
 			SetupGame();
@@ -274,11 +322,11 @@ namespace PA_MultiplayerGalacticWar
 				{
 					// Add the loading text to the screen
 					UI_Load = new Entity_UIPanel_FileIO();
-                    Add( UI_Load );
+					Add( UI_Load );
 
 					// Start at thread to load the content
 					Thread_Load.Start();
-                }
+				}
 				else
 				{
 					// Return to menu
@@ -291,7 +339,7 @@ namespace PA_MultiplayerGalacticWar
 		public void ThreadLoadGame()
 		{
 			string json = JSONToLoad;
-            if ( JSONToLoad == "" )
+			if ( JSONToLoad == "" )
 			{
 				json = Helper.ReadFile( FileToLoad );
 			}
@@ -380,7 +428,7 @@ namespace PA_MultiplayerGalacticWar
 		{
 			Info_Player.SetupAllArmy();
 			int playerid = 0;
-            foreach ( CommanderType com in CurrentGame.Commanders )
+			foreach ( CommanderType com in CurrentGame.Commanders )
 			{
 				Info_Player player = new Info_Player();
 				{
@@ -417,9 +465,11 @@ namespace PA_MultiplayerGalacticWar
 				}
 
 				playerid++;
-            }
+			}
 		}
+		#endregion
 
+		#region Player Turn
 		public void DoTurn( int action, int systemid, int player, int armyid, bool doturn = true )
 		{
 			// Actually perform the turn if received confirmation
@@ -440,13 +490,13 @@ namespace PA_MultiplayerGalacticWar
 					default:
 						break;
 				}
-            }
+			}
 
 			// Add to turn history
 			if ( CurrentGame.TurnHistory == null )
 			{
 				CurrentGame.TurnHistory = new List<TurnType>();
-            }
+			}
 
 			TurnType turn;
 			{
@@ -455,11 +505,11 @@ namespace PA_MultiplayerGalacticWar
 				turn.Data = systemid + " " + armyid;
 			}
 			CurrentGame.TurnHistory.Add( turn );
-        }
+		}
 		public int GetPlayerTurn()
 		{
 			return CurrentGame.CurrentTurn;
-        }
+		}
 		public bool GetIsPlayerTurn( int player )
 		{
 			return ( GetPlayerTurn() == player );
@@ -473,7 +523,7 @@ namespace PA_MultiplayerGalacticWar
 				CurrentGame.CurrentTurn = 0;
 			}
 			SetPlayerTurn( CurrentGame.CurrentTurn );
-        }
+		}
 		public void SetPlayerTurn( int turn )
 		{
 			CurrentGame.CurrentTurn = turn;
@@ -497,5 +547,6 @@ namespace PA_MultiplayerGalacticWar
 			Add( UI_TurnSwitch );
 			UI_TurnSwitch.Initialise();
 		}
-    }
+		#endregion
+	}
 }

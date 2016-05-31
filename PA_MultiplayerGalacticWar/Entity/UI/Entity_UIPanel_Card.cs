@@ -114,7 +114,7 @@ namespace PA_MultiplayerGalacticWar.Entity
 				Button_Choose.OnReleased = delegate ( Entity_UI_Button self )
 				{
 					Console.WriteLine( "added " + Label );
-					( (Scene_Game) Scene.Instance ).PickCard( this );
+					Helper.GetGameScene().PickCard( this );
 					Scene.Instance.Remove( this );
 					AudioManager.PlaySound( "resources/audio/ui_click.wav" );
 				};

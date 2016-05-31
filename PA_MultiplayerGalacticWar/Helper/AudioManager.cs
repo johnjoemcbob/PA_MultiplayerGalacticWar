@@ -24,7 +24,7 @@ namespace PA_MultiplayerGalacticWar
 
 			// Play the sound
 			Sounds[path].Loop = looping;
-			Sounds[path].Play();
+			//Sounds[path].Play();
 			return Sounds[path];
 		}
 

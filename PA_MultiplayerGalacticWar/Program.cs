@@ -24,11 +24,11 @@ namespace PA_MultiplayerGalacticWar
 		static public bool Clicked = false;
 		//static public Music Music;
 
-		// Loaded upgrade cards
+		// Loaded upgrade cards (raw json string)
 		static public List<string> Cards_Loaded_Commander;
 		static public List<string> Cards_Loaded_Unit;
 
-		// Cards applied to each commander
+		// Cards applied to each commander (deserialized json dynamic)
 		static public List<dynamic> Cards_Commander = new List<dynamic>();
 		static public List<dynamic> Cards = new List<dynamic>();
 
