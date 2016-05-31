@@ -377,7 +377,12 @@ namespace PA_MultiplayerGalacticWar.Entity
 
 		public void TryAction_Move()
 		{
-			if ( !( (Scene_Game) Scene ).GetIsPlayerTurn( Program.ThisPlayer ) ) return;
+			if ( !( (Scene_Game) Scene ).GetIsPlayerTurn( Program.ThisPlayer ) )
+			{
+				// Display "not your turn" warning (i.e. play turnswitch flourish)
+				Helper.GetGameScene().PlayTurnSwitch();
+				return;
+			}
 			if ( HasPlayerArmy != null ) return;
 
 			NetworkManager.SendTurnRequest( Helper.ACTION_MOVE, Index, Program.ThisPlayer, 0 );
@@ -385,7 +390,12 @@ namespace PA_MultiplayerGalacticWar.Entity
 
 		public void TryAction_War()
 		{
-			if ( !( (Scene_Game) Scene ).GetIsPlayerTurn( Program.ThisPlayer ) ) return;
+			if ( !( (Scene_Game) Scene ).GetIsPlayerTurn( Program.ThisPlayer ) )
+			{
+				// Display "not your turn" warning (i.e. play turnswitch flourish)
+				Helper.GetGameScene().PlayTurnSwitch();
+				return;
+			}
 			if ( HasPlayerArmy == null ) return;
 
 			NetworkManager.SendTurnRequest( Helper.ACTION_WAR, Index, Program.ThisPlayer, 0 );

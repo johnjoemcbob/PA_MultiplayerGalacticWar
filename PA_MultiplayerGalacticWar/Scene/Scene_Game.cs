@@ -477,14 +477,7 @@ namespace PA_MultiplayerGalacticWar
 		public void SetPlayerTurn( int turn )
 		{
 			CurrentGame.CurrentTurn = turn;
-
-			// Show turn switch UI
-			if ( UI_TurnSwitch.IsInScene )
-			{
-				//Remove( UI_TurnSwitch );
-			}
-			Add( UI_TurnSwitch );
-			UI_TurnSwitch.Initialise();
+			PlayTurnSwitch();
 
 			// temp
 			//Program.ThisPlayer = CurrentGame.CurrentTurn;
@@ -494,5 +487,15 @@ namespace PA_MultiplayerGalacticWar
 			//	system.SetSelected( false );
 			//}
 		}
-	}
+		public void PlayTurnSwitch()
+		{
+			// Show turn switch UI
+			if ( UI_TurnSwitch.IsInScene )
+			{
+				//Remove( UI_TurnSwitch );
+			}
+			Add( UI_TurnSwitch );
+			UI_TurnSwitch.Initialise();
+		}
+    }
 }

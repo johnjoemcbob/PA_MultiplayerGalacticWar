@@ -1,6 +1,7 @@
 ﻿using Otter;
 using System;
-using System.Text;
+using System.Net;
+using System.Net.NetworkInformation;
 using Newtonsoft.Json;
 using Lidgren.Network;
 
@@ -30,12 +31,18 @@ namespace PA_MultiplayerGalacticWar
 
 		static public void Host()
 		{
+			if ( IsPortInUse( Port ) )
+			{
+				Console.WriteLine( "Port " + Port + " is unavailable!" );
+				return;
+			}
+
 			Config = new NetPeerConfiguration( ApplicationName );
 			{
 				Config.Port = Port;
 			}
 			NetworkHandler = new NetServer( Config );
-			NetworkHandler.Start();
+            NetworkHandler.Start();
 
 			Server = true;
         }
@@ -110,58 +117,31 @@ namespace PA_MultiplayerGalacticWar
 		static private void ParseMessage_Data( NetIncomingMessage message )
 		{
 			// Handle custom messages
-			var data = message.Data;
-			//string datastr = Helper.TrimNullTerminatedString( Encoding.Default.GetString( data ) );
-			//string datastr = Encoding.ASCII.GetString( data );
-			string datastr = message.ReadString();
-			//Console.WriteLine( "Data: " + datastr );
-
-			// Get message id from the first char of the message
-			int id = -1;
-			{
-				// Find message id
-				int index = 0;
-				bool parsed = false;
-				while ( !parsed )
-				{
-					parsed = int.TryParse( datastr.ToCharArray()[index].ToString(), out id );
-					index++;
-					if ( index > 10 )
-					{
-						Console.WriteLine( "Message Parse Failed on: " + datastr );
-						return;
-					}
-				}
-				// Clip any garbage from the start
-				datastr = datastr.Substring( index - 1 );
-			}
-			Console.WriteLine( "Data ID: " + id );
+			int id = message.ReadInt32();
+			string datastr;
 
 			// Parse message
-			Console.WriteLine( "" );
-			string datacore = datastr.Substring( 2 );
 			switch ( id )
 			{
 				case MESSAGE_INITIAL:
-					//Console.WriteLine( "JSON: " + datacore );
-					( (Scene_Game) Scene.Instance ).LoadFromJSON( datacore );
+					datastr = message.ReadString();
+					( (Scene_Game) Scene.Instance ).LoadFromJSON( datastr );
 
 					break;
 				case MESSAGE_PLAYERID:
-					int num = int.Parse( datacore.ToCharArray()[0].ToString() );
-                    Console.WriteLine( "Player: " + num );
-					Program.ThisPlayer = num;
+					int playerid = message.ReadInt16();
+					Program.ThisPlayer = playerid;
 
 					break;
 				case MESSAGE_TURN_REQUEST:
-					NetworkTurnType turn = JsonConvert.DeserializeObject<NetworkTurnType>( datacore );
-					Console.WriteLine( "TurnRequest: " + datacore );
+					datastr = message.ReadString();
+					NetworkTurnType turn = JsonConvert.DeserializeObject<NetworkTurnType>( datastr );
 					SendTurnConfirm( turn.Action, turn.System, turn.Player, turn.Army );
 
 					break;
 				case MESSAGE_TURN_CONFIRM:
-					NetworkTurnType turnconfirm = JsonConvert.DeserializeObject<NetworkTurnType>( datacore );
-					Console.WriteLine( "TurnConfirm: " + datacore );
+					datastr = message.ReadString();
+					NetworkTurnType turnconfirm = JsonConvert.DeserializeObject<NetworkTurnType>( datastr );
 					Helper.GetGameScene().DoTurn( turnconfirm.Action, turnconfirm.System, turnconfirm.Player, turnconfirm.Army );
 
 					break;
@@ -187,22 +167,42 @@ namespace PA_MultiplayerGalacticWar
 			}
 		}
 
-		static public void Send( NetConnection sendto, int id, string data )
+		static public void SendMessage( NetConnection sendto, NetOutgoingMessage msg )
+		{
+			NetworkHandler.SendMessage( msg, sendto, NetDeliveryMethod.ReliableOrdered );
+		}
+
+		static public NetOutgoingMessage StartDefaultMessage( int id )
 		{
 			NetOutgoingMessage msg = NetworkHandler.CreateMessage();
 			{
-				//Byte[] bytes = Encoding.ASCII.GetBytes( id.ToString() + "@" + data );
-				//msg.Write( bytes );
-				msg.Write( id.ToString() + "@" + data );
+				msg.Write( id );
 			}
-			NetworkHandler.SendMessage( msg, sendto, NetDeliveryMethod.ReliableOrdered );
+			return msg;
 		}
+
+		static public void SendString( NetConnection sendto, int id, string data )
+		{
+			NetOutgoingMessage msg = StartDefaultMessage( id );
+			{
+                msg.Write( (string) data );
+			}
+			SendMessage( sendto, msg );
+        }
 
 		static public void SendInitialState( NetConnection sendto )
 		{
 			Info_Game game = ( (Scene_Game) Scene.Instance ).CurrentGame;
-			Send( sendto, MESSAGE_PLAYERID, NetworkHandler.ConnectionsCount.ToString() );
-			Send( sendto, MESSAGE_INITIAL, game.GetNetworkString() );
+
+			// Send the player ID
+			NetOutgoingMessage msg_playerid = StartDefaultMessage( MESSAGE_PLAYERID );
+			{
+				msg_playerid.Write( NetworkHandler.ConnectionsCount );
+            }
+			SendMessage( sendto, msg_playerid );
+
+			// Send the initial world state
+			SendString( sendto, MESSAGE_INITIAL, game.GetNetworkString() );
         }
 
 		static public void SendTurnRequest( int action, int system, int player, int playerarmy )
@@ -229,7 +229,7 @@ namespace PA_MultiplayerGalacticWar
 				string turndata = JsonConvert.SerializeObject( turn );
                 foreach ( NetConnection connection in NetworkHandler.Connections )
 				{
-					Send( connection, MESSAGE_TURN_REQUEST, turndata );
+					SendString( connection, MESSAGE_TURN_REQUEST, turndata );
 				}
 			}
 		}
@@ -251,8 +251,29 @@ namespace PA_MultiplayerGalacticWar
 			string turndata = JsonConvert.SerializeObject( turn );
 			foreach ( NetConnection connection in NetworkHandler.Connections )
 			{
-				Send( connection, MESSAGE_TURN_CONFIRM, turndata );
+				SendString( connection, MESSAGE_TURN_CONFIRM, turndata );
 			}
+		}
+
+		// From: https://softwarebydefault.com/2013/02/22/port-in-use/
+		// Used to determine if a port is available, to stop crashes when hosting on an unavailable port
+		public static bool IsPortInUse( int port )
+		{
+			bool inuse = false;
+			{
+				IPGlobalProperties ipproperties = IPGlobalProperties.GetIPGlobalProperties();
+				IPEndPoint[] ipendpoints = ipproperties.GetActiveUdpListeners();
+
+				foreach ( IPEndPoint endPoint in ipendpoints )
+				{
+					if ( endPoint.Port == port )
+					{
+						inuse = true;
+						break;
+					}
+				}
+			}
+			return inuse;
 		}
 	}
 }
