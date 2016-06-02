@@ -8,6 +8,7 @@ namespace PA_MultiplayerGalacticWar.Entity
 {
 	class Entity_UIPanel_StarSystem : Otter.Entity
 	{
+		#region Variable Declaration
 		// Panel sizing
 		public static int Width = 256;
 		public static int Height = 212;
@@ -27,7 +28,9 @@ namespace PA_MultiplayerGalacticWar.Entity
 		private Text Text_SystemType;
 		private Text Text_SystemInfo;
 		private Entity_UI_Button Button_Action;
+		#endregion
 
+		#region Initialise
 		// Constructor: Initialise the individual elements
 		public Entity_UIPanel_StarSystem( float x, float y, string name, string systemtype )
 		{
@@ -102,7 +105,9 @@ namespace PA_MultiplayerGalacticWar.Entity
 			Scene.Instance.Add( Image_Background );
 			Scene.Instance.Add( Button_Action );
         }
+		#endregion
 
+		#region Update
 		// Update In Scene: Update collider position to follow the camera
 		public override void Update()
 		{
@@ -111,7 +116,9 @@ namespace PA_MultiplayerGalacticWar.Entity
 			// Update the collider to follow the camera
 			Collider.SetPosition( -Game.Instance.HalfWidth + Scene.Instance.CameraCenterX, -Game.Instance.HalfHeight + Scene.Instance.CameraCenterY );
 		}
+		#endregion
 
+		#region Cleanup
 		// Removed From Scene: Remove individual elements
 		public override void Removed()
 		{
@@ -120,7 +127,9 @@ namespace PA_MultiplayerGalacticWar.Entity
 			Scene.Instance.Remove( Image_Background );
 			Scene.Instance.Remove( Button_Action );
 		}
+		#endregion
 
+		#region Alter Visuals
 		// Called when the linked system's state changes (e.g. an army moves there)
 		public void UpdateButton()
 		{
@@ -177,5 +186,6 @@ namespace PA_MultiplayerGalacticWar.Entity
 			Text_SystemInfo.String = "(Planets: " + StarSystemInfos.Infos[System.MapID].Planets + ")";
 			Text_SystemInfo.CenterOrigin();
 		}
+		#endregion
 	}
 }

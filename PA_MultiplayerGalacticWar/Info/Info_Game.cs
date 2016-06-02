@@ -2,11 +2,14 @@
 // JSON format for save games
 // 30/03/16
 
+#region Includes
 using System.Collections.Generic;
 using Newtonsoft.Json;
+#endregion
 
 namespace PA_MultiplayerGalacticWar
 {
+	#region Extra Data Structures
 	struct StarSystemType
 	{
 		public int Owner;
@@ -28,9 +31,11 @@ namespace PA_MultiplayerGalacticWar
 		public int ActionID;
 		public string Data;
 	};
+	#endregion
 
-    class Info_Game
+	class Info_Game
 	{
+		#region Variable Declaration
 		public string StartDate;
 		public int Players;
 		public List<CommanderType> Commanders;
@@ -39,7 +44,9 @@ namespace PA_MultiplayerGalacticWar
 		public List<TurnType> TurnHistory;
 		// Also store galaxy map & star system ownership
 		public GalaxyType Galaxy = new GalaxyType();
+		#endregion
 
+		#region Saving
 		public void SaveGalaxy( Entity.Entity_Galaxy galaxy )
 		{
 			Galaxy.StarSystems = new List<StarSystemType>();
@@ -137,10 +144,14 @@ namespace PA_MultiplayerGalacticWar
 			// Add this new data
 			Commanders = new List<CommanderType>( commanders );
 		}
+		#endregion
 
+		#region Getters
+		// Get current game state as a json string to send over network
 		public string GetNetworkString()
 		{
 			return JsonConvert.SerializeObject( this );
 		}
+		#endregion
 	}
 }

@@ -2,13 +2,16 @@
 // Loading/saving message UI element
 // 08/05/16
 
+#region Includes
 using Otter;
 using System;
+#endregion
 
 namespace PA_MultiplayerGalacticWar.Entity
 {
 	class Entity_UIPanel_FileIO : Otter.Entity
 	{
+		#region Variable Declaration
 		// Visual information
 		public string Label = "Loading";
 		public string Ellipsis = "";
@@ -24,7 +27,9 @@ namespace PA_MultiplayerGalacticWar.Entity
 
 		// Individual elements
 		private Text Text_Label;
+		#endregion
 
+		#region Initialise
 		// Constructor: Initialise circle positions & position this ui at the bottom left
 		public Entity_UIPanel_FileIO()
 		{
@@ -63,7 +68,9 @@ namespace PA_MultiplayerGalacticWar.Entity
 
 			Layer = Helper.Layer_UI;
 		}
+		#endregion
 
+		#region Update
 		// Updated In Scene: Update the animated elements
 		public override void Update()
 		{
@@ -132,7 +139,9 @@ namespace PA_MultiplayerGalacticWar.Entity
 				if ( circleid == NumCircles ) break;
 			}
 		}
+		#endregion
 
+		#region Render
 		// Render To Scene: Draw individual circles
 		public override void Render()
 		{
@@ -150,5 +159,6 @@ namespace PA_MultiplayerGalacticWar.Entity
 				);
             }
 		}
+		#endregion
 	}
 }

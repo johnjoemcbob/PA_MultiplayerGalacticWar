@@ -2,13 +2,16 @@
 // Individual player commander & army info and functionality
 // 02/04/16
 
+#region Includes
 using System;
 using System.IO;
 using System.Collections.Generic;
 using Newtonsoft.Json;
+#endregion
 
 namespace PA_MultiplayerGalacticWar
 {
+	#region Extra Data Structures
 	struct ArmyType
 	{
 		public string Name;
@@ -44,9 +47,11 @@ namespace PA_MultiplayerGalacticWar
 		public string FileName;
 		public dynamic JSON;
 	};
+	#endregion
 
 	class Info_Player
 	{
+		#region Variable Declaration
 		// Units to be added to the unit_list.json
 		static public List<string> ExtraUnits = new List<string>();
 		static public List<string> AllUnits = null;
@@ -56,7 +61,9 @@ namespace PA_MultiplayerGalacticWar
 		public dynamic Commander_Loaded;
 		public List<UnitType> Units_Loaded = new List<UnitType>();
 		public List<Entity.Entity_PlayerArmy> Armies = new List<Entity.Entity_PlayerArmy>();
+		#endregion
 
+		#region Initialise
 		public void Initialise()
 		{
 			LoadCommander();
@@ -70,31 +77,6 @@ namespace PA_MultiplayerGalacticWar
 
 			// Parse and alter
 			Commander_Loaded = JsonConvert.DeserializeObject( json );
-		}
-
-		public void AddCommanderCards( List<string> cards )
-		{
-			foreach ( string cardname in cards )
-			{
-				foreach ( dynamic card in Program.Cards_Commander )
-				{
-					if ( card["display_name"].Value == cardname )
-					{
-						//Commander.AddCard( Commander_Loaded, card );
-						break;
-					}
-				}
-			}
-		}
-
-		public void SaveCommander()
-		{
-			// Write back out
-			StreamWriter writer = new StreamWriter( Program.PATH_MOD + GetFilePath() );
-			{
-				writer.WriteLine( JsonConvert.SerializeObject( Commander_Loaded ) );
-			}
-			writer.Close();
 		}
 
 		public void LoadArmy()
@@ -120,13 +102,30 @@ namespace PA_MultiplayerGalacticWar
 					// Parse and store
 					UnitType unittype = new UnitType( temp, JsonConvert.DeserializeObject( json ) );
 					{
-						
+
 					}
-                    Units_Loaded.Add( unittype );
+					Units_Loaded.Add( unittype );
 				}
 				else
 				{
 					Console.WriteLine( "Skipping Base Class: " + unit );
+				}
+			}
+		}
+		#endregion
+
+		#region Add Data
+		public void AddCommanderCards( List<string> cards )
+		{
+			foreach ( string cardname in cards )
+			{
+				foreach ( dynamic card in Program.Cards_Commander )
+				{
+					if ( card["display_name"].Value == cardname )
+					{
+						//Commander.AddCard( Commander_Loaded, card );
+						break;
+					}
 				}
 			}
 		}
@@ -140,6 +139,42 @@ namespace PA_MultiplayerGalacticWar
 					unit.JSON["display_name"] = unit.JSON["display_name"].Value + Commander.ModelID; // TEMP
 				}
 			}
+		}
+
+		public void AddVisitedSystem( int system )
+		{
+			if ( Commander.VisitedSystems == null )
+			{
+				Commander.VisitedSystems = new List<int>();
+			}
+			if ( !Commander.VisitedSystems.Contains( system ) )
+			{
+				Commander.VisitedSystems.Add( system );
+			}
+		}
+
+		public void AddOwnedSystem( int system )
+		{
+			if ( Commander.OwnedSystems == null )
+			{
+				Commander.OwnedSystems = new List<int>();
+			}
+			if ( !Commander.OwnedSystems.Contains( system ) )
+			{
+				Commander.OwnedSystems.Add( system );
+			}
+		}
+		#endregion
+
+		#region Save Data
+		public void SaveCommander()
+		{
+			// Write back out
+			StreamWriter writer = new StreamWriter( Program.PATH_MOD + GetFilePath() );
+			{
+				writer.WriteLine( JsonConvert.SerializeObject( Commander_Loaded ) );
+			}
+			writer.Close();
 		}
 
 		public void SaveArmy()
@@ -191,7 +226,14 @@ namespace PA_MultiplayerGalacticWar
 				}
 			}
 		}
+		#endregion
 
+		public void SetColour( Otter.Color colour )
+		{
+			Commander.Colour = colour.ColorString;
+		}
+
+		#region Getters
 		public string GetFilePath()
 		{
 			return "pa/units/commanders/" + CommanderPath + ".json";
@@ -200,35 +242,6 @@ namespace PA_MultiplayerGalacticWar
 		public string GetUniqueUnitFilePath( string unit )
 		{
 			return unit.Substring( 0, unit.Length - 5 ) + Commander.ModelID + ".json";
-        }
-
-		public void SetColour( Otter.Color colour )
-		{
-			Commander.Colour = colour.ColorString;
-		}
-
-		public void AddVisitedSystem( int system )
-		{
-			if ( Commander.VisitedSystems == null )
-			{
-				Commander.VisitedSystems = new List<int>();
-			}
-			if ( !Commander.VisitedSystems.Contains( system ) )
-			{
-				Commander.VisitedSystems.Add( system );
-			}
-		}
-
-		public void AddOwnedSystem( int system )
-		{
-			if ( Commander.OwnedSystems == null )
-			{
-				Commander.OwnedSystems = new List<int>();
-			}
-			if ( !Commander.OwnedSystems.Contains( system ) )
-			{
-				Commander.OwnedSystems.Add( system );
-			}
 		}
 
 		public bool HasVisitedSystem( int system )
@@ -245,8 +258,9 @@ namespace PA_MultiplayerGalacticWar
 			}
 			return flag;
 		}
+		#endregion
 
-		#region static
+		#region Static
 		static public string GetArmyFilePath()
 		{
 			return Program.PATH_PA + "media/pa/units/";

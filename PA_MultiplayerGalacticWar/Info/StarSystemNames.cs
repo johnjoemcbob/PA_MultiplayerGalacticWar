@@ -2,15 +2,9 @@
 // Star system names and information
 // 02/04/16
 
-using Otter;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 namespace PA_MultiplayerGalacticWar
 {
+	#region Extra Data Structures
 	public struct StarSystemInfo
 	{
 		public StarSystemInfo( int planets )
@@ -20,9 +14,12 @@ namespace PA_MultiplayerGalacticWar
 
 		public int Planets;
 	}
+	#endregion
 
-    public static class StarSystemInfos
+	public static class StarSystemInfos
 	{
+		#region Variable Declaration
+		#region Variable Declaration: Names
 		public static string[] Names = new string[]
 		{
 			// Default
@@ -81,6 +78,9 @@ namespace PA_MultiplayerGalacticWar
 			"",
 			"",
 		};
+		#endregion
+
+		#region Variable Declaration: Maps
 		public static string[] Types = new string[]
 		{
 			"Clutch",
@@ -89,6 +89,8 @@ namespace PA_MultiplayerGalacticWar
 			"Bedlam",
 			"Pax"
 		};
+		#endregion
+
 		public static StarSystemInfo[] Infos = new StarSystemInfo[]
 		{
 			new StarSystemInfo( 1 ),
@@ -97,5 +99,6 @@ namespace PA_MultiplayerGalacticWar
 			new StarSystemInfo( 4 ),
 			new StarSystemInfo( 5 )
 		};
+		#endregion
 	}
 }

@@ -8,11 +8,14 @@ namespace PA_MultiplayerGalacticWar.Entity
 {
 	class Entity_Image : Otter.Entity
 	{
+		#region Variable Declaration
 		public bool LerpToTarget = true;
         public Graphic image;
 
 		private Vector2 Target = Vector2.Zero;
+		#endregion
 
+		#region Initialise
 		public Entity_Image( float x, float y, string imagepath, bool init = true ) : base( x, y )
 		{
 			if ( init )
@@ -33,18 +36,6 @@ namespace PA_MultiplayerGalacticWar.Entity
 			Layer = Helper.Layer_UI;
 		}
 
-		public override void Update()
-		{
-			base.Update();
-
-			// Lerp the position towards the target
-			if ( LerpToTarget )
-			{
-				X += ( Target.X - X ) * Game.DeltaTime;
-				Y += ( Target.Y - Y ) * Game.DeltaTime;
-			}
-		}
-
 		public void NineSlice( string file, int slicewidth, int sliceheight, int width, int height )
 		{
 			image = new NineSlice( file, slicewidth, sliceheight );
@@ -56,6 +47,21 @@ namespace PA_MultiplayerGalacticWar.Entity
 			}
 			AddGraphic( image );
 		}
+		#endregion
+
+		#region Update
+		public override void Update()
+		{
+			base.Update();
+
+			// Lerp the position towards the target
+			if ( LerpToTarget )
+			{
+				X += ( Target.X - X ) * Game.DeltaTime;
+				Y += ( Target.Y - Y ) * Game.DeltaTime;
+			}
+		}
+		#endregion
 
 		public void SetTarget( Vector2 target )
 		{

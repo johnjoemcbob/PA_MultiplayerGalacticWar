@@ -11,6 +11,7 @@ namespace PA_MultiplayerGalacticWar.Entity
 		// The cursor graphic file location
 		public string File = "";
 
+		#region Initialise
 		// Constructor: Prepare graphics for when added to the scene
 		public Entity_Cursor( string file )
 		{
@@ -24,7 +25,9 @@ namespace PA_MultiplayerGalacticWar.Entity
 
 			Layer = Helper.Layer_Cursor;
 		}
+		#endregion
 
+		#region Update
 		// Update In Scene: Graphic should follow the real cursor (which is hidden from view)
 		public override void Update()
 		{
@@ -36,5 +39,6 @@ namespace PA_MultiplayerGalacticWar.Entity
 			// Scale to be zoom independant
 			Graphic.Scale = 1.0f / Scene.Instance.CameraZoom;
 		}
+		#endregion
 	}
 }

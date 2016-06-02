@@ -2,16 +2,21 @@
 // Functionality to load and store audio for playback
 // 05/04/16
 
+#region Includes
 using Otter;
 using System.Collections.Generic;
+#endregion
 
 namespace PA_MultiplayerGalacticWar
 {
 	class AudioManager
 	{
+		#region Variable Declaration
 		static public Dictionary<string, Sound> Sounds = new Dictionary<string, Sound>();
 		//static public Dictionary<string, Music> Musics = new Dictionary<string, Music>();
+		#endregion
 
+		#region Play Audio
 		static public Sound PlaySound( string path, bool looping = false )
 		{
 			if ( Sounds == null ) return null;
@@ -40,10 +45,12 @@ namespace PA_MultiplayerGalacticWar
 
 		//	// Play the sound
 		//	Musics[path].Loop = looping;
-  //          Musics[path].Play();
+		//          Musics[path].Play();
 		//	return Musics[path];
 		//}
+		#endregion
 
+		#region Cleanup
 		static public void Cleanup()
 		{
 			if ( Sounds != null )
@@ -66,5 +73,6 @@ namespace PA_MultiplayerGalacticWar
 			//	Musics = null;
 			//}
 		}
+		#endregion
 	}
 }

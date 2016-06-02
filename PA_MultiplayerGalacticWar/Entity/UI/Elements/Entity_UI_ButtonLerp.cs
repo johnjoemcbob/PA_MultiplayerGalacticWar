@@ -2,13 +2,16 @@
 // Button UI element with functionality for lerping, moving, rotating & scaling
 // 05/04/16
 
+#region Includes
 using Otter;
 using System;
+#endregion
 
 namespace PA_MultiplayerGalacticWar.Entity
 {
 	class Entity_UI_ButtonLerp : Entity_UI_Button
 	{
+		#region Variable Declaration
 		// Default values
 		public Vector2 DefaultPosition = Vector2.Zero;
 		public float DefaultRotation = 0;
@@ -24,7 +27,9 @@ namespace PA_MultiplayerGalacticWar.Entity
 
 		// Hover sound
 		public Sound Sound_Hover = null;
+		#endregion
 
+		#region Initialise
 		// Constructor: Initialise base mouse hover callbacks
 		public Entity_UI_ButtonLerp()
 		{
@@ -96,7 +101,9 @@ namespace PA_MultiplayerGalacticWar.Entity
 			DefaultTextRotation = Text_Label.Angle - Image.image.Angle;
 			DefaultTextScale = new Vector2( Text_Label.ScaleX - Image.image.ScaleX, Text_Label.ScaleY - Image.image.ScaleY );
 		}
+		#endregion
 
+		#region Update
 		// Update In Scene: Interpolate the button depending on its clicked/hovered state
 		public override void Update()
 		{
@@ -119,7 +126,9 @@ namespace PA_MultiplayerGalacticWar.Entity
 				Text_Label.ScaleY = Image.image.ScaleY;
 			}
 		}
+		#endregion
 
+		#region Cleanup
 		// Removed From Scene: Stop the button hovering sound
 		public override void Removed()
 		{
@@ -129,5 +138,6 @@ namespace PA_MultiplayerGalacticWar.Entity
 				Sound_Hover = null;
 			}
         }
+		#endregion
 	}
 }

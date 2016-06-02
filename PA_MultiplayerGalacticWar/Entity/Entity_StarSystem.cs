@@ -2,17 +2,17 @@
 // Star system instance entity
 // 18/03/16
 
+#region Includes
 using Otter;
 using System;
 using System.Collections.Generic;
-
-// Add random system map selector
-// Add lines connecting to others
+#endregion
 
 namespace PA_MultiplayerGalacticWar.Entity
 {
 	class Entity_StarSystem : Otter.Entity
 	{
+		#region Variable Declaration
 		// System name and type (i.e. map)
 		public string Name = "";
 		public string Type = "";
@@ -41,7 +41,9 @@ namespace PA_MultiplayerGalacticWar.Entity
 		private List<Entity_StarSystem> Neighbours = new List<Entity_StarSystem>();
 
 		private List<Entity_PlayerArmy> VisibleBy = new List<Entity_PlayerArmy>();
+		#endregion
 
+		#region Initialise
 		public Entity_StarSystem( Scene scene, float x, float y, string path_pa, string path_mod ) : base( x, y )
 		{
 			string file;
@@ -92,7 +94,9 @@ namespace PA_MultiplayerGalacticWar.Entity
 
 			Layer = Helper.Layer_Star;
 		}
+		#endregion
 
+		#region Update
 		public override void Update()
 		{
 			base.Update();
@@ -223,6 +227,15 @@ namespace PA_MultiplayerGalacticWar.Entity
 			}
 		}
 
+		private Vector2 GetMousePosition()
+		{
+			int x = (int) ( Input.MouseScreenX / Scene.Instance.CameraZoom );
+			int y = (int) ( Input.MouseScreenY / Scene.Instance.CameraZoom );
+			return new Vector2( x, y );
+		}
+		#endregion
+
+		#region Cleanup
 		public override void Removed()
 		{
 			base.Removed();
@@ -231,7 +244,9 @@ namespace PA_MultiplayerGalacticWar.Entity
 			Image_Star = null;
 			Scene.Instance.Remove( UI );
         }
+		#endregion
 
+		#region System Selection
 		private void Select()
 		{
 			Selected = true;
@@ -253,18 +268,20 @@ namespace PA_MultiplayerGalacticWar.Entity
 			Scene.Instance.Remove( UI );
 		}
 
-		private Vector2 GetMousePosition()
+		public void SetSelected( bool select )
 		{
-			int x = (int) ( Input.MouseScreenX / Scene.Instance.CameraZoom );
-			int y = (int) ( Input.MouseScreenY / Scene.Instance.CameraZoom );
-			return new Vector2( x, y );
+			if ( select )
+			{
+				Select();
+			}
+			else
+			{
+				Deselect();
+			}
 		}
+		#endregion
 
-		public void AddConnection( Entity_StarSystem other )
-		{
-			Neighbours.Add( other );
-		}
-
+		#region Player Army & Visibility
 		public void AddPlayerArmy( Entity_PlayerArmy army )
 		{
 			HasPlayerArmy = army;
@@ -366,15 +383,31 @@ namespace PA_MultiplayerGalacticWar.Entity
 
 			Visible = visible || semivisible;
 			Interactable = visible;
-        }
+		}
 
+		public void SetOwner( int owner )
+		{
+			if ( owner == -1 ) return;
+
+			Owner = owner;
+
+			Colour = new Otter.Color( ( (Scene_Game) Scene.Instance ).CurrentPlayers.ToArray()[Owner].Commander.Colour );
+			Image_Owner.image.Color = Colour;
+
+			CheckVisibility();
+		}
+		#endregion
+
+		#region Alter Visuals
 		public void UpdateText()
 		{
 			UI.Label = Name;
 			UI.SystemType = Type;
 			UI.UpdateText();
 		}
+		#endregion
 
+		#region Actions
 		public void TryAction_Move()
 		{
 			if ( !( (Scene_Game) Scene ).GetIsPlayerTurn( Program.ThisPlayer ) )
@@ -424,29 +457,11 @@ namespace PA_MultiplayerGalacticWar.Entity
 		{
             ( (Scene_Game) Scene ).SetNextPlayerTurn();
 		}
+		#endregion
 
-		public void SetSelected( bool select )
+		public void AddConnection( Entity_StarSystem other )
 		{
-			if ( select )
-			{
-				Select();
-            }
-			else
-			{
-				Deselect();
-			}
-		}
-
-		public void SetOwner( int owner )
-		{
-			if ( owner == -1 ) return;
-
-			Owner = owner;
-
-			Colour = new Otter.Color( ( (Scene_Game) Scene.Instance ).CurrentPlayers.ToArray()[Owner].Commander.Colour );
-			Image_Owner.image.Color = Colour;
-
-			CheckVisibility();
+			Neighbours.Add( other );
 		}
 
 		public List<Entity_StarSystem> GetNeighbours()

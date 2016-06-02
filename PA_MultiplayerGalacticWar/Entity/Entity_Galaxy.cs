@@ -2,14 +2,17 @@
 // Galaxy container of star systems
 // 18/03/16
 
+#region Includes
 using Otter;
 using System.Collections.Generic;
 using System.Linq;
+#endregion
 
 namespace PA_MultiplayerGalacticWar.Entity
 {
 	class Entity_Galaxy : Otter.Entity
 	{
+		#region Variable Declaration
 		// System descriptors
 		public int MaxSystems = 40;
 		public float MinSystemDistance = 50;
@@ -30,7 +33,9 @@ namespace PA_MultiplayerGalacticWar.Entity
 		private Entity_Image_Background Background;
 		private List<Entity_StarSystem> StarSystems = new List<Entity_StarSystem>();
 		private Entity_StarRoutes StarRoutes;
+		#endregion
 
+		#region Initialise
 		// Constructor: Initialise individual elements
 		public Entity_Galaxy( Scene scene, string path_pa, string path_mod )
 		{
@@ -128,20 +133,9 @@ namespace PA_MultiplayerGalacticWar.Entity
 				systemid++;
             }
 		}
+		#endregion
 
-		// Called from individual star systems when they are selected: To give the galaxy knowledge of the currently selected (for drawing StarRoutes)
-		public void UpdateSelection( int id, bool selected )
-		{
-			if ( selected )
-			{
-				SelectedSystem = id;
-			}
-			else if ( SelectedSystem == id )
-			{
-				SelectedSystem = -1;
-			}
-		}
-
+		#region Procedural Generation
 		// Called from Scene_Game.NewGame: To create a new galaxy map
 		public void Generate()
 		{
@@ -436,6 +430,20 @@ namespace PA_MultiplayerGalacticWar.Entity
 				system.Type = StarSystemInfos.Types.RandomElement();
 				system.MapID = StarSystemInfos.Types.IndexOf( system.Type );
 				system.UpdateText();
+			}
+		}
+		#endregion
+
+		// Called from individual star systems when they are selected: To give the galaxy knowledge of the currently selected (for drawing StarRoutes)
+		public void UpdateSelection( int id, bool selected )
+		{
+			if ( selected )
+			{
+				SelectedSystem = id;
+			}
+			else if ( SelectedSystem == id )
+			{
+				SelectedSystem = -1;
 			}
 		}
 

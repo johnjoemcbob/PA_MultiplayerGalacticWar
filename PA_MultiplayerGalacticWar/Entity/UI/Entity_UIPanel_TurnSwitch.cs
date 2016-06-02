@@ -2,9 +2,11 @@
 // Player turn switch message UI element
 // 12/05/16
 
+#region Includes
 using Otter;
 using System;
 using System.Linq;
+#endregion
 
 namespace PA_MultiplayerGalacticWar.Entity
 {
@@ -18,6 +20,7 @@ namespace PA_MultiplayerGalacticWar.Entity
 
 	class Entity_UIPanel_TurnSwitch : Otter.Entity
 	{
+		#region Variable Declaration
 		// Visual information
 		public string Label = "{0} TO PLAY";
 
@@ -30,7 +33,9 @@ namespace PA_MultiplayerGalacticWar.Entity
 
 		// Individual elements
 		private Text Text_Label;
+		#endregion
 
+		#region Initialise
 		// Constructor: Initialise the animation & individual elements, and position the panel in the top center
 		public Entity_UIPanel_TurnSwitch()
 		{
@@ -76,7 +81,9 @@ namespace PA_MultiplayerGalacticWar.Entity
 			EnabledTime = Game.Instance.Timer;
 			State = TurnSwitchAnimationState.Entry;
 		}
+		#endregion
 
+		#region Update
 		// Update In Scene: Animate
 		public override void Update()
 		{
@@ -139,6 +146,7 @@ namespace PA_MultiplayerGalacticWar.Entity
 		private float GetElapsedTime()
 		{
 			return ( Game.Instance.Timer - EnabledTime );
-        }
+		}
+		#endregion
 	}
 }

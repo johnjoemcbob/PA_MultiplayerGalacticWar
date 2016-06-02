@@ -10,6 +10,7 @@ namespace PA_MultiplayerGalacticWar.Entity
 
 	class Entity_UI_Button : Otter.Entity
 	{
+		#region Variable Declaration
 		// Label string to display on top of the button
 		public string Label = "DEFAULT TEXT";
 
@@ -44,7 +45,9 @@ namespace PA_MultiplayerGalacticWar.Entity
 		// Button individual elements
 		public Entity_Image Image;
 		protected Text Text_Label;
+		#endregion
 
+		#region Intialise
 		// Constructor: Initialise base mouse hover callbacks
 		public Entity_UI_Button()
 		{
@@ -90,7 +93,9 @@ namespace PA_MultiplayerGalacticWar.Entity
 
 			Layer = Helper.Layer_UI;
 		}
+		#endregion
 
+		#region Update
 		// Update In Scene: Move the button clickable boundaries with the camera & run click logic
 		public override void Update()
 		{
@@ -169,6 +174,14 @@ namespace PA_MultiplayerGalacticWar.Entity
 			}
 		}
 
+		// Called only once ever each update - even between many buttons: For clickable logic
+		public static void GlobalUpdate()
+		{
+			Program.Clicked = Scene.Instance.Input.MouseButtonPressed( MouseButton.Left );
+		}
+		#endregion
+
+		#region Cleanup
 		// Removed From Scene: Remove the button image (which is not properly attached to this button)
 		public override void Removed()
 		{
@@ -176,7 +189,9 @@ namespace PA_MultiplayerGalacticWar.Entity
 
 			Scene.Instance.Remove( Image );
 		}
+		#endregion
 
+		#region Alter Visuals
 		// Called from outside: To amend the button visuals with any recent variable changes
 		public void UpdateGraphic()
 		{
@@ -189,11 +204,6 @@ namespace PA_MultiplayerGalacticWar.Entity
 			// Colour
 			Image.image.Color = Colour_Default;
 		}
-
-		// Called only once ever each update - even between many buttons: For clickable logic
-		public static void GlobalUpdate()
-		{
-			Program.Clicked = Scene.Instance.Input.MouseButtonPressed( MouseButton.Left );
-        }
+		#endregion
 	}
 }

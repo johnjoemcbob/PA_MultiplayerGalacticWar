@@ -1,6 +1,8 @@
 {
-	"display_name":"Eagle Upgrade",
-	"description":"200% increase in base commander sight",
+	"display_name":"Eagle Eye Upgrade",
+	"description":"Your commander becomes specialised in detecting enemies.\n\nGain a 200% increase to base commander sight",
+	"stack_limit":5,
+	"probability":10,
 	"recon":{
 		"observer":{
 			"items":[

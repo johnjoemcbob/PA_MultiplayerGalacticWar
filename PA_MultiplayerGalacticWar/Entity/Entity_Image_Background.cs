@@ -2,19 +2,24 @@
 // Background stars and galaxy images with parallax
 // 18/03/16
 
+#region Includes
 using Otter;
 using System;
+#endregion
 
 namespace PA_MultiplayerGalacticWar.Entity
 {
 	class Entity_Image_Background : Otter.Entity
 	{
+		#region Variable Declaration
 		static public float Scale = 0.75f; // 1.25f;
 
 		// Camera
 		private Vector2 CameraTarget;
 		private Vector2 CameraPos;
+		#endregion
 
+		#region Intitialise
 		public Entity_Image_Background( Scene scene, string path_pa, string path_mod )
 		{
 			string file;
@@ -49,6 +54,19 @@ namespace PA_MultiplayerGalacticWar.Entity
 			Layer = Helper.Layer_Background;
 		}
 
+		private void AddImage( string file, float scale = 0.5f )
+		{
+			Image image = new Image( file );
+			{
+				image.Scale = scale;
+				image.CenterOrigin();
+				image.Scroll = 1;
+			}
+			AddGraphic( image );
+		}
+		#endregion
+
+		#region Update
 		public override void Update()
 		{
 			base.Update();
@@ -78,16 +96,6 @@ namespace PA_MultiplayerGalacticWar.Entity
 				current++;
             }
 		}
-
-		private void AddImage( string file, float scale = 0.5f )
-		{
-			Image image = new Image( file );
-			{
-				image.Scale = scale;
-				image.CenterOrigin();
-				image.Scroll = 1;
-			}
-			AddGraphic( image );
-		}
+		#endregion
 	}
 }

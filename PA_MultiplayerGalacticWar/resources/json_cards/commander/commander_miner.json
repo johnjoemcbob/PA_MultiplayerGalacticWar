@@ -1,6 +1,8 @@
 {
 	"display_name":"Foreman Commander",
-	"description":"Your commander is specialised in\nproducing metal.\n\nGain a 100% increase to base metal\nproduction.",
+	"description":"Your commander becomes specialised in producing metal.\n\nGain a 100% increase to base metal production.",
+	"stack_limit":1,
+	"probability":9,
 	"production":{
 		"energy":0.0,
 		"metal":200.0

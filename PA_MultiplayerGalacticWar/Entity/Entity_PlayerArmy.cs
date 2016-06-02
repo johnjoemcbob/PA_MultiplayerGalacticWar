@@ -2,14 +2,17 @@
 // Individual Player Army, for moving around the galactic map
 // 09/05/16
 
+#region Includes
 using Otter;
 using System;
 using System.Collections.Generic;
+#endregion
 
 namespace PA_MultiplayerGalacticWar.Entity
 {
 	class Entity_PlayerArmy : Otter.Entity
 	{
+		#region Variable Declaration
 		public int Player = 0;
 		public int PlayerArmyID = 0;
 		public Entity_StarSystem System = null;
@@ -30,7 +33,9 @@ namespace PA_MultiplayerGalacticWar.Entity
 
 		private Sound Sound_Move;
 		private float PitchModifier = 1;
+		#endregion
 
+		#region Initialise
 		public override void Added()
 		{
 			base.Added();
@@ -56,7 +61,9 @@ namespace PA_MultiplayerGalacticWar.Entity
 
 			Layer = Helper.Layer_Player;
         }
+		#endregion
 
+		#region Update
 		public override void Update()
 		{
 			base.Update();
@@ -122,7 +129,9 @@ namespace PA_MultiplayerGalacticWar.Entity
 				Visible = false;
 			}
 		}
+		#endregion
 
+		#region Render
 		public override void Render()
 		{
 			base.Render();
@@ -146,6 +155,7 @@ namespace PA_MultiplayerGalacticWar.Entity
 			// Manual draw on top of the trail
 			Icon.Render( X, Y );
         }
+		#endregion
 
 		private Vector2 GetWobblePoint( Vector2 point, float radius, float speed, float offset )
 		{
@@ -186,6 +196,7 @@ namespace PA_MultiplayerGalacticWar.Entity
 			}
 		}
 
+		#region Getters
 		static public Entity_PlayerArmy[] GetAllByPlayer( int player )
 		{
 			// Find all army entities in the scene and sort through to find this player's
@@ -201,5 +212,6 @@ namespace PA_MultiplayerGalacticWar.Entity
 			}
 			return armies.ToArray();
 		}
-    }
+		#endregion
+	}
 }

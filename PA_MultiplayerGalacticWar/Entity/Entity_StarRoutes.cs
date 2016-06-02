@@ -2,12 +2,11 @@
 // Visual routes between the star systems
 // 18/03/16
 
+#region Includes
 using Otter;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+#endregion
 
 namespace PA_MultiplayerGalacticWar.Entity
 {
@@ -23,10 +22,13 @@ namespace PA_MultiplayerGalacticWar.Entity
 
 	class Entity_StarRoutes : Otter.Entity
 	{
-        private List<PARoute> StarRoutes = new List<PARoute>();
+		#region Variable Declaration
+		private List<PARoute> StarRoutes = new List<PARoute>();
 		private List<PARoute> StarRoutesOffsets = new List<PARoute>();
 		private List<Vector2> StarIDs = new List<Vector2>();
+		#endregion
 
+		#region Initialise
 		public Entity_StarRoutes( Scene scene, Vector2[] routes, Vector2[] positions, string path_pa, string path_mod )
 		{
 			foreach ( Vector2 route in routes )
@@ -62,7 +64,9 @@ namespace PA_MultiplayerGalacticWar.Entity
 
 			Layer = Helper.Layer_StarRoute;
 		}
+		#endregion
 
+		#region Render
 		public override void Render()
 		{
 			base.Render();
@@ -79,7 +83,9 @@ namespace PA_MultiplayerGalacticWar.Entity
 				id++;
 			}
 		}
+		#endregion
 
+		#region Alter Visuals
 		// Called from the Galaxy when a star system is taken, to update the visuals
 		public void UpdateColours( int node, Color colour )
 		{
@@ -106,5 +112,6 @@ namespace PA_MultiplayerGalacticWar.Entity
 				}
 			}
 		}
+		#endregion
 	}
 }

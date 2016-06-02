@@ -2,15 +2,18 @@
 // Various helper functions
 // 30/03/16
 
+#region Includes
 using Otter;
 using System;
 using System.IO;
 using System.Collections.Generic;
+#endregion
 
 namespace PA_MultiplayerGalacticWar
 {
 	class Helper
 	{
+		#region Variable Declaration
 		// Flags
 		static public bool DEBUG = false;
 
@@ -28,7 +31,9 @@ namespace PA_MultiplayerGalacticWar
 		// Action Types
 		public const int ACTION_MOVE = 0;
 		public const int ACTION_WAR = 1;
+		#endregion
 
+		#region File IO
 		// Ensure all directories in path exist
 		static public void CreateDirectory( string path )
 		{
@@ -75,7 +80,9 @@ namespace PA_MultiplayerGalacticWar
 			}
 			return null;
 		}
+		#endregion
 
+		#region Collision & Positioning
 		// Basic collision detection; rect expects upper left and lower right points
 		public static bool PointWithinRect( Vector2 point, Vector4 rect )
 		{
@@ -117,7 +124,9 @@ namespace PA_MultiplayerGalacticWar
 			Vector2 screenoff = new Vector2( Game.Instance.Width * off.X, Game.Instance.Height * off.Y );
 			return ( pos + screenoff );
 		}
+		#endregion
 
+		#region Check for Entities in Scene
 		// Entity checking helpers
 		public static bool AnyInScene<T>( List<T> entities )
 		{
@@ -136,11 +145,6 @@ namespace PA_MultiplayerGalacticWar
 			return AnyInScene<Entity.Entity_UIPanel_FileIO>( Otter.Scene.Instance.GetEntities<Entity.Entity_UIPanel_FileIO>() );
 		}
 
-		public static Scene_Game GetGameScene()
-		{
-			return ( (Scene_Game) Scene.Instance );
-		}
-
 		public static Entity.Entity_PlayerArmy GetPlayerArmy( int player, int armyid )
 		{
 			foreach ( Entity.Entity_PlayerArmy army in Scene.Instance.GetEntities<Entity.Entity_PlayerArmy>() )
@@ -152,16 +156,11 @@ namespace PA_MultiplayerGalacticWar
 			}
 			return null;
 		}
+		#endregion
 
-		// From: http://stackoverflow.com/questions/20879457/remove-junk-value-from-string
-		public static string TrimNullTerminatedString( string s )
+		public static Scene_Game GetGameScene()
 		{
-			if ( s == null )
-				throw new NotImplementedException();
-			int i = s.IndexOf( '\0' );
-			if ( i >= 0 )
-				return s.Substring( 0, i );
-			return s;
+			return ( (Scene_Game) Scene.Instance );
 		}
 	}
 }

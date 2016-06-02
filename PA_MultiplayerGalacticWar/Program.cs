@@ -2,21 +2,19 @@
 // Main program loop
 // 18/03/16
 
+#region Includes
 using Otter;
 using System;
-using System.Drawing;
 using System.IO;
 using System.Collections.Generic;
-using System.Reflection;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Newtonsoft.Json;
+#endregion
 
 namespace PA_MultiplayerGalacticWar
 {
 	class Program
 	{
+		#region Variable Declaration
 		// ID for the player on this client
 		static public int ThisPlayer = 0;
 
@@ -47,6 +45,7 @@ namespace PA_MultiplayerGalacticWar
 
 		// Basic PA font
 		static public Otter.Font Font = new Otter.Font( Program.PATH_PA + "media/ui/main/shared/font/Sansation_Bold-webfont.ttf" );
+		#endregion
 
 		static void Main( string[] args )
 		{

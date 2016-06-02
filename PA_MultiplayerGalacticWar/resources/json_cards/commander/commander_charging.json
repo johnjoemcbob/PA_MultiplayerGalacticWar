@@ -1,6 +1,8 @@
 {
 	"display_name":"Powerhouse Commander",
-	"description":"Your commander is specialised in\nproducing energy.\n\nGain a 50% increase to base energy\nproduction.",
+	"description":"Your commander becomes specialised in producing energy.\n\nGain a 50% increase to base energy production.",
+	"stack_limit":1,
+	"probability":9,
 	"production":{
 		"energy":50.0,
 		"metal":0.0

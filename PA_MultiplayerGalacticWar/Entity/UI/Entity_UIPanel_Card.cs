@@ -2,13 +2,16 @@
 // Unlock Card UI element
 // 01/04/16
 
+#region Includes
 using Otter;
 using System;
+#endregion
 
 namespace PA_MultiplayerGalacticWar.Entity
 {
 	class Entity_UIPanel_Card : Otter.Entity
 	{
+		#region Variable Declaration
 		// Card visual information
 		public string Label = "Test Card";
 		public string Description = "Description Text\nYeah!";
@@ -19,9 +22,11 @@ namespace PA_MultiplayerGalacticWar.Entity
 		private Entity_Image Image_Icon;
 		private Entity_Image Image_Button_Background;
 		private Text Text_Label;
-		private Text Text_Description;
+		private RichText Text_Description;
 		private Entity_UI_Button Button_Choose;
+		#endregion
 
+		#region Initialise
 		// Constructor: Position the card & initialise
 		public Entity_UIPanel_Card( float x, float y, string label = "Test Card", string description = "Description", string iconfile = "" )
 		{
@@ -82,9 +87,11 @@ namespace PA_MultiplayerGalacticWar.Entity
 			Image_Icon.AddGraphic( Text_Label );
 
 			// Description
-			Text_Description = new Text( Description, Program.Font, 12 );
+			Text_Description = new RichText( Description, Program.Font, 12 );
 			{
                 Text_Description.SetPosition( new Vector2( -128 + 16, 96 ) );
+				Text_Description.TextWidth = 256 - 32;
+				Text_Description.WordWrap = true;
 			}
 			Image_Icon.AddGraphic( Text_Description );
 
@@ -125,7 +132,9 @@ namespace PA_MultiplayerGalacticWar.Entity
 
 			Layer = Helper.Layer_UI;
 		}
+		#endregion
 
+		#region Cleanup
 		// Removed From Scene: Remove individual elements (which are not properly attached to this card)
 		public override void Removed()
 		{
@@ -136,5 +145,6 @@ namespace PA_MultiplayerGalacticWar.Entity
 			Scene.Instance.Remove( Image_Button_Background );
 			Scene.Instance.Remove( Button_Choose );
 		}
+		#endregion
 	}
 }

@@ -1,6 +1,8 @@
 {
 	"display_name":"Sprinter Upgrade",
-	"description":"10% increase in base commander speed",
+	"description":"Your commander becomes specialised in agility.\n\nGain a 10% increase to base commander speed",
+	"stack_limit":10,
+	"probability":10,
 	"navigation":{
 		"type":"amphibious",
 		"acceleration":0,

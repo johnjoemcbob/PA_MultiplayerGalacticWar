@@ -2,6 +2,7 @@
 // Main game scene; play the current game
 // 30/03/16
 
+#region Includes
 using Otter;
 using System;
 using System.IO;
@@ -11,6 +12,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 using PA_MultiplayerGalacticWar.Entity;
+#endregion
 
 namespace PA_MultiplayerGalacticWar
 {
@@ -75,9 +77,6 @@ namespace PA_MultiplayerGalacticWar
 
 			// Setup galaxy & star system information: BEFORE LOADING
 			Galaxy = new Entity_Galaxy( this, Program.PATH_PA, Program.PATH_MOD );
-
-			// Temp testing
-			DisplayWinRewardSelection();
 
 			// Load thread
 			if ( FileToLoad != "" )
@@ -185,7 +184,7 @@ namespace PA_MultiplayerGalacticWar
 			}
 
 			// Apply this card to the winning player
-			CurrentGame.Commanders[Program.ThisPlayer].Cards.Add( pickedcard.Label );
+			CurrentGame.Commanders[Program.ThisPlayer].CommanderCards.Add( pickedcard.Label );
 		}
 
 		private void ApplyCards( Info_Player player, List<string> commandercards, List<string> cards )
@@ -200,31 +199,19 @@ namespace PA_MultiplayerGalacticWar
 		}
 
 		// Called when a player wins a match on the client of that player; to give the choice of rewards
-		public void DisplayWinRewardSelection()
+		public void RewardSelection()
 		{
-			// Find all cards (make a copy to remove elements from)
-			List<dynamic> cards_all = new List<dynamic>( Program.Cards_Commander );
-
-			// Choose possible (i.e. some can only be unlocked once)
+			List<dynamic> cards_all = RewardSelection_GetPossibleCards();
 
 			// Choose from possible using weightings
-			JObject[] cards_possiblereward = new JObject[CARD_REWARD_MAX];
-			{
-				for ( int card = 0; card < CARD_REWARD_MAX; card++ )
-				{
-					// Choose a card
-					JObject cardjson = cards_all.RandomElement();
-
-					// Remove it from current possible and add to the visible
-					cards_all.Remove( cardjson );
-					cards_possiblereward[card] = cardjson;
-				}
-			}
+			JObject[] cards_possiblereward = RewardSelection_ChooseCards( cards_all );
 
 			// Display these cards to the player for selection
 			int[] card_position = new int[] { -256, 0, 256 };
 			for ( int card = 0; card < CARD_REWARD_MAX; card++ )
 			{
+				if ( cards_possiblereward[card] == null ) continue;
+
 				PossibleCards.Add( new Entity_UIPanel_Card(
 					card_position[card], 0,
 					cards_possiblereward[card]["display_name"].ToString(),
@@ -235,6 +222,65 @@ namespace PA_MultiplayerGalacticWar
 			{
 				Add( card );
 			}
+		}
+
+		// Called when calculating rewards, to find a list of all possibilities
+		private List<dynamic> RewardSelection_GetPossibleCards()
+		{
+			// Find all cards (make a copy to remove elements from)
+			List<dynamic> cards_all = new List<dynamic>( Program.Cards_Commander );
+			{
+				// Choose possible (i.e. some can only be unlocked once)
+				List<dynamic> cards_toremove = new List<dynamic>();
+				foreach ( JObject card in cards_all )
+				{
+					string cardname = card["display_name"].ToString();
+					int alreadypossessed = 0;
+					{
+						foreach ( string possessedcard in CurrentGame.Commanders[Program.ThisPlayer].CommanderCards )
+						{
+							if ( possessedcard == cardname )
+							{
+								alreadypossessed++;
+							}
+						}
+					}
+					if ( alreadypossessed >= card.Value<int>( "stack_limit" ) )
+					{
+						cards_toremove.Add( card );
+					}
+				}
+				// Remove those which cannot be unlocked again
+				foreach ( dynamic card in cards_toremove )
+				{
+					cards_all.Remove( card );
+				}
+			}
+			return cards_all;
+		}
+
+		// Called when calculating rewards, to choose a few from all possibilities
+		private JObject[] RewardSelection_ChooseCards( List<dynamic> cards_all )
+		{
+			JObject[] cards_possiblereward = new JObject[CARD_REWARD_MAX];
+			{
+				for ( int card = 0; card < CARD_REWARD_MAX; card++ )
+				{
+					if ( cards_all.Count == 0 ) break;
+
+					// Count all probability
+					// Get random number
+					// Calculate card from number and list of probabilities
+
+					// Choose a card
+					JObject cardjson = cards_all.RandomElement();
+
+					// Remove it from current possible and add to the visible
+					cards_all.Remove( cardjson );
+					cards_possiblereward[card] = cardjson;
+				}
+			}
+			return cards_possiblereward;
 		}
 		#endregion
 
@@ -466,6 +512,9 @@ namespace PA_MultiplayerGalacticWar
 
 				playerid++;
 			}
+
+			// Temp testing
+			RewardSelection();
 		}
 		#endregion
 

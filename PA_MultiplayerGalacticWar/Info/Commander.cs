@@ -2,13 +2,10 @@
 // JSON format for ---: Commanders
 // 18/03/16
 
+#region Includes
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+#endregion
 
 namespace PA_MultiplayerGalacticWar
 {
@@ -19,6 +16,8 @@ namespace PA_MultiplayerGalacticWar
 	//			"profile_image":"/ui/main/shared/img/commanders/profiles/profile_imperial_invictus.png"
 	//		}
 	//	}
+
+	#region Extra Data Structures
 	struct PAUI
 	{
 		public string image;
@@ -71,9 +70,11 @@ namespace PA_MultiplayerGalacticWar
 		public float turn_accel;
 		public bool turn_in_place;
 	}
+	#endregion
 
 	class Commander
 	{
+		#region Variable Declaration
 		public String base_spec;
 		public String display_name;
 		public String description;
@@ -94,7 +95,9 @@ namespace PA_MultiplayerGalacticWar
 		public Object tools; // ?????
 		public String catalog_object_name;
 		public Object client; // ?????
+		#endregion
 
+		#region Cards
 		static public void AddCard( JObject commander, JObject card )
 		{
 			AddIndividualCard( ref commander, ref card, "max_health" );
@@ -131,5 +134,6 @@ namespace PA_MultiplayerGalacticWar
 				commander[key][key2] = float.Parse( commander[key][key2].ToString() ) + ( ( float.Parse( commander[key][key2].ToString() ) / 100.0f * float.Parse( card[key][key2].ToString() ) ) );
 			}
 		}
+		#endregion
 	}
 }

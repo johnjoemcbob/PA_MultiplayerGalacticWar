@@ -1,9 +1,15 @@
-﻿using Otter;
+﻿// Matthew Cormack
+// Network Connection Manager
+// 02/06/16
+
+#region Includes
+using Otter;
 using System;
 using System.Net;
 using System.Net.NetworkInformation;
 using Newtonsoft.Json;
 using Lidgren.Network;
+#endregion
 
 namespace PA_MultiplayerGalacticWar
 {
@@ -17,6 +23,7 @@ namespace PA_MultiplayerGalacticWar
 
 	class NetworkManager
 	{
+		#region Variable Declaration
 		public const int MESSAGE_INITIAL = 0;
 		public const int MESSAGE_PLAYERID = 1;
 		public const int MESSAGE_TURN_REQUEST = 2;
@@ -28,7 +35,9 @@ namespace PA_MultiplayerGalacticWar
 		static public NetPeerConfiguration Config = null;
 		static public NetPeer NetworkHandler = null;
 		static public bool Server = false;
+		#endregion
 
+		#region Initialise
 		static public void Host()
 		{
 			if ( IsPortInUse( Port ) )
@@ -58,7 +67,9 @@ namespace PA_MultiplayerGalacticWar
 
 			Server = false;
         }
+		#endregion
 
+		#region Update
 		static public void Update()
 		{
 			if ( NetworkHandler == null ) return;
@@ -75,7 +86,9 @@ namespace PA_MultiplayerGalacticWar
 				}
 			}
 		}
+		#endregion
 
+		#region Cleanup
 		// Called by cleanup to clear any connections and sockets
 		static public void Cleanup()
 		{
@@ -84,7 +97,9 @@ namespace PA_MultiplayerGalacticWar
 			NetworkHandler.Shutdown( "Left Game" );
 			NetworkHandler = null;
         }
+		#endregion
 
+		#region Message Parsing
 		static private void ParseMessage( NetIncomingMessage message )
 		{
 			Console.WriteLine( "Received message with type: " + message.MessageType );
@@ -166,7 +181,9 @@ namespace PA_MultiplayerGalacticWar
 					/* .. */
 			}
 		}
+		#endregion
 
+		#region Message Sending
 		static public void SendMessage( NetConnection sendto, NetOutgoingMessage msg )
 		{
 			NetworkHandler.SendMessage( msg, sendto, NetDeliveryMethod.ReliableOrdered );
@@ -254,6 +271,7 @@ namespace PA_MultiplayerGalacticWar
 				SendString( connection, MESSAGE_TURN_CONFIRM, turndata );
 			}
 		}
+		#endregion
 
 		// From: https://softwarebydefault.com/2013/02/22/port-in-use/
 		// Used to determine if a port is available, to stop crashes when hosting on an unavailable port

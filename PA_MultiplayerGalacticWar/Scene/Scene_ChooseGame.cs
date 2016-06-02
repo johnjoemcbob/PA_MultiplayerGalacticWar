@@ -2,20 +2,25 @@
 // Main menu scene; choose saved game or enter the create new game menu
 // 30/03/16
 
+#region Includes
 using Otter;
 
 using PA_MultiplayerGalacticWar.Entity;
+#endregion
 
 namespace PA_MultiplayerGalacticWar
 {
 	class Scene_ChooseGame : Scene
 	{
+		#region Variable Declaration
 		Entity_UI_Button Button_New;
 		Entity_UI_Button Button_Continue;
 		Entity_UI_Button Button_Load;
 		Entity_UI_Button Button_Join;
         Entity_UI_Button Button_Quit;
+		#endregion
 
+		#region Initialise
 		public override void Begin()
 		{
 			base.Begin();
@@ -145,7 +150,9 @@ namespace PA_MultiplayerGalacticWar
 			// Cursor last
 			Add( new Entity_Cursor( Program.PATH_PA + "media/ui/main/shared/img/icons/cursor.png" ) );
 		}
+		#endregion
 
+		#region Update
 		public override void UpdateFirst()
 		{
 			base.UpdateFirst();
@@ -162,7 +169,9 @@ namespace PA_MultiplayerGalacticWar
 				Game.Instance.Close();
 			}
         }
+		#endregion
 
+		#region Cleanup
 		public override void End()
 		{
 			base.End();
@@ -172,5 +181,6 @@ namespace PA_MultiplayerGalacticWar
 			Remove( Button_Load );
 			Remove( Button_Quit );
 		}
+		#endregion
 	}
 }
