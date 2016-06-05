@@ -6,6 +6,7 @@
 using Otter;
 using System;
 using System.IO;
+using System.IO.Compression;
 using System.Collections.Generic;
 #endregion
 
@@ -47,6 +48,65 @@ namespace PA_MultiplayerGalacticWar
 					Directory.CreateDirectory( currentdir );
 				}
             }
+		}
+
+		// Copy all directories and files from source to destination, with overwriting
+		static public void CopyDirectory( string sourcepath, string destpath )
+		{
+			foreach ( string sourcedir in Directory.GetDirectories( sourcepath ) )
+			{
+				// Get appended for destination
+				string destdir = sourcedir.Remove( 0, sourcepath.Length );
+				// Remove any double slashes
+				destdir = destdir.Replace( "//", "/" );
+				destdir = destdir.Replace( "\\", "/" );
+				// Recurse
+				CopyDirectory( sourcedir, destpath + destdir );
+			}
+
+			foreach ( string sourcefile in Directory.GetFiles( sourcepath ) )
+			{
+				// Remove any double slashes
+				string file;
+				file = sourcefile.Replace( "//", "/" );
+				file = sourcefile.Replace( "\\", "/" );
+
+				// Get appended for destination & copy
+				string destfile = destpath + file.Remove( 0, sourcepath.Length );
+
+				// Delete the file if it already exists, as File.Copy doesn't handle overwriting
+				if ( File.Exists( destfile ) )
+				{
+					File.Delete( destfile );
+				}
+
+				// Copy the source file to the destination
+				CreateDirectory( destfile );
+				File.Copy( file, destfile );
+			}
+		}
+
+		// Creates a zip file in a destination from a source directory
+		static public void ZipDirectory( string sourcepath, string destpath = "" )
+		{
+			// Default to same directory
+			if ( destpath == "" )
+			{
+				destpath = sourcepath;
+			}
+
+			// Remove last slash and add .zip file extension
+			destpath = destpath.Remove( destpath.Length - 1, 1 );
+			destpath += ".zip";
+
+			// Delete file if pre-existing
+			if ( File.Exists( destpath ) )
+			{
+				File.Delete( destpath );
+			}
+
+			// Compress
+			ZipFile.CreateFromDirectory( sourcepath, destpath );
 		}
 
 		// Load files as strings

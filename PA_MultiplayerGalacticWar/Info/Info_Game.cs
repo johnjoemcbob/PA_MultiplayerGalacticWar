@@ -47,6 +47,7 @@ namespace PA_MultiplayerGalacticWar
 		#endregion
 
 		#region Saving
+		// Prepares the current galaxy state for file output
 		public void SaveGalaxy( Entity.Entity_Galaxy galaxy )
 		{
 			Galaxy.StarSystems = new List<StarSystemType>();
@@ -81,6 +82,7 @@ namespace PA_MultiplayerGalacticWar
 			}
 		}
 
+		// Prepares the current player state for file output
 		public void SavePlayers( List<Info_Player> players, bool update = true )
 		{
 			if ( !update ) return;

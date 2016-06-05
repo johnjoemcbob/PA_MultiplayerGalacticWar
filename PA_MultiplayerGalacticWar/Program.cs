@@ -32,7 +32,7 @@ namespace PA_MultiplayerGalacticWar
 
 		// File directory paths
 		static public string PATH_PA = "C:/Program Files (x86)/Steam/steamapps/common/Planetary Annihilation Titans/";
-		static public string PATH_MOD = "C:/Users/mcorm/AppData/Local/Uber Entertainment/Planetary Annihilation/server_mods/com.pa.startege.TCommander/";
+		static public string PATH_MOD = "C:/Users/mcorm/AppData/Local/Uber Entertainment/Planetary Annihilation/download/com.pa.johnjoemcbob.MultiplayerGalacticWar/";
 		static public string PATH_BASE = "resources/json_base/";
 		static public string[] PATH_COMMANDER = new string[] {
 			"imperial_invictus/imperial_invictus",

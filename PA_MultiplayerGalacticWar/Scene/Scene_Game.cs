@@ -435,11 +435,10 @@ namespace PA_MultiplayerGalacticWar
 
 		public void ThreadSaveGame()
 		{
-			// Save player states
+			// Save player states for mod
 			foreach ( Info_Player player in CurrentPlayers )
 			{
-				player.SaveCommander();
-				player.SaveArmy();
+				player.SaveMod();
 			}
 
 			// Save game state

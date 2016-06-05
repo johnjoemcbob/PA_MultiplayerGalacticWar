@@ -1,0 +1,24 @@
+{
+	"enabled": true,
+	"context": "server",
+	"identifier": "com.pa.johnjoemcbob.MultiplayerGalacticWar",
+	"display_name": "Multiplayer Galactic War",
+	"description": "Multiplayer Galactic War",
+	"author": "johnjoemcbob",
+	"version": "1.0",
+	"build": "88288",
+	"date": "2015/10/04",
+	"signature": "not yet implemented",
+	"forum": "https://forums.uberent.com/threads/wip-multiplayer-galactic-war-campaign.71705/",
+	"category": [
+		"server-mod",
+		"units",
+		"game-mode"
+	],
+	"id": "",
+	"icon": "",
+	"priority": 21,
+    "scenes": {
+        "live_game": ["coui://ui/mods/gMultiplayerGalacticWar/live_game.js"]
+    },
+}

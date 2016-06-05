@@ -68,9 +68,9 @@ namespace PA_MultiplayerGalacticWar
 		{
 			LoadCommander();
 			LoadArmy();
-        }
+		}
 
-        public void LoadCommander()
+		public void LoadCommander()
 		{
 			// Read file
 			String json = Helper.ReadFile( Program.PATH_BASE + GetFilePath() );
@@ -167,6 +167,22 @@ namespace PA_MultiplayerGalacticWar
 		#endregion
 
 		#region Save Data
+		public void SaveMod()
+		{
+			// Ensure all the appropriate directories exist
+			Helper.CreateDirectory( Program.PATH_MOD + GetFilePath() );
+
+			// Setup the mod directory (i.e. copy all from json_base to mod directory)
+			Helper.CopyDirectory( "resources/json_base/", Program.PATH_MOD );
+			Helper.ZipDirectory( Program.PATH_MOD );
+
+			// Add to mount order
+
+			// Save new data
+			SaveCommander();
+			SaveArmy();
+		}
+
 		public void SaveCommander()
 		{
 			// Write back out
