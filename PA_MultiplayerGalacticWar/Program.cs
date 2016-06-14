@@ -23,11 +23,9 @@ namespace PA_MultiplayerGalacticWar
 		//static public Music Music;
 
 		// Loaded upgrade cards (raw json string)
-		static public List<string> Cards_Loaded_Commander;
 		static public List<string> Cards_Loaded_Unit;
 
 		// Cards applied to each commander (deserialized json dynamic)
-		static public List<dynamic> Cards_Commander = new List<dynamic>();
 		static public List<dynamic> Cards = new List<dynamic>();
 
 		// File directory paths
@@ -60,15 +58,6 @@ namespace PA_MultiplayerGalacticWar
 
 			// Load JSON
 			{
-				Cards_Loaded_Commander = LoadCards( "resources/json_cards/commander/" );
-				{
-					foreach ( string json_card in Cards_Loaded_Commander )
-					{
-						dynamic card_commander = JsonConvert.DeserializeObject( json_card );
-						// Add to card container
-						Cards_Commander.Add( card_commander );
-					}
-				}
 				Cards_Loaded_Unit = LoadCards( "resources/json_cards/" );
 				{
 					foreach ( string json_card in Cards_Loaded_Unit )
@@ -78,12 +67,6 @@ namespace PA_MultiplayerGalacticWar
 						Cards.Add( card );
 					}
 				}
-
-				//SetupCommander( PATH_INVICTUS, Commander_Cards_Invictus );
-				//SetupCommander( PATH_OSIRIS, Commander_Cards_Osiris );
-				//SetupCommander( PATH_CENTURION, Commander_Cards_Centurion );
-
-				//SetupArmies( PATH_PA + "media/pa/units/", new int[]{ 0, 1, 2, 3, 4, 5 } );
 			}
 
 			// Start up in the choose game scene

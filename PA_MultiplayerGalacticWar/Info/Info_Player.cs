@@ -119,7 +119,7 @@ namespace PA_MultiplayerGalacticWar
 		{
 			foreach ( string cardname in cards )
 			{
-				foreach ( dynamic card in Program.Cards_Commander )
+				foreach ( dynamic card in Program.Cards )
 				{
 					if ( card["display_name"].Value == cardname )
 					{

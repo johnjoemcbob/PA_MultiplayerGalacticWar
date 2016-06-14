@@ -39,6 +39,7 @@ namespace PA_MultiplayerGalacticWar
 		#region Variable Declaration: Networking
 		// Networking
 		private string IPToConnect = "";
+		private JObject[] CurrentPossibleRewardCards;
 		#endregion
 		#region Variable Declaration: UI
 		private List<Entity_UIPanel_Card> PossibleCards = new List<Entity_UIPanel_Card>();
@@ -172,7 +173,7 @@ namespace PA_MultiplayerGalacticWar
 		#endregion
 
 		#region Cards
-		public void PickCard( Entity_UIPanel_Card pickedcard )
+		public void HideCards()
 		{
 			// Remove all cards UI from the screen
 			foreach ( Entity_UIPanel_Card card in PossibleCards )
@@ -182,9 +183,13 @@ namespace PA_MultiplayerGalacticWar
 					Remove( card );
 				}
 			}
+		}
 
+		public void PickCard( string cardname )
+		{
 			// Apply this card to the winning player
-			CurrentGame.Commanders[Program.ThisPlayer].CommanderCards.Add( pickedcard.Label );
+			CurrentGame.Commanders[Program.ThisPlayer].CommanderCards.Add( cardname );
+			Console.WriteLine( "added " + cardname );
 		}
 
 		private void ApplyCards( Info_Player player, List<string> commandercards, List<string> cards )
@@ -198,14 +203,21 @@ namespace PA_MultiplayerGalacticWar
 			Info_Player.EndSetupArmy( Program.PATH_PA + "media/pa/units/" );
 		}
 
-		// Called when a player wins a match on the client of that player; to give the choice of rewards
-		public void RewardSelection()
+		// Called when a player wins a match, on the server; to choose rewards and send to winning client
+		public void RewardSelection( int player = 0 )
 		{
-			List<dynamic> cards_all = RewardSelection_GetPossibleCards();
+			List<dynamic> cards_all = RewardSelection_GetPossibleCards( player );
 
 			// Choose from possible using weightings
-			JObject[] cards_possiblereward = RewardSelection_ChooseCards( cards_all );
+			CurrentPossibleRewardCards = RewardSelection_ChooseCards( cards_all );
 
+			// Send to winning player's client
+			NetworkManager.SendWinCards( player, CurrentPossibleRewardCards );
+		}
+
+		// Called when a player wins a match, on their client; to give the choice of rewards
+		public void RewardSelection_ReceiveCards( JObject[] cards_possiblereward )
+		{
 			// Display these cards to the player for selection
 			int[] card_position = new int[] { -256, 0, 256 };
 			for ( int card = 0; card < CARD_REWARD_MAX; card++ )
@@ -215,7 +227,9 @@ namespace PA_MultiplayerGalacticWar
 				PossibleCards.Add( new Entity_UIPanel_Card(
 					card_position[card], 0,
 					cards_possiblereward[card]["display_name"].ToString(),
-					cards_possiblereward[card]["description"].ToString()
+					cards_possiblereward[card]["description"].ToString(),
+					"",
+					cards_possiblereward[card]
 				) );
 			}
 			foreach ( Entity_UIPanel_Card card in PossibleCards )
@@ -224,11 +238,11 @@ namespace PA_MultiplayerGalacticWar
 			}
 		}
 
-		// Called when calculating rewards, to find a list of all possibilities
-		private List<dynamic> RewardSelection_GetPossibleCards()
+		// Called when calculating rewards; to find a list of all possibilities
+		private List<dynamic> RewardSelection_GetPossibleCards( int player = 0 )
 		{
 			// Find all cards (make a copy to remove elements from)
-			List<dynamic> cards_all = new List<dynamic>( Program.Cards_Commander );
+			List<dynamic> cards_all = new List<dynamic>( Program.Cards );
 			{
 				// Choose possible (i.e. some can only be unlocked once)
 				List<dynamic> cards_toremove = new List<dynamic>();
@@ -237,7 +251,7 @@ namespace PA_MultiplayerGalacticWar
 					string cardname = card["display_name"].ToString();
 					int alreadypossessed = 0;
 					{
-						foreach ( string possessedcard in CurrentGame.Commanders[Program.ThisPlayer].CommanderCards )
+						foreach ( string possessedcard in CurrentGame.Commanders[player].CommanderCards )
 						{
 							if ( possessedcard == cardname )
 							{
@@ -259,28 +273,68 @@ namespace PA_MultiplayerGalacticWar
 			return cards_all;
 		}
 
-		// Called when calculating rewards, to choose a few from all possibilities
+		// Called when calculating rewards; to choose a few from all possibilities
 		private JObject[] RewardSelection_ChooseCards( List<dynamic> cards_all )
 		{
 			JObject[] cards_possiblereward = new JObject[CARD_REWARD_MAX];
 			{
+				// Sum all probabilities
+				int probablesum = 0;
+                foreach ( JObject probablecard in cards_all )
+				{
+                    probablesum += GetCardProbability( probablecard );
+				}
+
+				// Choose cards
 				for ( int card = 0; card < CARD_REWARD_MAX; card++ )
 				{
 					if ( cards_all.Count == 0 ) break;
 
-					// Count all probability
-					// Get random number
-					// Calculate card from number and list of probabilities
+					// Get random probable number
+					int probablerand = Rand.Int( probablesum );
 
-					// Choose a card
+					// Calculate card from probable number and list of probabilities
 					JObject cardjson = cards_all.RandomElement();
+					int probablecurrent = 0;
+					foreach ( JObject probablecard in cards_all )
+					{
+						probablecurrent += GetCardProbability( probablecard );
+						if ( probablecurrent >= probablerand )
+						{
+							cardjson = probablecard;
+							break;
+						}
+					}
 
-					// Remove it from current possible and add to the visible
-					cards_all.Remove( cardjson );
+					// Remove it from current possible and probability, then add to the visible
+					probablesum -= GetCardProbability( cardjson );
+                    cards_all.Remove( cardjson );
 					cards_possiblereward[card] = cardjson;
 				}
 			}
 			return cards_possiblereward;
+		}
+
+		// Called when the server receives a pick card request; to check the card picked was of the offered three
+		public bool CheckChosenCard( string cardname )
+		{
+			foreach ( JObject card in CurrentPossibleRewardCards )
+			{
+				if ( card["display_name"].ToString() == cardname )
+				{
+					return true;
+				}
+			}
+			return false;
+		}
+
+		static int GetCardProbability( JObject card )
+		{
+			int prob = 0;
+			{
+				int.TryParse( card["probability"].ToString(), out prob );
+			}
+			return prob;
 		}
 		#endregion
 
@@ -554,14 +608,17 @@ namespace PA_MultiplayerGalacticWar
 			}
 			CurrentGame.TurnHistory.Add( turn );
 		}
+
 		public int GetPlayerTurn()
 		{
 			return CurrentGame.CurrentTurn;
 		}
+
 		public bool GetIsPlayerTurn( int player )
 		{
 			return ( GetPlayerTurn() == player );
 		}
+
 		public void SetNextPlayerTurn()
 		{
 			CurrentGame.CurrentTurn++;
@@ -572,6 +629,7 @@ namespace PA_MultiplayerGalacticWar
 			}
 			SetPlayerTurn( CurrentGame.CurrentTurn );
 		}
+
 		public void SetPlayerTurn( int turn )
 		{
 			CurrentGame.CurrentTurn = turn;
@@ -585,6 +643,7 @@ namespace PA_MultiplayerGalacticWar
 			//	system.SetSelected( false );
 			//}
 		}
+
 		public void PlayTurnSwitch()
 		{
 			// Show turn switch UI

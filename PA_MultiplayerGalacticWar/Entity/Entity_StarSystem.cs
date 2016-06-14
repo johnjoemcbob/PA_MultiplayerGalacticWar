@@ -449,7 +449,7 @@ namespace PA_MultiplayerGalacticWar.Entity
 			if ( HasPlayerArmy == null ) return;
 
 			Console.WriteLine( "WAR " + Name );
-			( (Scene_Game) Scene.Instance ).SaveGame();
+			//( (Scene_Game) Scene.Instance ).SaveGame();
 			AfterAction();
 		}
 

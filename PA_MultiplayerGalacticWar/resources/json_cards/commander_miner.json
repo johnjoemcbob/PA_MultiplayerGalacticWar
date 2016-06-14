@@ -2,9 +2,13 @@
 	"display_name":"Foreman Commander",
 	"description":"Your commander becomes specialised in producing metal.\n\nGain a 100% increase to base metal production.",
 	"stack_limit":1,
-	"probability":9,
-	"production":{
-		"energy":0.0,
-		"metal":200.0
+	"probability":90,
+	"effects":{
+		"commander":{
+			"production":{
+				"energy":0.0,
+				"metal":200.0
+			}
+		}
 	}
 }

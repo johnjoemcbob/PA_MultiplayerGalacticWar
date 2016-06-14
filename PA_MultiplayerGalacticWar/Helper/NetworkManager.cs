@@ -8,6 +8,7 @@ using System;
 using System.Net;
 using System.Net.NetworkInformation;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Lidgren.Network;
 #endregion
 
@@ -28,6 +29,9 @@ namespace PA_MultiplayerGalacticWar
 		public const int MESSAGE_PLAYERID = 1;
 		public const int MESSAGE_TURN_REQUEST = 2;
 		public const int MESSAGE_TURN_CONFIRM = 3;
+		public const int MESSAGE_CARD_DISPLAYWIN = 4;
+		public const int MESSAGE_CARD_TRYPICK = 5;
+		public const int MESSAGE_CARD_CONFIRM = 6;
 
 		static public string ApplicationName = "Galactic War";
 		static public int Port = 25001;
@@ -134,6 +138,7 @@ namespace PA_MultiplayerGalacticWar
 			// Handle custom messages
 			int id = message.ReadInt32();
 			string datastr;
+			string cardname;
 
 			// Parse message
 			switch ( id )
@@ -160,6 +165,36 @@ namespace PA_MultiplayerGalacticWar
 					Helper.GetGameScene().DoTurn( turnconfirm.Action, turnconfirm.System, turnconfirm.Player, turnconfirm.Army );
 
 					break;
+				case MESSAGE_CARD_DISPLAYWIN:
+					string[] cards = new string[3];
+					JObject[] cards_json = new JObject[3];
+					{
+						for ( int card = 0; card < 3; card++ )
+						{
+							cards[card] = message.ReadString();
+							cards_json[card] = (JObject) JsonConvert.DeserializeObject( cards[card] );
+						}
+					}
+					Helper.GetGameScene().RewardSelection_ReceiveCards( cards_json );
+
+					break;
+				case MESSAGE_CARD_TRYPICK:
+					cardname = message.ReadString();
+					// Check against cards originally sent
+					bool real = Helper.GetGameScene().CheckChosenCard( cardname );
+					if ( !real )
+					{
+						cardname = "";
+						Console.WriteLine( "Card denied by server." );
+					}
+					SendCardConfirm( message.SenderConnection, cardname );
+
+					break;
+				case MESSAGE_CARD_CONFIRM:
+					cardname = message.ReadString();
+					Helper.GetGameScene().PickCard( cardname );
+
+					break;
 				default:
 					break;
 			}
@@ -184,6 +219,7 @@ namespace PA_MultiplayerGalacticWar
 		#endregion
 
 		#region Message Sending
+		#region Message Sending: Helper
 		static public void SendMessage( NetConnection sendto, NetOutgoingMessage msg )
 		{
 			NetworkHandler.SendMessage( msg, sendto, NetDeliveryMethod.ReliableOrdered );
@@ -206,6 +242,7 @@ namespace PA_MultiplayerGalacticWar
 			}
 			SendMessage( sendto, msg );
         }
+		#endregion
 
 		static public void SendInitialState( NetConnection sendto )
 		{
@@ -222,6 +259,7 @@ namespace PA_MultiplayerGalacticWar
 			SendString( sendto, MESSAGE_INITIAL, game.GetNetworkString() );
         }
 
+		#region Message Sending: Turns
 		static public void SendTurnRequest( int action, int system, int player, int playerarmy )
 		{
 			if ( NetworkHandler == null ) return;
@@ -229,13 +267,11 @@ namespace PA_MultiplayerGalacticWar
 			if ( Server )
 			{
 				// Server host has no need to confirm, skip straight to sending the confirmed turns to all clients
-				Console.WriteLine( "HOST is skipping turn request" );
 				SendTurnConfirm( action, system, player, playerarmy );
             }
 			else
 			{
 				// Client sends to server to confirm action
-				Console.WriteLine( "CLIENT is doing turn request" );
 				NetworkTurnType turn = new NetworkTurnType();
 				{
 					turn.Action = action;
@@ -270,7 +306,63 @@ namespace PA_MultiplayerGalacticWar
 			{
 				SendString( connection, MESSAGE_TURN_CONFIRM, turndata );
 			}
+
+			// TEMP Testing
+			if ( action == Helper.ACTION_WAR )
+			{
+				Helper.GetGameScene().RewardSelection( player );
+			}
 		}
+		#endregion
+
+		#region Message Sending: Cards
+		static public void SendWinCards( int player, JObject[] cards )
+		{
+			if ( !Server ) return;
+
+			// Winning player is server host, skip sending data
+			if ( player == Program.ThisPlayer )
+			{
+				Helper.GetGameScene().RewardSelection_ReceiveCards( cards );
+			}
+			else
+			{
+				NetOutgoingMessage message = StartDefaultMessage( MESSAGE_CARD_DISPLAYWIN );
+				{
+					for ( int card = 0; card < 3; card++ )
+					{
+						message.Write( JsonConvert.SerializeObject( cards[card] ) );
+					}
+				}
+				SendMessage( NetworkHandler.Connections[player - 1], message );
+			}
+		}
+
+		static public void SendPickCard( string card )
+		{
+			if ( Server )
+			{
+				Helper.GetGameScene().PickCard( card );
+			}
+			else
+			{
+				NetOutgoingMessage message = StartDefaultMessage( MESSAGE_CARD_TRYPICK );
+				{
+					message.Write( card );
+				}
+				SendMessage( NetworkHandler.Connections[0], message );
+			}
+		}
+
+		static public void SendCardConfirm( NetConnection sendto, string cardname )
+		{
+			NetOutgoingMessage message = StartDefaultMessage( MESSAGE_CARD_CONFIRM );
+			{
+				message.Write( cardname );
+			}
+			SendMessage( sendto, message );
+		}
+		#endregion
 		#endregion
 
 		// From: https://softwarebydefault.com/2013/02/22/port-in-use/

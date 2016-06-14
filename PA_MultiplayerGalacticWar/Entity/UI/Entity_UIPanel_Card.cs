@@ -5,6 +5,7 @@
 #region Includes
 using Otter;
 using System;
+using Newtonsoft.Json.Linq;
 #endregion
 
 namespace PA_MultiplayerGalacticWar.Entity
@@ -16,6 +17,7 @@ namespace PA_MultiplayerGalacticWar.Entity
 		public string Label = "Test Card";
 		public string Description = "Description Text\nYeah!";
 		public string IconFile = "";
+		public JObject JSONData = null;
 
 		// Card individual elements
 		private Entity_Image Image_Background;
@@ -28,21 +30,21 @@ namespace PA_MultiplayerGalacticWar.Entity
 
 		#region Initialise
 		// Constructor: Position the card & initialise
-		public Entity_UIPanel_Card( float x, float y, string label = "Test Card", string description = "Description", string iconfile = "" )
+		public Entity_UIPanel_Card( float x, float y, string label = "Test Card", string description = "Description", string iconfile = "", JObject data = null )
 		{
 			X = x;
 			Y = y;
-			Initialise( label, description, iconfile );
+			Initialise( label, description, iconfile, data );
         }
 
 		// Constructor: Initialise
-		public Entity_UIPanel_Card( string label = "Test Card", string description = "Description", string iconfile = "" )
+		public Entity_UIPanel_Card( string label = "Test Card", string description = "Description", string iconfile = "", JObject data = null )
 		{
-			Initialise( label, description, iconfile );
+			Initialise( label, description, iconfile, data );
 		}
 
 		// Called from constructor: Initialise visual information variables
-		private void Initialise( string label, string description, string iconfile )
+		private void Initialise( string label, string description, string iconfile, JObject data )
 		{
 			if ( iconfile == "" )
 			{
@@ -52,6 +54,7 @@ namespace PA_MultiplayerGalacticWar.Entity
 			Label = label;
 			Description = description;
 			IconFile = iconfile;
+			JSONData = data;
 		}
 
 		// Added To Scene: Initialise individual elements
@@ -120,9 +123,8 @@ namespace PA_MultiplayerGalacticWar.Entity
 				};
 				Button_Choose.OnReleased = delegate ( Entity_UI_Button self )
 				{
-					Console.WriteLine( "added " + Label );
-					Helper.GetGameScene().PickCard( this );
-					Scene.Instance.Remove( this );
+					NetworkManager.SendPickCard( Label );
+					Helper.GetGameScene().HideCards();
 					AudioManager.PlaySound( "resources/audio/ui_click.wav" );
 				};
 

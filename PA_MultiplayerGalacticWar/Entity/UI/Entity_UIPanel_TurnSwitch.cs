@@ -105,6 +105,7 @@ namespace PA_MultiplayerGalacticWar.Entity
 				X += ( dist * Game.Instance.Width );
 
 				Text_Label.Shader.SetParameter( "time", time / maxtime );
+				Text_Label.ScaleX = 1 + dist;
 
 				if ( time >= maxtime )
 				{
@@ -133,6 +134,7 @@ namespace PA_MultiplayerGalacticWar.Entity
 				X -= ( dist * Game.Instance.Width );
 
 				Text_Label.Shader.SetParameter( "time", 1 - ( time / maxtime ) );
+				Text_Label.ScaleX = 1 + dist;
 
 				if ( time >= maxtime )
 				{

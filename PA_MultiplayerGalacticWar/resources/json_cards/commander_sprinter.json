@@ -1,0 +1,32 @@
+{
+	"display_name":"Sprinter Upgrade",
+	"description":"Your commander becomes specialised in agility.\n\nGain a 10% increase to base commander speed",
+	"stack_limit":10,
+	"probability":100,
+	"effects":{
+		"commander":{
+			"navigation":{
+				"type":"amphibious",
+				"acceleration":0,
+				"brake":0,
+				"move_speed":10,
+				"turn_speed":0,
+				"turn_in_place":false,
+				"park_stamp":{
+					"shape":"sphere",
+					"cost":0,
+					"type_data":[
+						{
+							"move_type":"land-small",
+							"stamp_type":"simple"
+						},
+						{
+							"move_type":"amphibious",
+							"stamp_type":"simple"
+						}
+					]
+				}
+			}
+		}
+	}
+}
