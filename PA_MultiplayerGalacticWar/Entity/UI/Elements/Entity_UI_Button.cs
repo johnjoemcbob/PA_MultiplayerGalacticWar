@@ -54,7 +54,7 @@ namespace PA_MultiplayerGalacticWar.Entity
 			OnHover = delegate ( Entity_UI_Button self )
 			{
 				Image.image.Color = Colour_Hover;
-				AudioManager.PlaySound( "resources/audio/ui_hover.wav" );
+				AudioManager.Instance.PlaySound( "resources/audio/ui_hover.wav" );
 			};
 			OnUnHover = delegate ( Entity_UI_Button self )
 			{

@@ -20,7 +20,7 @@ namespace PA_MultiplayerGalacticWar
 
 		static public float CloseTime = -1;
 		static public bool Clicked = false;
-		//static public Music Music;
+		static public Music Music;
 
 		// Loaded upgrade cards (raw json string)
 		static public List<string> Cards_Loaded_Unit;
@@ -53,8 +53,6 @@ namespace PA_MultiplayerGalacticWar
 			{
 				//game.MouseVisible = true;
 			}
-			//Music = AudioManager.PlayMusic( "resources/audio/music.ogg" );
-			//Music.Volume = 0.2f;
 
 			// Load JSON
 			{
@@ -69,15 +67,19 @@ namespace PA_MultiplayerGalacticWar
 				}
 			}
 
+			// Start audiomanager
+			AudioManager AudioManager = new AudioManager();
+			{
+				Music = AudioManager.PlayMusic( "resources/audio/music.ogg" );
+				Music.Volume = 0.2f;
+			}
+
 			// Start up in the choose game scene
 			game.Start( new Scene_ChooseGame() );
 
 			// Cleanup
 			AudioManager.Cleanup();
 			NetworkManager.Cleanup();
-			//Music.Stop();
-			//Music.Dispose();
-			//Music = null;
         }
 
 		static List<string> LoadCards( string directory )

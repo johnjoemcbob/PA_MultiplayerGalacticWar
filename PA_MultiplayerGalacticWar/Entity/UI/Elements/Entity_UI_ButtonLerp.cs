@@ -36,7 +36,7 @@ namespace PA_MultiplayerGalacticWar.Entity
 			OnHover = delegate ( Entity_UI_Button self )
 			{
                 Image.image.Color = Colour_Hover;
-				AudioManager.PlaySound( "resources/audio/ui_hover.wav" );
+				AudioManager.Instance.PlaySound( "resources/audio/ui_hover.wav" );
 
 				Entity_UI_ButtonLerp selfl = (Entity_UI_ButtonLerp) self;
 				{
@@ -56,7 +56,7 @@ namespace PA_MultiplayerGalacticWar.Entity
 
 					if ( Sound_Hover == null )
 					{
-						Sound_Hover = AudioManager.PlaySound( "resources/audio/ui_hover_loop.wav" );
+						Sound_Hover = AudioManager.Instance.PlaySound( "resources/audio/ui_hover_loop.wav" );
 						Sound_Hover.Volume = 0.2f + Math.Abs( Game.Instance.Input.MouseDeltaX * 0.2f ) + Math.Abs( Game.Instance.Input.MouseDeltaX * 0.2f );
 						Sound_Hover.Pitch = 0.9f + ( mouse.X * 0.1f ) + ( mouse.Y * 0.1f );
 					}

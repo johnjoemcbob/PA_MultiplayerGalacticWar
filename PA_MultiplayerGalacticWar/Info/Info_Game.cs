@@ -141,7 +141,10 @@ namespace PA_MultiplayerGalacticWar
 			}
 
 			// Remove old player data
-			Commanders.Clear();
+			if ( Commanders != null )
+			{
+				Commanders.Clear();
+			}
 
 			// Add this new data
 			Commanders = new List<CommanderType>( commanders );

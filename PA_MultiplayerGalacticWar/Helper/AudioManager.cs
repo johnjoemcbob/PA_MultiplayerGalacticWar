@@ -12,12 +12,21 @@ namespace PA_MultiplayerGalacticWar
 	class AudioManager
 	{
 		#region Variable Declaration
-		static public Dictionary<string, Sound> Sounds = new Dictionary<string, Sound>();
-		//static public Dictionary<string, Music> Musics = new Dictionary<string, Music>();
+		public static AudioManager Instance;
+
+		public Dictionary<string, Sound> Sounds = new Dictionary<string, Sound>();
+		public Dictionary<string, Music> Musics = new Dictionary<string, Music>();
+		#endregion
+
+		#region Initialise
+		public AudioManager()
+		{
+			Instance = this;
+		}
 		#endregion
 
 		#region Play Audio
-		static public Sound PlaySound( string path, bool looping = false )
+		public Sound PlaySound( string path, bool looping = false )
 		{
 			if ( Sounds == null ) return null;
 
@@ -29,29 +38,29 @@ namespace PA_MultiplayerGalacticWar
 
 			// Play the sound
 			Sounds[path].Loop = looping;
-			//Sounds[path].Play();
+			Sounds[path].Play();
 			return Sounds[path];
 		}
 
-		//static public Music PlayMusic( string path, bool looping = true )
-		//{
-		//	if ( Musics == null ) return null;
+		public Music PlayMusic( string path, bool looping = true )
+		{
+			if ( Musics == null ) return null;
 
-		//	// Load and store the sound if first play
-		//	if ( !Musics.ContainsKey( path ) )
-		//	{
-		//		Musics.Add( path, new Music( path ) );
-		//	}
+			// Load and store the sound if first play
+			if ( !Musics.ContainsKey( path ) )
+			{
+				Musics.Add( path, new Music( path ) );
+			}
 
-		//	// Play the sound
-		//	Musics[path].Loop = looping;
-		//          Musics[path].Play();
-		//	return Musics[path];
-		//}
+			// Play the sound
+			Musics[path].Loop = looping;
+			Musics[path].Play();
+			return Musics[path];
+		}
 		#endregion
 
 		#region Cleanup
-		static public void Cleanup()
+		public void Cleanup()
 		{
 			if ( Sounds != null )
 			{
@@ -62,16 +71,16 @@ namespace PA_MultiplayerGalacticWar
 				Sounds.Clear();
 				Sounds = null;
 			}
-			//if ( Musics != null )
-			//{
-			//	foreach ( KeyValuePair<string, Music> music in Musics )
-			//	{
-			//		music.Value.Stop();
-			//		music.Value.Dispose();
-			//	}
-			//	Musics.Clear();
-			//	Musics = null;
-			//}
+			if ( Musics != null )
+			{
+				foreach ( KeyValuePair<string, Music> music in Musics )
+				{
+					music.Value.Stop();
+					music.Value.Dispose();
+				}
+				Musics.Clear();
+				Musics = null;
+			}
 		}
 		#endregion
 	}

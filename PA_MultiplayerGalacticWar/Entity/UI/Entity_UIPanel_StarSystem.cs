@@ -145,12 +145,12 @@ namespace PA_MultiplayerGalacticWar.Entity
 				Button_Action.OnPressed = delegate ( Entity_UI_Button self )
 				{
 					self.Image.image.Color = self.Colour_Hover * Color.Gray;
-					AudioManager.PlaySound( "resources/audio/ui_click.wav" );
+					AudioManager.Instance.PlaySound( "resources/audio/ui_click.wav" );
 				};
 				Button_Action.OnReleased = delegate ( Entity_UI_Button self )
 				{
 					System.TryAction_Move();
-					AudioManager.PlaySound( "resources/audio/ui_click.wav" );
+					AudioManager.Instance.PlaySound( "resources/audio/ui_click.wav" );
 				};
 			}
 			// WAR
@@ -164,12 +164,12 @@ namespace PA_MultiplayerGalacticWar.Entity
 				Button_Action.OnPressed = delegate ( Entity_UI_Button self )
 				{
 					self.Image.image.Color = self.Colour_Hover * Color.Gray;
-					AudioManager.PlaySound( "resources/audio/ui_click.wav" );
+					AudioManager.Instance.PlaySound( "resources/audio/ui_click.wav" );
 				};
 				Button_Action.OnReleased = delegate ( Entity_UI_Button self )
 				{
 					System.TryAction_War();
-					AudioManager.PlaySound( "resources/audio/ui_click.wav" );
+					AudioManager.Instance.PlaySound( "resources/audio/ui_click.wav" );
 				};
 			}
 		}

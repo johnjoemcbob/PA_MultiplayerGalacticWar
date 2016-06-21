@@ -54,7 +54,7 @@ namespace PA_MultiplayerGalacticWar.Entity
 				Icon.Color = new Otter.Color( Info.Commander.Colour );
 			}
 
-			Sound_Move = AudioManager.PlaySound( "resources/audio/player_move_loop.wav", true );
+			Sound_Move = AudioManager.Instance.PlaySound( "resources/audio/player_move_loop.wav", true );
 			Sound_Move.Volume = 0.1f;
 
 			Visible = false;

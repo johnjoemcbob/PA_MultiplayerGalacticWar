@@ -367,6 +367,8 @@ namespace PA_MultiplayerGalacticWar.Entity
 		// To find the closest other star system within a group (i.e. to link two groups together)
 		private Vector2 Generate_FindClosestNeighbour( int system, List<int> neighbours = null )
 		{
+			if ( ( system < 0 ) || ( system >= StarPositions.Count ) ) return new Vector2( -1, -1 );
+
 			int index = -1;
 			int otherid = 0;
 			float mindistance = -1;
